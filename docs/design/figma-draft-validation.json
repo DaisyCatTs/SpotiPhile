@@ -1,0 +1,56 @@
+{
+  "scope": "Structural draft audit and manually reviewed PNG exports, not design-system completion",
+  "audits": [
+    {
+      "root": "4:2",
+      "theme": "dark",
+      "width": 1280,
+      "counts": {
+        "FRAME": 83,
+        "TEXT": 76
+      },
+      "fonts": [
+        "Inter"
+      ],
+      "overflow": [],
+      "editableText": true,
+      "imageNodes": 0,
+      "componentized": false,
+      "tokenBindings": false
+    },
+    {
+      "root": "4:161",
+      "theme": "light",
+      "width": 1280,
+      "counts": {
+        "FRAME": 83,
+        "TEXT": 76
+      },
+      "fonts": [
+        "Inter"
+      ],
+      "overflow": [],
+      "editableText": true,
+      "imageNodes": 0,
+      "componentized": false,
+      "tokenBindings": false
+    },
+    {
+      "root": "4:320",
+      "theme": "oled",
+      "width": 760,
+      "counts": {
+        "FRAME": 64,
+        "TEXT": 53
+      },
+      "fonts": [
+        "Inter"
+      ],
+      "overflow": [],
+      "editableText": true,
+      "imageNodes": 0,
+      "componentized": false,
+      "tokenBindings": false
+    }
+  ]
+}

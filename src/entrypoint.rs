@@ -773,7 +773,7 @@ fn native_options(
         app_icon()
     };
     let viewport = egui::ViewportBuilder::default()
-        .with_title("Spotifast")
+        .with_title("Spotiphile")
         .with_app_id(app_id)
         .with_taskbar(true)
         .with_icon(icon);

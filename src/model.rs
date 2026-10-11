@@ -838,6 +838,8 @@ pub enum RowContext {
 /// Track data held during a drag.
 #[derive(Clone, Debug)]
 pub struct DragTrack {
+    /// Queue occurrence indexes and their manual order at drag start.
+    pub queue_rows: Option<(Vec<usize>, Vec<String>)>,
     pub title: String,
     /// Cover art for the drag preview.
     pub image: Option<String>,
@@ -973,6 +975,15 @@ pub enum Action {
         uri: String,
         label: String,
     },
+    /// Insert playable rows before the manual queue on the active local player.
+    /// Unlike a drag insert, this must never fall back to remote append.
+    PlayNext {
+        items: Vec<PlayableItem>,
+    },
+    /// Append playable rows to the manual queue, before context continuation.
+    PlayLater {
+        items: Vec<PlayableItem>,
+    },
     ToggleSaved(String),
     /// Queue several songs in order and show one notification.
     QueueMany {
@@ -985,6 +996,24 @@ pub enum Action {
         from: usize,
         to: usize,
     },
+    /// Move one occurrence to an edge only while the shown manual queue is current.
+    MoveQueueToEdge {
+        index: usize,
+        expected_queue: Vec<String>,
+        to_end: bool,
+    },
+    RemoveQueueRows {
+        rows: Vec<usize>,
+        expected_queue: Vec<String>,
+    },
+    MoveQueueRows {
+        rows: Vec<usize>,
+        position: usize,
+        expected_queue: Vec<String>,
+    },
+    PasteQueue(String),
+    UndoQueue,
+    RedoQueue,
     /// Insert dragged songs into "Playing next" at a position, instead of
     /// always appending like `QueueMany`. Falls back to appending when the
     /// local player is not the active target.
@@ -1104,6 +1133,9 @@ pub enum Action {
     InstallUpdate,
     SettingsChanged,
     SetTheme(crate::settings::ThemeChoice),
+    SetOledTheme,
+    SetAccent(crate::settings::AccentChoice),
+    SetDensity(crate::settings::DensityChoice),
     /// Draw the interface in this language from the next frame on.
     SetLanguage(crate::settings::LanguageChoice),
     OpenThemesFolder,

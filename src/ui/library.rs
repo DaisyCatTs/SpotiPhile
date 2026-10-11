@@ -34,8 +34,26 @@ pub fn show(app: &mut App, ui: &mut egui::Ui, page: Page) {
             gettext(locale, "Saved episodes appear here."),
         ),
     };
-    theme::text(ui, title.as_ref(), theme::bold(28.0), palette.text);
-    ui.add_space(14.0);
+    theme::text(ui, title.as_ref(), theme::bold(24.0), palette.text);
+    ui.add_space(10.0);
+    // These are existing collection routes, not new aggregate-library data.
+    // Wrapping keeps translated labels reachable in narrow workspaces.
+    ui.horizontal_wrapped(|ui| {
+        for (target, label) in [
+            (Page::LikedSongs, "Liked Songs"),
+            (Page::Albums, "Albums"),
+            (Page::Artists, "Artists"),
+            (Page::Podcasts, "Podcasts"),
+            (Page::Episodes, "Episodes"),
+        ] {
+            if theme::soft_button(ui, &palette, None, &gettext(locale, label), page == target)
+                .clicked()
+            {
+                app.actions.push(Action::Open(target));
+            }
+        }
+    });
+    ui.add_space(12.0);
     match page {
         Page::Albums => {
             let card_height = widgets::card_row_height(ui);

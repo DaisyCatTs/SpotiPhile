@@ -25,6 +25,7 @@ pub fn page(app: &mut App, ui: &mut egui::Ui) {
             palette.text,
         );
         ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
+            history_buttons(app, ui);
             if save_button(ui, &palette, offer_save, app.locale) {
                 app.actions.push(Action::SaveQueueAsPlaylist);
             }
@@ -61,9 +62,12 @@ pub fn side_panel(app: &mut App, ui: &mut egui::Ui) {
             ui.available_width(),
         );
         ui.add_space(window_controls.queue_top);
+        inspector_tabs(app, ui, true);
+        ui.add_space(8.0);
         // Measure buttons first and give the remaining width to the chips.
         // Without `shrink_left`, wrapped chips can overlap the close button.
         let tab = app.queue_tab;
+        let locale = app.locale;
         let offer_save = tab == QueueTab::Queue && !app.queue_playlist_uris().is_empty();
         let mut picked = None;
         let mut close = false;
@@ -76,8 +80,8 @@ pub fn side_panel(app: &mut App, ui: &mut egui::Ui) {
                     ui,
                     &palette,
                     &[
-                        (QueueTab::Queue, &gettext(app.locale, "Queue")),
-                        (QueueTab::Recents, &gettext(app.locale, "Recent")),
+                        (QueueTab::Queue, &gettext(locale, "Queue")),
+                        (QueueTab::Recents, &gettext(locale, "Recent")),
                     ],
                     tab,
                 );
@@ -103,6 +107,9 @@ pub fn side_panel(app: &mut App, ui: &mut egui::Ui) {
         }
         if save {
             app.actions.push(Action::SaveQueueAsPlaylist);
+        }
+        if app.queue_tab == QueueTab::Queue && (app.can_undo_queue() || app.can_redo_queue()) {
+            ui.horizontal(|ui| history_buttons(app, ui));
         }
         ui.add_space(8.0);
         // Lazy load recents when tab becomes visible.
@@ -133,6 +140,29 @@ pub fn side_panel(app: &mut App, ui: &mut egui::Ui) {
         app.settings.queue_width = width;
         app.actions.push(Action::SettingsChanged);
     }
+}
+
+/// Switch the existing mutually exclusive inspectors without toggling the
+/// current one closed. Keep this row separate from each panel's tools so long
+/// translated tab labels can wrap without displacing close/save controls.
+pub(super) fn inspector_tabs(app: &mut App, ui: &mut egui::Ui, queue: bool) {
+    let palette = app.palette;
+    ui.horizontal_wrapped(|ui| {
+        for (is_queue, label) in [
+            (true, gettext(app.locale, "Queue")),
+            (false, gettext(app.locale, "Lyrics")),
+        ] {
+            let selected = is_queue == queue;
+            let response = theme::inspector_tab(ui, &palette, &label, selected);
+            if response.clicked() && !selected {
+                app.actions.push(if is_queue {
+                    Action::ToggleQueuePanel
+                } else {
+                    Action::ToggleLyricsPanel
+                });
+            }
+        }
+    });
 }
 
 /// Saves the current and upcoming queue as a playlist.
@@ -192,11 +222,21 @@ const SECTION_GAP: f32 = 14.0;
 
 fn contents(app: &mut App, ui: &mut egui::Ui, compact: bool) {
     let palette = app.palette;
+    app.sync_queue_selection();
+    ui.ctx()
+        .data_mut(|data| data.insert_temp(egui::Id::new("queue-row-ids"), Vec::<egui::Id>::new()));
     // Neither the Web API nor librespot can reorder or insert into a live
     // remote queue, so without local playback active every drop just
     // appends, same as the "Add to queue" menu item.
     let reorderable = app.queue_locally_reorderable();
-    if !reorderable && let Some(track) = queue_drop(ui, ui.clip_rect()) {
+    if !reorderable
+        && let Some(track) = queue_drop(ui, ui.clip_rect())
+        && track.queue_rows.is_none()
+        && !track
+            .from
+            .as_ref()
+            .is_some_and(|(origin, _)| origin == "queue")
+    {
         app.actions.push(Action::QueueMany {
             songs: track
                 .items
@@ -289,7 +329,14 @@ fn contents(app: &mut App, ui: &mut egui::Ui, compact: bool) {
     if queue_is_empty(app) {
         // Nothing queued at all yet: the only slot a drop could land on is
         // the first one.
-        if reorderable && let Some(track) = queue_drop(ui, ui.clip_rect()) {
+        if reorderable
+            && let Some(track) = queue_drop(ui, ui.clip_rect())
+            && track.queue_rows.is_none()
+            && !track
+                .from
+                .as_ref()
+                .is_some_and(|(origin, _)| origin == "queue")
+        {
             app.actions.push(Action::InsertInQueue {
                 items: track.items.clone(),
                 position: 0,
@@ -302,13 +349,19 @@ fn contents(app: &mut App, ui: &mut egui::Ui, compact: bool) {
             &gettext(app.locale, "Nothing queued"),
             &gettext(app.locale, "Queued songs appear here."),
         );
+        queue_shortcuts(app, ui);
         return;
     }
-    let row_height = if compact {
-        theme::COMPACT_ROW_HEIGHT
-    } else {
-        theme::ROW_HEIGHT
-    };
+    let row_height = app.settings.daisy_density.map_or_else(
+        || {
+            if compact {
+                theme::COMPACT_ROW_HEIGHT
+            } else {
+                theme::ROW_HEIGHT
+            }
+        },
+        |density| theme::Geometry::for_density(density).row,
+    );
     let queue_len = app.queue.get().map(|queue| queue.queue.len()).unwrap_or(0);
     // The user's own songs get their own section on top; the playing
     // context's rows follow under the usual heading. One numbering runs
@@ -388,33 +441,45 @@ fn contents(app: &mut App, ui: &mut egui::Ui, compact: bool) {
             if ui.input(|input| input.pointer.button_released(egui::PointerButton::Primary))
                 && let Some(track) = egui::DragAndDrop::take_payload::<DragTrack>(ui.ctx())
             {
-                match track.from.as_ref() {
-                    Some((origin, from)) if origin == "queue" => {
-                        let from = *from as usize;
-                        let uri = track.items[0].uri();
-                        // Playback can advance mid-drag and shift queue
-                        // indices; trust the recorded one only if it still
-                        // names the dragged song, otherwise find where that
-                        // song actually sits now. Not there at all means it
-                        // left the queue, so there is nothing left to move.
-                        let from = if app.manual_queue.get(from).map(String::as_str) == Some(uri) {
-                            Some(from)
-                        } else {
-                            app.manual_queue.iter().position(|queued| queued == uri)
-                        };
-                        // A row dropped back on its own edges moves nothing.
-                        if let Some(from) = from
-                            && slot != from
-                            && slot != from + 1
+                if let Some((rows, expected_queue)) = &track.queue_rows {
+                    app.actions.push(Action::MoveQueueRows {
+                        rows: rows.clone(),
+                        position: slot,
+                        expected_queue: expected_queue.clone(),
+                    });
+                } else {
+                    match track.from.as_ref() {
+                        Some((origin, from))
+                            if origin == "queue" && app.can_edit_manual_queue() =>
                         {
-                            app.actions.push(Action::MoveInQueue { from, to: slot });
+                            let from = *from as usize;
+                            let uri = track.items[0].uri();
+                            // Playback can advance mid-drag and shift queue
+                            // indices; trust the recorded one only if it still
+                            // names the dragged song, otherwise find where that
+                            // song actually sits now. Not there at all means it
+                            // left the queue, so there is nothing left to move.
+                            let from =
+                                if app.manual_queue.get(from).map(String::as_str) == Some(uri) {
+                                    Some(from)
+                                } else {
+                                    app.manual_queue.iter().position(|queued| queued == uri)
+                                };
+                            // A row dropped back on its own edges moves nothing.
+                            if let Some(from) = from
+                                && slot != from
+                                && slot != from + 1
+                            {
+                                app.actions.push(Action::MoveInQueue { from, to: slot });
+                            }
                         }
-                    }
-                    _ => {
-                        app.actions.push(Action::InsertInQueue {
-                            items: track.items.clone(),
-                            position: slot,
-                        });
+                        Some((origin, _)) if origin == "queue" => {}
+                        _ => {
+                            app.actions.push(Action::InsertInQueue {
+                                items: track.items.clone(),
+                                position: slot,
+                            });
+                        }
                     }
                 }
             }
@@ -438,6 +503,137 @@ fn contents(app: &mut App, ui: &mut egui::Ui, compact: bool) {
         ui.add_space(4.0);
         widgets::virtual_rows(ui, queue_len - queued_len, row_height, |ui, index| {
             queue_row(app, ui, queued_len + index, compact, 0.0);
+        });
+    }
+    queue_shortcuts(app, ui);
+}
+
+/// Shared ownership check so the central collection does not consume clipboard
+/// events intended for the queue inspector drawn later in the frame.
+pub(crate) fn owns_keyboard_focus(ctx: &egui::Context) -> bool {
+    let ids = ctx
+        .data(|data| data.get_temp::<Vec<egui::Id>>(egui::Id::new("queue-row-ids")))
+        .unwrap_or_default();
+    ctx.memory(|memory| memory.focused())
+        .is_some_and(|id| ids.contains(&id))
+}
+
+fn history_buttons(app: &mut App, ui: &mut egui::Ui) {
+    for (label, enabled, action) in [
+        (
+            gettext(app.locale, "Undo"),
+            app.can_undo_queue(),
+            Action::UndoQueue,
+        ),
+        (
+            gettext(app.locale, "Redo"),
+            app.can_redo_queue(),
+            Action::RedoQueue,
+        ),
+    ] {
+        if ui.add_enabled(enabled, egui::Button::new(label)).clicked() {
+            app.actions.push(action);
+        }
+    }
+}
+
+fn queue_shortcuts(app: &mut App, ui: &egui::Ui) {
+    if ui.ctx().text_edit_focused() || app.dialog.is_some() || egui::Popup::is_any_open(ui.ctx()) {
+        return;
+    }
+    let ids = ui
+        .ctx()
+        .data(|data| data.get_temp::<Vec<egui::Id>>(egui::Id::new("queue-row-ids")))
+        .unwrap_or_default();
+    let focus = ui.memory(|memory| memory.focused());
+    let owns_focus = focus.is_some_and(|id| ids.contains(&id));
+    if !owns_focus && !(matches!(app.page(), crate::model::Page::Queue) && focus.is_none()) {
+        return;
+    }
+    let redo = app.can_redo_queue()
+        && ui.input_mut(|input| {
+            input.consume_key(
+                egui::Modifiers::COMMAND | egui::Modifiers::SHIFT,
+                egui::Key::Z,
+            ) || input.consume_key(egui::Modifiers::COMMAND, egui::Key::Y)
+        });
+    let undo = app.can_undo_queue()
+        && ui.input_mut(|input| input.consume_key(egui::Modifiers::COMMAND, egui::Key::Z));
+    if redo {
+        app.actions.push(Action::RedoQueue);
+    } else if undo {
+        app.actions.push(Action::UndoQueue);
+    }
+    let select_all =
+        ui.input_mut(|input| input.consume_key(egui::Modifiers::COMMAND, egui::Key::A));
+    if select_all {
+        app.select_all_queue_rows();
+    }
+    let rows: Vec<_> = app.queue_selection.rows.iter().copied().collect();
+    let items = app.selected_queue_items();
+    let editable = app.can_edit_queue_rows(&rows);
+    let (copy, cut, paste, delete, up, down) = ui.input_mut(|input| {
+        let copy = !items.is_empty() && input.events.contains(&egui::Event::Copy);
+        let cut = editable && input.events.contains(&egui::Event::Cut);
+        let paste = app
+            .can_edit_manual_queue()
+            .then(|| {
+                input.events.iter().find_map(|event| {
+                    if let egui::Event::Paste(text) = event {
+                        Some(text.clone())
+                    } else {
+                        None
+                    }
+                })
+            })
+            .flatten();
+        input.events.retain(|event| match event {
+            egui::Event::Copy => !copy,
+            egui::Event::Cut => !cut,
+            egui::Event::Paste(_) => paste.is_none(),
+            _ => true,
+        });
+        (
+            copy,
+            cut,
+            paste,
+            editable
+                && (input.consume_key(egui::Modifiers::NONE, egui::Key::Delete)
+                    || (cfg!(target_os = "macos")
+                        && input.consume_key(egui::Modifiers::NONE, egui::Key::Backspace))),
+            editable && input.consume_key(egui::Modifiers::COMMAND, egui::Key::ArrowUp),
+            editable && input.consume_key(egui::Modifiers::COMMAND, egui::Key::ArrowDown),
+        )
+    });
+    if copy || cut {
+        app.actions.push(Action::CopySongs(items));
+    }
+    if cut || delete {
+        app.actions.push(Action::RemoveQueueRows {
+            rows: rows.clone(),
+            expected_queue: app.manual_queue.clone(),
+        });
+    }
+    if let Some(text) = paste {
+        app.actions.push(Action::PasteQueue(text));
+    }
+    if up && let Some(first) = rows.first().copied().filter(|first| *first > 0) {
+        app.actions.push(Action::MoveQueueRows {
+            rows: rows.clone(),
+            position: first - 1,
+            expected_queue: app.manual_queue.clone(),
+        });
+    }
+    if down
+        && let Some(last) = rows
+            .last()
+            .copied()
+            .filter(|last| last + 1 < app.manual_queue.len())
+    {
+        app.actions.push(Action::MoveQueueRows {
+            rows,
+            position: last + 2,
+            expected_queue: app.manual_queue.clone(),
         });
     }
 }
@@ -515,7 +711,12 @@ fn recents_contents(app: &mut App, ui: &mut egui::Ui) {
         ui.add_space(6.0);
     }
 
-    let row_height = theme::COMPACT_ROW_HEIGHT;
+    let row_height = app
+        .settings
+        .daisy_density
+        .map_or(theme::COMPACT_ROW_HEIGHT, |density| {
+            theme::Geometry::for_density(density).row
+        });
     // Build PlayableItems on the fly; virtual_rows needs stable index.
     widgets::virtual_rows(ui, items.len(), row_height, |ui, index| {
         let entry = &items[index];
@@ -584,7 +785,9 @@ fn queue_row(app: &mut App, ui: &mut egui::Ui, index: usize, compact: bool, shif
     else {
         return;
     };
-    widgets::track_row(
+    let picked = app.queue_selection.rows.contains(&index);
+    let picked_songs = app.selected_queue_items();
+    let (response, pick) = widgets::track_row_response(
         ui,
         app,
         TrackRow {
@@ -600,8 +803,17 @@ fn queue_row(app: &mut App, ui: &mut egui::Ui, index: usize, compact: bool, shif
             compact,
             thin: false,
             shift,
-            picked: false,
-            picked_songs: &[],
+            picked,
+            picked_songs: &picked_songs,
         },
     );
+    ui.ctx().data_mut(|data| {
+        let id = egui::Id::new("queue-row-ids");
+        let mut ids = data.get_temp::<Vec<egui::Id>>(id).unwrap_or_default();
+        ids.push(response.id);
+        data.insert_temp(id, ids);
+    });
+    if let Some(pick) = pick {
+        app.pick_queue_row(index, pick);
+    }
 }

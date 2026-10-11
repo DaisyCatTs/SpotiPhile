@@ -16,20 +16,20 @@ pub fn show(app: &mut App, ui: &mut egui::Ui) {
     let palette = app.palette;
     ui.add_space(6.0);
     let greeting = crate::util::greeting(app.locale);
-    theme::text(ui, greeting.as_ref(), theme::bold(30.0), palette.text);
-    ui.add_space(12.0);
-    quick_access(app, ui);
+    theme::text(ui, greeting.as_ref(), theme::bold(24.0), palette.text);
+    ui.add_space(10.0);
+    ui.push_id("home-quick_access", |ui| quick_access(app, ui));
     ui.add_space(16.0);
 
+    ui.push_id("home-recently_played", |ui| recently_played(app, ui));
     if app.settings.home.made_for_you.visible {
-        made_for_you(app, ui);
+        ui.push_id("home-made_for_you", |ui| made_for_you(app, ui));
     }
-    recently_played(app, ui);
-    podcasts(app, ui);
-    top_artists(app, ui);
-    top_tracks(app, ui);
+    ui.push_id("home-podcasts", |ui| podcasts(app, ui));
+    ui.push_id("home-top_artists", |ui| top_artists(app, ui));
+    ui.push_id("home-top_tracks", |ui| top_tracks(app, ui));
     if app.settings.home.recommendations.visible {
-        recommendations(app, ui);
+        ui.push_id("home-recommendations", |ui| recommendations(app, ui));
     }
 }
 
@@ -71,7 +71,7 @@ fn quick_access(app: &mut App, ui: &mut egui::Ui) {
         }
     }
     let available = ui.available_width();
-    let columns = ((available / 300.0).floor() as usize).clamp(2, 4);
+    let columns = ((available / 240.0).floor() as usize).clamp(1, 4);
     let gap = 10.0;
     let tile_width = (available - gap * (columns as f32 - 1.0)) / columns as f32;
     let rows = tiles.len().div_ceil(columns);
@@ -91,7 +91,10 @@ fn quick_access(app: &mut App, ui: &mut egui::Ui) {
                     break;
                 };
                 let (rect, response) =
-                    ui.allocate_exact_size(vec2(tile_width, 60.0), Sense::click());
+                    ui.allocate_exact_size(vec2(tile_width, 48.0), Sense::click());
+                response.widget_info(|| {
+                    egui::WidgetInfo::labeled(egui::WidgetType::Button, ui.is_enabled(), name)
+                });
                 if ui.is_rect_visible(rect) {
                     let hovered = ui.rect_contains_pointer(rect);
                     let fill = if hovered {
@@ -100,7 +103,7 @@ fn quick_access(app: &mut App, ui: &mut egui::Ui) {
                         palette.surface
                     };
                     ui.painter().rect_filled(rect, CornerRadius::same(6), fill);
-                    let cover = Rect::from_min_size(rect.min, Vec2::splat(60.0));
+                    let cover = Rect::from_min_size(rect.min, Vec2::splat(48.0));
                     if *liked {
                         super::sidebar::liked_cover(ui, cover, 6.0);
                     } else {
@@ -167,6 +170,7 @@ fn quick_access(app: &mut App, ui: &mut egui::Ui) {
                         }
                     }
                 }
+                theme::focus_ring(ui, &response);
                 if response.clicked() {
                     app.actions.push(Action::Open(page.clone()));
                 }

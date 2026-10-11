@@ -79,6 +79,53 @@ impl Palette {
         }
     }
 
+    /// Built-in Spotiphile appearance. Custom palettes bypass this builder.
+    pub fn spotiphile(dark: bool, oled: bool, accent: crate::settings::AccentChoice) -> Self {
+        use crate::settings::AccentChoice;
+        let rgb = |hex: u32| Color32::from_rgb((hex >> 16) as u8, (hex >> 8) as u8, hex as u8);
+        let mut p = if dark { Self::dark() } else { Self::light() };
+        let c = if dark && oled {
+            [
+                0x000000, 0x050607, 0x0d1117, 0x131923, 0x202936, 0xf3f6f8, 0xaeb7c3, 0x87919f,
+            ]
+        } else if dark {
+            [
+                0x0d1014, 0x14181f, 0x202832, 0x26313c, 0x303a46, 0xf3f6f8, 0xaeb7c3, 0x87919f,
+            ]
+        } else {
+            [
+                0xf8fafc, 0xffffff, 0xe7ecf2, 0xdce4ed, 0xcdd6e1, 0x12171d, 0x4e5865, 0x5f6873,
+            ]
+        }
+        .map(rgb);
+        [
+            p.window,
+            p.panel,
+            p.surface,
+            p.surface_hover,
+            p.outline,
+            p.text,
+            p.secondary,
+            p.dim,
+        ] = c;
+        p.surface_active = p.surface_hover;
+        p.overlay = p.panel;
+        let (color, hover, on) = match (dark, accent) {
+            (true, AccentChoice::Blue) => (0x60a5fa, 0x22d3ee, 0x06101e),
+            (true, AccentChoice::Teal) => (0x2dd4bf, 0x38bdf8, 0x031412),
+            (true, AccentChoice::Coral) => (0xfb7185, 0xf97316, 0x22050a),
+            (true, AccentChoice::Neutral) => (0xcbd5e1, 0x94a3b8, 0x111827),
+            (false, AccentChoice::Blue) => (0x2563eb, 0x0891b2, 0xffffff),
+            (false, AccentChoice::Teal) => (0x0f766e, 0x0369a1, 0xffffff),
+            (false, AccentChoice::Coral) => (0xdc2626, 0xc2410c, 0xffffff),
+            (false, AccentChoice::Neutral) => (0x475569, 0x64748b, 0xffffff),
+        };
+        p.accent = rgb(color);
+        p.accent_hover = rgb(hover);
+        p.on_accent = rgb(on);
+        p
+    }
+
     /// A colour derived from album art, softened so it can sit behind text.
     pub fn tint_from_art(&self, rgb: [u8; 3]) -> Color32 {
         let [r, g, b] = rgb.map(|c| c as f32 / 255.0);
@@ -182,6 +229,32 @@ pub fn catalog_detail(
             locale,
             "Custom themes could not be loaded. Run spotifast reload-themes to try again.",
         ),
+    }
+}
+
+/// Approved shell geometry in logical points.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Geometry {
+    pub row: f32,
+    pub topbar: f32,
+    pub player: f32,
+    pub card_gap: f32,
+}
+
+impl Geometry {
+    pub fn for_density(density: crate::settings::DensityChoice) -> Self {
+        use crate::settings::DensityChoice;
+        let (row, topbar, player, card_gap) = match density {
+            DensityChoice::Compact => (38.0, 50.0, 78.0, 8.0),
+            DensityChoice::Default => (46.0, 54.0, 88.0, 12.0),
+            DensityChoice::Comfortable => (54.0, 58.0, 96.0, 16.0),
+        };
+        Self {
+            row,
+            topbar,
+            player,
+            card_gap,
+        }
     }
 }
 
@@ -701,7 +774,17 @@ pub fn soft_button(
     label: &str,
     active: bool,
 ) -> Response {
-    soft_button_inner(ui, palette, icon, label, active, false).0
+    soft_button_inner(ui, palette, icon, label, active, false, false).0
+}
+
+/// A mutually exclusive inspector choice with a single selected-state event.
+pub fn inspector_tab(
+    ui: &mut egui::Ui,
+    palette: &Palette,
+    label: &str,
+    selected: bool,
+) -> Response {
+    soft_button_inner(ui, palette, None, label, selected, false, true).0
 }
 
 /// A [`soft_button`] whose icon turns into a cross on hover, allowing the
@@ -712,7 +795,7 @@ pub fn soft_button_dismiss(
     icon: Icon,
     label: &str,
 ) -> (Response, bool) {
-    soft_button_inner(ui, palette, Some(icon), label, false, true)
+    soft_button_inner(ui, palette, Some(icon), label, false, true, false)
 }
 
 /// The width `soft_button` gives a button without an icon, for laying out
@@ -729,6 +812,7 @@ fn soft_button_inner(
     label: &str,
     active: bool,
     dismissible: bool,
+    tab: bool,
 ) -> (Response, bool) {
     let font = medium(13.0);
     let color = if active { palette.window } else { palette.text };
@@ -739,7 +823,16 @@ fn soft_button_inner(
     let size = Vec2::new(galley.size().x + icon_width, galley.size().y) + padding * 2.0;
     let (rect, response) = ui.allocate_exact_size(size, Sense::click());
     response.widget_info(|| {
-        egui::WidgetInfo::labeled(egui::WidgetType::Button, ui.is_enabled(), label)
+        if tab {
+            egui::WidgetInfo::selected(
+                egui::WidgetType::RadioButton,
+                ui.is_enabled(),
+                active,
+                label,
+            )
+        } else {
+            egui::WidgetInfo::labeled(egui::WidgetType::Button, ui.is_enabled(), label)
+        }
     });
     let icon_rect = egui::Rect::from_center_size(
         egui::pos2(rect.left() + padding.x + icon_size / 2.0, rect.center().y),
@@ -898,6 +991,55 @@ pub fn subtle(ui: &mut egui::Ui, palette: &Palette, label: &str) -> Response {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn contrast(a: Color32, b: Color32) -> f32 {
+        let luminance = |c: Color32| {
+            let linear = |v: u8| {
+                let s = v as f32 / 255.0;
+                if s <= 0.04045 {
+                    s / 12.92
+                } else {
+                    ((s + 0.055) / 1.055).powf(2.4)
+                }
+            };
+            0.2126 * linear(c.r()) + 0.7152 * linear(c.g()) + 0.0722 * linear(c.b())
+        };
+        let a = luminance(a);
+        let b = luminance(b);
+        (a.max(b) + 0.05) / (a.min(b) + 0.05)
+    }
+
+    #[test]
+    fn spotiphile_themes_keep_primary_and_secondary_text_readable() {
+        for (dark, oled) in [(false, false), (true, false), (true, true)] {
+            for accent in crate::settings::AccentChoice::ALL {
+                let p = Palette::spotiphile(dark, oled, accent);
+                for bg in [p.window, p.panel, p.surface] {
+                    for text in [p.text, p.secondary, p.dim] {
+                        assert!(
+                            contrast(text, bg) >= 4.5,
+                            "{dark} {oled} {accent:?} {text:?} {bg:?}"
+                        );
+                    }
+                }
+                assert!(contrast(p.on_accent, p.accent) >= 4.5);
+                assert_eq!(p.dark, dark);
+            }
+        }
+    }
+
+    #[test]
+    fn oled_is_only_applied_to_a_dark_base() {
+        use crate::settings::AccentChoice;
+        assert_eq!(
+            Palette::spotiphile(false, true, AccentChoice::Blue),
+            Palette::spotiphile(false, false, AccentChoice::Blue)
+        );
+        assert_eq!(
+            Palette::spotiphile(true, true, AccentChoice::Blue).window,
+            Color32::BLACK
+        );
+    }
 
     /// The logo drawn in the app is the app icon's own picture, not a
     /// disc in the theme's accent colour: it uploads the icon's pixels.

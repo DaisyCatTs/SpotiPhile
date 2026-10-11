@@ -1,0 +1,108 @@
+{
+  "date": "2026-10-08",
+  "source_sha256": "F5F3438DEDCAD519F8CF8393C756DEE281135AE8413BEA3298311706B1934EE7",
+  "method": "T3 collaborative preview, direct parent closeout checks",
+  "geometry": [
+    {
+      "count": 216,
+      "failures": [],
+      "height": 800,
+      "width": 760
+    },
+    {
+      "count": 216,
+      "failures": [],
+      "height": 800,
+      "width": 1280
+    },
+    {
+      "count": 216,
+      "failures": [],
+      "height": 900,
+      "width": 1440
+    },
+    {
+      "count": 216,
+      "failures": [],
+      "height": 1440,
+      "width": 2560
+    }
+  ],
+  "captures": [
+    {
+      "width": 760,
+      "height": 800,
+      "page": "library",
+      "theme": "light",
+      "accent": "teal",
+      "density": "compact",
+      "inspector": "closed",
+      "path": "docs/design/captures/current-760-light-library.png",
+      "brokenImages": 0,
+      "fontReady": true
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "page": "playlist",
+      "theme": "oled",
+      "accent": "coral",
+      "density": "default",
+      "inspector": "open",
+      "path": "docs/design/captures/current-1440-oled-playlist.png",
+      "brokenImages": 0,
+      "fontReady": true
+    },
+    {
+      "width": 2560,
+      "height": 1440,
+      "page": "library",
+      "theme": "dark",
+      "accent": "teal",
+      "density": "default",
+      "inspector": "open",
+      "path": "docs/design/captures/current-2560-dark-library.png",
+      "brokenImages": 0,
+      "fontReady": true
+    },
+    {
+      "width": 1280,
+      "height": 800,
+      "page": "home",
+      "theme": "light",
+      "accent": "blue",
+      "density": "default",
+      "inspector": "closed",
+      "path": "docs/design/captures/current-1280-light-home.png",
+      "brokenImages": 0,
+      "fontReady": true
+    },
+    {
+      "width": 1280,
+      "height": 800,
+      "page": "home",
+      "theme": "dark",
+      "accent": "blue",
+      "density": "default",
+      "inspector": "open",
+      "path": "docs/design/captures/current-1280-dark-home.png",
+      "brokenImages": 0,
+      "fontReady": true
+    }
+  ],
+  "keyboard": {
+    "narrowLibraryInspectorReopen": true,
+    "closeFocusReturn": true,
+    "arrowRightSelectsLyrics": true,
+    "tabpanelRelationships": true,
+    "escapeClosesInspector": true
+  },
+  "scope": "Geometry, sampled rendering, local font/artwork and targeted keyboard checks only. Not native integration, full accessibility certification or visual approval.",
+  "notes": [
+    "Earlier fixed-height review header clipped controls at760; corrected to auto height.",
+    "Earlier muted-label contrast and blank pause icon corrected in the replacement.",
+    "Transitions disabled for settled geometry/capture matrix; actual close transition checked separately.",
+    "First-generation cream/gold draft remains rejected."
+  ],
+  "pass": true
+}

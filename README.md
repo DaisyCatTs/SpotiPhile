@@ -1,3 +1,10 @@
+> **Spotiphile development fork:** the product name is now Spotiphile. Phase 1
+> native UI work is in progress on a focused branch. This is not a new stable
+> release. See [the design workspace](docs/design/README.md) and
+> [the canonical plan](DaisySpoti_MASTER_PLAN.md). The inherited downloads and
+> guides below belong to Spotifast, whose attribution is retained. Package,
+> profile, credential and update identities have not been migrated.
+
 <p align="center">
   <img src="docs/assets/images/logo.svg" alt="Spotifast logo" width="88" height="88">
 </p>
@@ -37,6 +44,16 @@ https://github.com/user-attachments/assets/a5f669ce-b3b7-4f8e-9933-976a78876c7e
 </details>
 
 [Features](#your-music-on-your-desktop) · [Install](#install) · [First playback](#start-listening) · [Mini player](#the-winamp-mini-player) · [MilkDrop](#music-in-motion) · [Help](#guides-and-help)
+
+**Spotiphile development feature:** native track/selection menus now offer
+**Play next** on the active local player. It inserts before manually queued songs
+without starting playback or removing playlist continuation. Manual queue rows
+also offer **Move to top** and **Move to bottom**, preserving the current song
+and context queue. **Play later** appends before playlist continuation. Queue
+selection supports block drag/movement, Copy/Cut/Paste and selected removal with
+Ctrl/Cmd and Shift shortcuts. Manual edits require active local playback; context
+rows remain protected. Remote queueing keeps append semantics. See
+[the queue contract](docs/_reference/queue.md).
 
 ## Your music, on your desktop
 

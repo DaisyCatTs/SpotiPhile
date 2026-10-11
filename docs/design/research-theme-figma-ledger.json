@@ -1,0 +1,1926 @@
+[
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "11 / Theme studies / replacement proposal",
+      "x": 80,
+      "y": 2220,
+      "width": 1600,
+      "height": 830,
+      "fillColor": {
+        "r": 0.06274509803921569,
+        "g": 0.07058823529411765,
+        "b": 0.08235294117647059
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0
+    },
+    "nodeId": "11:459"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:459",
+      "name": "Themes belong to the listener.",
+      "x": 32,
+      "y": 24,
+      "text": "Themes belong to the listener.",
+      "fontSize": 28,
+      "fontWeight": 700,
+      "fontColor": {
+        "r": 0.9529411764705882,
+        "g": 0.9647058823529412,
+        "b": 0.9725490196078431
+      }
+    },
+    "nodeId": "11:460"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:459",
+      "name": "Dark / Light / OLED. Accent is a separate choice. Repla",
+      "x": 32,
+      "y": 66,
+      "text": "Dark / Light / OLED. Accent is a separate choice. Replacement proposal, not approved or variable-bound.",
+      "fontSize": 15,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.6823529411764706,
+        "g": 0.7176470588235294,
+        "b": 0.7647058823529411
+      }
+    },
+    "nodeId": "11:461"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "dark / blue",
+      "x": 32,
+      "y": 120,
+      "width": 366,
+      "height": 194,
+      "fillColor": {
+        "r": 0.0784313725490196,
+        "g": 0.09411764705882353,
+        "b": 0.12156862745098039
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:459"
+    },
+    "nodeId": "11:462"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:462",
+      "name": "DARK / blue",
+      "x": 16,
+      "y": 14,
+      "text": "DARK / blue",
+      "fontSize": 16,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.9529411764705882,
+        "g": 0.9647058823529412,
+        "b": 0.9725490196078431
+      }
+    },
+    "nodeId": "11:463"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:462",
+      "name": "Paralyzed",
+      "x": 16,
+      "y": 44,
+      "text": "Paralyzed",
+      "fontSize": 18,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.9529411764705882,
+        "g": 0.9647058823529412,
+        "b": 0.9725490196078431
+      }
+    },
+    "nodeId": "11:464"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:462",
+      "name": "Riverline",
+      "x": 16,
+      "y": 72,
+      "text": "Riverline",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.6823529411764706,
+        "g": 0.7176470588235294,
+        "b": 0.7647058823529411
+      }
+    },
+    "nodeId": "11:465"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "Primary action",
+      "x": 16,
+      "y": 108,
+      "width": 108,
+      "height": 38,
+      "fillColor": {
+        "r": 0.3764705882352941,
+        "g": 0.6470588235294118,
+        "b": 0.9803921568627451
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:462"
+    },
+    "nodeId": "11:466"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:466",
+      "name": "Play",
+      "x": 18,
+      "y": 9,
+      "text": "Play",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.023529411764705882,
+        "g": 0.06274509803921569,
+        "b": 0.11764705882352941
+      }
+    },
+    "nodeId": "11:467"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:462",
+      "name": "Accent #60a5fa",
+      "x": 142,
+      "y": 117,
+      "text": "Accent #60a5fa",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.6823529411764706,
+        "g": 0.7176470588235294,
+        "b": 0.7647058823529411
+      }
+    },
+    "nodeId": "11:468"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:462",
+      "name": "Window #0d1014 / Text #f3f6f8",
+      "x": 16,
+      "y": 164,
+      "text": "Window #0d1014 / Text #f3f6f8",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.5294117647058824,
+        "g": 0.5686274509803921,
+        "b": 0.6235294117647059
+      }
+    },
+    "nodeId": "11:469"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "dark / teal",
+      "x": 422,
+      "y": 120,
+      "width": 366,
+      "height": 194,
+      "fillColor": {
+        "r": 0.0784313725490196,
+        "g": 0.09411764705882353,
+        "b": 0.12156862745098039
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:459"
+    },
+    "nodeId": "11:470"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:470",
+      "name": "DARK / teal",
+      "x": 16,
+      "y": 14,
+      "text": "DARK / teal",
+      "fontSize": 16,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.9529411764705882,
+        "g": 0.9647058823529412,
+        "b": 0.9725490196078431
+      }
+    },
+    "nodeId": "11:471"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:470",
+      "name": "Paralyzed",
+      "x": 16,
+      "y": 44,
+      "text": "Paralyzed",
+      "fontSize": 18,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.9529411764705882,
+        "g": 0.9647058823529412,
+        "b": 0.9725490196078431
+      }
+    },
+    "nodeId": "11:472"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:470",
+      "name": "Riverline",
+      "x": 16,
+      "y": 72,
+      "text": "Riverline",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.6823529411764706,
+        "g": 0.7176470588235294,
+        "b": 0.7647058823529411
+      }
+    },
+    "nodeId": "11:473"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "Primary action",
+      "x": 16,
+      "y": 108,
+      "width": 108,
+      "height": 38,
+      "fillColor": {
+        "r": 0.17647058823529413,
+        "g": 0.8313725490196079,
+        "b": 0.7490196078431373
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:470"
+    },
+    "nodeId": "11:474"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:474",
+      "name": "Play",
+      "x": 18,
+      "y": 9,
+      "text": "Play",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.011764705882352941,
+        "g": 0.0784313725490196,
+        "b": 0.07058823529411765
+      }
+    },
+    "nodeId": "11:475"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:470",
+      "name": "Accent #2dd4bf",
+      "x": 142,
+      "y": 117,
+      "text": "Accent #2dd4bf",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.6823529411764706,
+        "g": 0.7176470588235294,
+        "b": 0.7647058823529411
+      }
+    },
+    "nodeId": "11:476"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:470",
+      "name": "Window #0d1014 / Text #f3f6f8",
+      "x": 16,
+      "y": 164,
+      "text": "Window #0d1014 / Text #f3f6f8",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.5294117647058824,
+        "g": 0.5686274509803921,
+        "b": 0.6235294117647059
+      }
+    },
+    "nodeId": "11:477"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "dark / coral",
+      "x": 812,
+      "y": 120,
+      "width": 366,
+      "height": 194,
+      "fillColor": {
+        "r": 0.0784313725490196,
+        "g": 0.09411764705882353,
+        "b": 0.12156862745098039
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:459"
+    },
+    "nodeId": "11:478"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:478",
+      "name": "DARK / coral",
+      "x": 16,
+      "y": 14,
+      "text": "DARK / coral",
+      "fontSize": 16,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.9529411764705882,
+        "g": 0.9647058823529412,
+        "b": 0.9725490196078431
+      }
+    },
+    "nodeId": "11:479"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:478",
+      "name": "Paralyzed",
+      "x": 16,
+      "y": 44,
+      "text": "Paralyzed",
+      "fontSize": 18,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.9529411764705882,
+        "g": 0.9647058823529412,
+        "b": 0.9725490196078431
+      }
+    },
+    "nodeId": "11:480"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:478",
+      "name": "Riverline",
+      "x": 16,
+      "y": 72,
+      "text": "Riverline",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.6823529411764706,
+        "g": 0.7176470588235294,
+        "b": 0.7647058823529411
+      }
+    },
+    "nodeId": "11:481"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "Primary action",
+      "x": 16,
+      "y": 108,
+      "width": 108,
+      "height": 38,
+      "fillColor": {
+        "r": 0.984313725490196,
+        "g": 0.44313725490196076,
+        "b": 0.5215686274509804
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:478"
+    },
+    "nodeId": "11:482"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:482",
+      "name": "Play",
+      "x": 18,
+      "y": 9,
+      "text": "Play",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.13333333333333333,
+        "g": 0.0196078431372549,
+        "b": 0.0392156862745098
+      }
+    },
+    "nodeId": "11:483"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:478",
+      "name": "Accent #fb7185",
+      "x": 142,
+      "y": 117,
+      "text": "Accent #fb7185",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.6823529411764706,
+        "g": 0.7176470588235294,
+        "b": 0.7647058823529411
+      }
+    },
+    "nodeId": "11:484"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:478",
+      "name": "Window #0d1014 / Text #f3f6f8",
+      "x": 16,
+      "y": 164,
+      "text": "Window #0d1014 / Text #f3f6f8",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.5294117647058824,
+        "g": 0.5686274509803921,
+        "b": 0.6235294117647059
+      }
+    },
+    "nodeId": "11:485"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "dark / neutral",
+      "x": 1202,
+      "y": 120,
+      "width": 366,
+      "height": 194,
+      "fillColor": {
+        "r": 0.0784313725490196,
+        "g": 0.09411764705882353,
+        "b": 0.12156862745098039
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:459"
+    },
+    "nodeId": "11:486"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:486",
+      "name": "DARK / neutral",
+      "x": 16,
+      "y": 14,
+      "text": "DARK / neutral",
+      "fontSize": 16,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.9529411764705882,
+        "g": 0.9647058823529412,
+        "b": 0.9725490196078431
+      }
+    },
+    "nodeId": "11:487"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:486",
+      "name": "Paralyzed",
+      "x": 16,
+      "y": 44,
+      "text": "Paralyzed",
+      "fontSize": 18,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.9529411764705882,
+        "g": 0.9647058823529412,
+        "b": 0.9725490196078431
+      }
+    },
+    "nodeId": "11:488"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:486",
+      "name": "Riverline",
+      "x": 16,
+      "y": 72,
+      "text": "Riverline",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.6823529411764706,
+        "g": 0.7176470588235294,
+        "b": 0.7647058823529411
+      }
+    },
+    "nodeId": "11:489"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "Primary action",
+      "x": 16,
+      "y": 108,
+      "width": 108,
+      "height": 38,
+      "fillColor": {
+        "r": 0.796078431372549,
+        "g": 0.8352941176470589,
+        "b": 0.8823529411764706
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:486"
+    },
+    "nodeId": "11:490"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:490",
+      "name": "Play",
+      "x": 18,
+      "y": 9,
+      "text": "Play",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.06666666666666667,
+        "g": 0.09411764705882353,
+        "b": 0.15294117647058825
+      }
+    },
+    "nodeId": "11:491"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:486",
+      "name": "Accent #cbd5e1",
+      "x": 142,
+      "y": 117,
+      "text": "Accent #cbd5e1",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.6823529411764706,
+        "g": 0.7176470588235294,
+        "b": 0.7647058823529411
+      }
+    },
+    "nodeId": "11:492"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:486",
+      "name": "Window #0d1014 / Text #f3f6f8",
+      "x": 16,
+      "y": 164,
+      "text": "Window #0d1014 / Text #f3f6f8",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.5294117647058824,
+        "g": 0.5686274509803921,
+        "b": 0.6235294117647059
+      }
+    },
+    "nodeId": "11:493"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "light / blue",
+      "x": 32,
+      "y": 340,
+      "width": 366,
+      "height": 194,
+      "fillColor": {
+        "r": 1,
+        "g": 1,
+        "b": 1
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:459"
+    },
+    "nodeId": "11:494"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:494",
+      "name": "LIGHT / blue",
+      "x": 16,
+      "y": 14,
+      "text": "LIGHT / blue",
+      "fontSize": 16,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.07058823529411765,
+        "g": 0.09019607843137255,
+        "b": 0.11372549019607843
+      }
+    },
+    "nodeId": "11:495"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:494",
+      "name": "Paralyzed",
+      "x": 16,
+      "y": 44,
+      "text": "Paralyzed",
+      "fontSize": 18,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.07058823529411765,
+        "g": 0.09019607843137255,
+        "b": 0.11372549019607843
+      }
+    },
+    "nodeId": "11:496"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:494",
+      "name": "Riverline",
+      "x": 16,
+      "y": 72,
+      "text": "Riverline",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.3058823529411765,
+        "g": 0.34509803921568627,
+        "b": 0.396078431372549
+      }
+    },
+    "nodeId": "11:497"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "Primary action",
+      "x": 16,
+      "y": 108,
+      "width": 108,
+      "height": 38,
+      "fillColor": {
+        "r": 0.1450980392156863,
+        "g": 0.38823529411764707,
+        "b": 0.9215686274509803
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:494"
+    },
+    "nodeId": "11:498"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:498",
+      "name": "Play",
+      "x": 18,
+      "y": 9,
+      "text": "Play",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 1,
+        "g": 1,
+        "b": 1
+      }
+    },
+    "nodeId": "11:499"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:494",
+      "name": "Accent #2563eb",
+      "x": 142,
+      "y": 117,
+      "text": "Accent #2563eb",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.3058823529411765,
+        "g": 0.34509803921568627,
+        "b": 0.396078431372549
+      }
+    },
+    "nodeId": "11:500"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:494",
+      "name": "Window #f8fafc / Text #12171d",
+      "x": 16,
+      "y": 164,
+      "text": "Window #f8fafc / Text #12171d",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.37254901960784315,
+        "g": 0.40784313725490196,
+        "b": 0.45098039215686275
+      }
+    },
+    "nodeId": "11:501"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "light / teal",
+      "x": 422,
+      "y": 340,
+      "width": 366,
+      "height": 194,
+      "fillColor": {
+        "r": 1,
+        "g": 1,
+        "b": 1
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:459"
+    },
+    "nodeId": "11:502"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:502",
+      "name": "LIGHT / teal",
+      "x": 16,
+      "y": 14,
+      "text": "LIGHT / teal",
+      "fontSize": 16,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.07058823529411765,
+        "g": 0.09019607843137255,
+        "b": 0.11372549019607843
+      }
+    },
+    "nodeId": "11:503"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:502",
+      "name": "Paralyzed",
+      "x": 16,
+      "y": 44,
+      "text": "Paralyzed",
+      "fontSize": 18,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.07058823529411765,
+        "g": 0.09019607843137255,
+        "b": 0.11372549019607843
+      }
+    },
+    "nodeId": "11:504"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:502",
+      "name": "Riverline",
+      "x": 16,
+      "y": 72,
+      "text": "Riverline",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.3058823529411765,
+        "g": 0.34509803921568627,
+        "b": 0.396078431372549
+      }
+    },
+    "nodeId": "11:505"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "Primary action",
+      "x": 16,
+      "y": 108,
+      "width": 108,
+      "height": 38,
+      "fillColor": {
+        "r": 0.058823529411764705,
+        "g": 0.4627450980392157,
+        "b": 0.43137254901960786
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:502"
+    },
+    "nodeId": "11:506"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:506",
+      "name": "Play",
+      "x": 18,
+      "y": 9,
+      "text": "Play",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 1,
+        "g": 1,
+        "b": 1
+      }
+    },
+    "nodeId": "11:507"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:502",
+      "name": "Accent #0f766e",
+      "x": 142,
+      "y": 117,
+      "text": "Accent #0f766e",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.3058823529411765,
+        "g": 0.34509803921568627,
+        "b": 0.396078431372549
+      }
+    },
+    "nodeId": "11:508"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:502",
+      "name": "Window #f8fafc / Text #12171d",
+      "x": 16,
+      "y": 164,
+      "text": "Window #f8fafc / Text #12171d",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.37254901960784315,
+        "g": 0.40784313725490196,
+        "b": 0.45098039215686275
+      }
+    },
+    "nodeId": "11:509"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "light / coral",
+      "x": 812,
+      "y": 340,
+      "width": 366,
+      "height": 194,
+      "fillColor": {
+        "r": 1,
+        "g": 1,
+        "b": 1
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:459"
+    },
+    "nodeId": "11:510"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:510",
+      "name": "LIGHT / coral",
+      "x": 16,
+      "y": 14,
+      "text": "LIGHT / coral",
+      "fontSize": 16,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.07058823529411765,
+        "g": 0.09019607843137255,
+        "b": 0.11372549019607843
+      }
+    },
+    "nodeId": "11:511"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:510",
+      "name": "Paralyzed",
+      "x": 16,
+      "y": 44,
+      "text": "Paralyzed",
+      "fontSize": 18,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.07058823529411765,
+        "g": 0.09019607843137255,
+        "b": 0.11372549019607843
+      }
+    },
+    "nodeId": "11:512"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:510",
+      "name": "Riverline",
+      "x": 16,
+      "y": 72,
+      "text": "Riverline",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.3058823529411765,
+        "g": 0.34509803921568627,
+        "b": 0.396078431372549
+      }
+    },
+    "nodeId": "11:513"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "Primary action",
+      "x": 16,
+      "y": 108,
+      "width": 108,
+      "height": 38,
+      "fillColor": {
+        "r": 0.8627450980392157,
+        "g": 0.14901960784313725,
+        "b": 0.14901960784313725
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:510"
+    },
+    "nodeId": "11:514"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:514",
+      "name": "Play",
+      "x": 18,
+      "y": 9,
+      "text": "Play",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 1,
+        "g": 1,
+        "b": 1
+      }
+    },
+    "nodeId": "11:515"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:510",
+      "name": "Accent #dc2626",
+      "x": 142,
+      "y": 117,
+      "text": "Accent #dc2626",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.3058823529411765,
+        "g": 0.34509803921568627,
+        "b": 0.396078431372549
+      }
+    },
+    "nodeId": "11:516"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:510",
+      "name": "Window #f8fafc / Text #12171d",
+      "x": 16,
+      "y": 164,
+      "text": "Window #f8fafc / Text #12171d",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.37254901960784315,
+        "g": 0.40784313725490196,
+        "b": 0.45098039215686275
+      }
+    },
+    "nodeId": "11:517"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "light / neutral",
+      "x": 1202,
+      "y": 340,
+      "width": 366,
+      "height": 194,
+      "fillColor": {
+        "r": 1,
+        "g": 1,
+        "b": 1
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:459"
+    },
+    "nodeId": "11:518"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:518",
+      "name": "LIGHT / neutral",
+      "x": 16,
+      "y": 14,
+      "text": "LIGHT / neutral",
+      "fontSize": 16,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.07058823529411765,
+        "g": 0.09019607843137255,
+        "b": 0.11372549019607843
+      }
+    },
+    "nodeId": "11:519"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:518",
+      "name": "Paralyzed",
+      "x": 16,
+      "y": 44,
+      "text": "Paralyzed",
+      "fontSize": 18,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.07058823529411765,
+        "g": 0.09019607843137255,
+        "b": 0.11372549019607843
+      }
+    },
+    "nodeId": "11:520"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:518",
+      "name": "Riverline",
+      "x": 16,
+      "y": 72,
+      "text": "Riverline",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.3058823529411765,
+        "g": 0.34509803921568627,
+        "b": 0.396078431372549
+      }
+    },
+    "nodeId": "11:521"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "Primary action",
+      "x": 16,
+      "y": 108,
+      "width": 108,
+      "height": 38,
+      "fillColor": {
+        "r": 0.2784313725490196,
+        "g": 0.3333333333333333,
+        "b": 0.4117647058823529
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:518"
+    },
+    "nodeId": "11:522"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:522",
+      "name": "Play",
+      "x": 18,
+      "y": 9,
+      "text": "Play",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 1,
+        "g": 1,
+        "b": 1
+      }
+    },
+    "nodeId": "11:523"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:518",
+      "name": "Accent #475569",
+      "x": 142,
+      "y": 117,
+      "text": "Accent #475569",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.3058823529411765,
+        "g": 0.34509803921568627,
+        "b": 0.396078431372549
+      }
+    },
+    "nodeId": "11:524"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:518",
+      "name": "Window #f8fafc / Text #12171d",
+      "x": 16,
+      "y": 164,
+      "text": "Window #f8fafc / Text #12171d",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.37254901960784315,
+        "g": 0.40784313725490196,
+        "b": 0.45098039215686275
+      }
+    },
+    "nodeId": "11:525"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "oled / blue",
+      "x": 32,
+      "y": 560,
+      "width": 366,
+      "height": 194,
+      "fillColor": {
+        "r": 0.0196078431372549,
+        "g": 0.023529411764705882,
+        "b": 0.027450980392156862
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:459"
+    },
+    "nodeId": "11:526"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:526",
+      "name": "OLED / blue",
+      "x": 16,
+      "y": 14,
+      "text": "OLED / blue",
+      "fontSize": 16,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.9529411764705882,
+        "g": 0.9647058823529412,
+        "b": 0.9725490196078431
+      }
+    },
+    "nodeId": "11:527"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:526",
+      "name": "Paralyzed",
+      "x": 16,
+      "y": 44,
+      "text": "Paralyzed",
+      "fontSize": 18,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.9529411764705882,
+        "g": 0.9647058823529412,
+        "b": 0.9725490196078431
+      }
+    },
+    "nodeId": "11:528"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:526",
+      "name": "Riverline",
+      "x": 16,
+      "y": 72,
+      "text": "Riverline",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.6823529411764706,
+        "g": 0.7176470588235294,
+        "b": 0.7647058823529411
+      }
+    },
+    "nodeId": "11:529"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "Primary action",
+      "x": 16,
+      "y": 108,
+      "width": 108,
+      "height": 38,
+      "fillColor": {
+        "r": 0.3764705882352941,
+        "g": 0.6470588235294118,
+        "b": 0.9803921568627451
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:526"
+    },
+    "nodeId": "11:530"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:530",
+      "name": "Play",
+      "x": 18,
+      "y": 9,
+      "text": "Play",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.023529411764705882,
+        "g": 0.06274509803921569,
+        "b": 0.11764705882352941
+      }
+    },
+    "nodeId": "11:531"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:526",
+      "name": "Accent #60a5fa",
+      "x": 142,
+      "y": 117,
+      "text": "Accent #60a5fa",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.6823529411764706,
+        "g": 0.7176470588235294,
+        "b": 0.7647058823529411
+      }
+    },
+    "nodeId": "11:532"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:526",
+      "name": "Window #000000 / Text #f3f6f8",
+      "x": 16,
+      "y": 164,
+      "text": "Window #000000 / Text #f3f6f8",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.5294117647058824,
+        "g": 0.5686274509803921,
+        "b": 0.6235294117647059
+      }
+    },
+    "nodeId": "11:533"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "oled / teal",
+      "x": 422,
+      "y": 560,
+      "width": 366,
+      "height": 194,
+      "fillColor": {
+        "r": 0.0196078431372549,
+        "g": 0.023529411764705882,
+        "b": 0.027450980392156862
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:459"
+    },
+    "nodeId": "11:534"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:534",
+      "name": "OLED / teal",
+      "x": 16,
+      "y": 14,
+      "text": "OLED / teal",
+      "fontSize": 16,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.9529411764705882,
+        "g": 0.9647058823529412,
+        "b": 0.9725490196078431
+      }
+    },
+    "nodeId": "11:535"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:534",
+      "name": "Paralyzed",
+      "x": 16,
+      "y": 44,
+      "text": "Paralyzed",
+      "fontSize": 18,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.9529411764705882,
+        "g": 0.9647058823529412,
+        "b": 0.9725490196078431
+      }
+    },
+    "nodeId": "11:536"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:534",
+      "name": "Riverline",
+      "x": 16,
+      "y": 72,
+      "text": "Riverline",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.6823529411764706,
+        "g": 0.7176470588235294,
+        "b": 0.7647058823529411
+      }
+    },
+    "nodeId": "11:537"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "Primary action",
+      "x": 16,
+      "y": 108,
+      "width": 108,
+      "height": 38,
+      "fillColor": {
+        "r": 0.17647058823529413,
+        "g": 0.8313725490196079,
+        "b": 0.7490196078431373
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:534"
+    },
+    "nodeId": "11:538"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:538",
+      "name": "Play",
+      "x": 18,
+      "y": 9,
+      "text": "Play",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.011764705882352941,
+        "g": 0.0784313725490196,
+        "b": 0.07058823529411765
+      }
+    },
+    "nodeId": "11:539"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:534",
+      "name": "Accent #2dd4bf",
+      "x": 142,
+      "y": 117,
+      "text": "Accent #2dd4bf",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.6823529411764706,
+        "g": 0.7176470588235294,
+        "b": 0.7647058823529411
+      }
+    },
+    "nodeId": "11:540"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:534",
+      "name": "Window #000000 / Text #f3f6f8",
+      "x": 16,
+      "y": 164,
+      "text": "Window #000000 / Text #f3f6f8",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.5294117647058824,
+        "g": 0.5686274509803921,
+        "b": 0.6235294117647059
+      }
+    },
+    "nodeId": "11:541"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "oled / coral",
+      "x": 812,
+      "y": 560,
+      "width": 366,
+      "height": 194,
+      "fillColor": {
+        "r": 0.0196078431372549,
+        "g": 0.023529411764705882,
+        "b": 0.027450980392156862
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:459"
+    },
+    "nodeId": "11:542"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:542",
+      "name": "OLED / coral",
+      "x": 16,
+      "y": 14,
+      "text": "OLED / coral",
+      "fontSize": 16,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.9529411764705882,
+        "g": 0.9647058823529412,
+        "b": 0.9725490196078431
+      }
+    },
+    "nodeId": "11:543"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:542",
+      "name": "Paralyzed",
+      "x": 16,
+      "y": 44,
+      "text": "Paralyzed",
+      "fontSize": 18,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.9529411764705882,
+        "g": 0.9647058823529412,
+        "b": 0.9725490196078431
+      }
+    },
+    "nodeId": "11:544"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:542",
+      "name": "Riverline",
+      "x": 16,
+      "y": 72,
+      "text": "Riverline",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.6823529411764706,
+        "g": 0.7176470588235294,
+        "b": 0.7647058823529411
+      }
+    },
+    "nodeId": "11:545"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "Primary action",
+      "x": 16,
+      "y": 108,
+      "width": 108,
+      "height": 38,
+      "fillColor": {
+        "r": 0.984313725490196,
+        "g": 0.44313725490196076,
+        "b": 0.5215686274509804
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:542"
+    },
+    "nodeId": "11:546"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:546",
+      "name": "Play",
+      "x": 18,
+      "y": 9,
+      "text": "Play",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.13333333333333333,
+        "g": 0.0196078431372549,
+        "b": 0.0392156862745098
+      }
+    },
+    "nodeId": "11:547"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:542",
+      "name": "Accent #fb7185",
+      "x": 142,
+      "y": 117,
+      "text": "Accent #fb7185",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.6823529411764706,
+        "g": 0.7176470588235294,
+        "b": 0.7647058823529411
+      }
+    },
+    "nodeId": "11:548"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:542",
+      "name": "Window #000000 / Text #f3f6f8",
+      "x": 16,
+      "y": 164,
+      "text": "Window #000000 / Text #f3f6f8",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.5294117647058824,
+        "g": 0.5686274509803921,
+        "b": 0.6235294117647059
+      }
+    },
+    "nodeId": "11:549"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "oled / neutral",
+      "x": 1202,
+      "y": 560,
+      "width": 366,
+      "height": 194,
+      "fillColor": {
+        "r": 0.0196078431372549,
+        "g": 0.023529411764705882,
+        "b": 0.027450980392156862
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:459"
+    },
+    "nodeId": "11:550"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:550",
+      "name": "OLED / neutral",
+      "x": 16,
+      "y": 14,
+      "text": "OLED / neutral",
+      "fontSize": 16,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.9529411764705882,
+        "g": 0.9647058823529412,
+        "b": 0.9725490196078431
+      }
+    },
+    "nodeId": "11:551"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:550",
+      "name": "Paralyzed",
+      "x": 16,
+      "y": 44,
+      "text": "Paralyzed",
+      "fontSize": 18,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.9529411764705882,
+        "g": 0.9647058823529412,
+        "b": 0.9725490196078431
+      }
+    },
+    "nodeId": "11:552"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:550",
+      "name": "Riverline",
+      "x": 16,
+      "y": 72,
+      "text": "Riverline",
+      "fontSize": 13,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.6823529411764706,
+        "g": 0.7176470588235294,
+        "b": 0.7647058823529411
+      }
+    },
+    "nodeId": "11:553"
+  },
+  {
+    "command": "create_frame",
+    "params": {
+      "name": "Primary action",
+      "x": 16,
+      "y": 108,
+      "width": 108,
+      "height": 38,
+      "fillColor": {
+        "r": 0.796078431372549,
+        "g": 0.8352941176470589,
+        "b": 0.8823529411764706
+      },
+      "layoutMode": "NONE",
+      "paddingTop": 0,
+      "paddingBottom": 0,
+      "paddingLeft": 0,
+      "paddingRight": 0,
+      "itemSpacing": 0,
+      "parentId": "11:550"
+    },
+    "nodeId": "11:554"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:554",
+      "name": "Play",
+      "x": 18,
+      "y": 9,
+      "text": "Play",
+      "fontSize": 15,
+      "fontWeight": 600,
+      "fontColor": {
+        "r": 0.06666666666666667,
+        "g": 0.09411764705882353,
+        "b": 0.15294117647058825
+      }
+    },
+    "nodeId": "11:555"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:550",
+      "name": "Accent #cbd5e1",
+      "x": 142,
+      "y": 117,
+      "text": "Accent #cbd5e1",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.6823529411764706,
+        "g": 0.7176470588235294,
+        "b": 0.7647058823529411
+      }
+    },
+    "nodeId": "11:556"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:550",
+      "name": "Window #000000 / Text #f3f6f8",
+      "x": 16,
+      "y": 164,
+      "text": "Window #000000 / Text #f3f6f8",
+      "fontSize": 12,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.5294117647058824,
+        "g": 0.5686274509803921,
+        "b": 0.6235294117647059
+      }
+    },
+    "nodeId": "11:557"
+  },
+  {
+    "command": "create_text",
+    "params": {
+      "parentId": "11:459",
+      "name": "Inter / restrained surfaces / no cream default / preser",
+      "x": 32,
+      "y": 796,
+      "text": "Inter / restrained surfaces / no cream default / preserve existing custom palettes",
+      "fontSize": 14,
+      "fontWeight": 400,
+      "fontColor": {
+        "r": 0.6823529411764706,
+        "g": 0.7176470588235294,
+        "b": 0.7647058823529411
+      }
+    },
+    "nodeId": "11:558"
+  }
+]

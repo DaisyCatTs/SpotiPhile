@@ -6,7 +6,9 @@ use crate::api::models::pick_image;
 use crate::app::App;
 use crate::i18n::{gettext, ngettext, pgettext};
 use crate::model::{Action, Dialog};
-use crate::settings::{LanguageChoice, ProxyMode, ThemeChoice};
+use crate::settings::{
+    AccentChoice, DensityChoice, LanguageChoice, ProxyMode, ThemeChoice, ThemeVariant,
+};
 use crate::theme::{self, Icon, Palette};
 
 use super::widgets;
@@ -882,6 +884,14 @@ pub fn show(app: &mut App, ui: &mut egui::Ui) {
                 "Show the song moving behind the player bar's controls while it plays here.",
             ),
         ),
+        RowText::new(
+            gettext(locale, "Accent"),
+            gettext(locale, "Accent for built-in themes. Custom themes keep their own colours."),
+        ),
+        RowText::new(
+            gettext(locale, "Row density"),
+            gettext(locale, "Choose the spacing of track rows."),
+        ),
     ];
     if section_matches(&needle, &appearance, &appearance_rows) {
         any_visible = true;
@@ -904,7 +914,13 @@ pub fn show(app: &mut App, ui: &mut egui::Ui) {
                             .custom_theme
                             .as_deref()
                             .map(|filename| fastframe_theme::display_name(filename).into())
-                            .unwrap_or_else(|| app.settings.theme.label(locale));
+                            .unwrap_or_else(|| {
+                                if app.settings.daisy_theme_variant == Some(ThemeVariant::Oled) {
+                                    gettext(locale, "OLED")
+                                } else {
+                                    app.settings.theme.label(locale)
+                                }
+                            });
                         let response = egui::ComboBox::from_id_salt("appearance_theme")
                             .selected_text(selected.as_ref())
                             .width(200.0_f32.min(ui.available_width()))
@@ -913,6 +929,7 @@ pub fn show(app: &mut App, ui: &mut egui::Ui) {
                                     if ui
                                         .selectable_label(
                                             app.settings.custom_theme.is_none()
+                                                && app.settings.daisy_theme_variant.is_none()
                                                 && app.settings.theme == choice,
                                             choice.label(locale).as_ref(),
                                         )
@@ -920,6 +937,17 @@ pub fn show(app: &mut App, ui: &mut egui::Ui) {
                                     {
                                         app.actions.push(Action::SetTheme(choice));
                                     }
+                                }
+                                if ui
+                                    .selectable_label(
+                                        app.settings.custom_theme.is_none()
+                                            && app.settings.daisy_theme_variant
+                                                == Some(ThemeVariant::Oled),
+                                        gettext(locale, "OLED"),
+                                    )
+                                    .clicked()
+                                {
+                                    app.actions.push(Action::SetOledTheme);
                                 }
                                 if app.custom_themes.picker_themes().next().is_some() {
                                     ui.separator();
@@ -991,6 +1019,79 @@ pub fn show(app: &mut App, ui: &mut egui::Ui) {
                 &appearance,
                 &appearance_rows[1],
                 |ui| language_picker(app, ui),
+            );
+            filtered_row(
+                ui,
+                &palette,
+                &needle,
+                &appearance,
+                &appearance_rows[9],
+                |ui| {
+                    let selected = app.settings.daisy_accent.unwrap_or_default();
+                    let label = |choice| match choice {
+                        AccentChoice::Blue => gettext(locale, "Blue"),
+                        AccentChoice::Teal => gettext(locale, "Teal"),
+                        AccentChoice::Coral => gettext(locale, "Coral"),
+                        AccentChoice::Neutral => gettext(locale, "Neutral"),
+                    };
+                    let response = egui::ComboBox::from_id_salt("appearance_accent")
+                        .selected_text(label(selected))
+                        .show_ui(ui, |ui| {
+                            for choice in AccentChoice::ALL {
+                                if ui
+                                    .selectable_label(choice == selected, label(choice))
+                                    .clicked()
+                                {
+                                    app.actions.push(Action::SetAccent(choice));
+                                }
+                            }
+                        });
+                    response.response.widget_info(|| {
+                        let mut info = egui::WidgetInfo::labeled(
+                            egui::WidgetType::ComboBox,
+                            ui.is_enabled(),
+                            gettext(locale, "Accent"),
+                        );
+                        info.current_text_value = Some(label(selected).into_owned());
+                        info
+                    });
+                },
+            );
+            filtered_row(
+                ui,
+                &palette,
+                &needle,
+                &appearance,
+                &appearance_rows[10],
+                |ui| {
+                    let selected = app.settings.daisy_density.unwrap_or_default();
+                    let label = |choice| match choice {
+                        DensityChoice::Compact => gettext(locale, "Compact"),
+                        DensityChoice::Default => gettext(locale, "Default"),
+                        DensityChoice::Comfortable => gettext(locale, "Comfortable"),
+                    };
+                    let response = egui::ComboBox::from_id_salt("appearance_density")
+                        .selected_text(label(selected))
+                        .show_ui(ui, |ui| {
+                            for choice in DensityChoice::ALL {
+                                if ui
+                                    .selectable_label(choice == selected, label(choice))
+                                    .clicked()
+                                {
+                                    app.actions.push(Action::SetDensity(choice));
+                                }
+                            }
+                        });
+                    response.response.widget_info(|| {
+                        let mut info = egui::WidgetInfo::labeled(
+                            egui::WidgetType::ComboBox,
+                            ui.is_enabled(),
+                            gettext(locale, "Row density"),
+                        );
+                        info.current_text_value = Some(label(selected).into_owned());
+                        info
+                    });
+                },
             );
             filtered_row(
                 ui,
@@ -1857,7 +1958,7 @@ pub fn show(app: &mut App, ui: &mut egui::Ui) {
     let source_code = gettext(locale, "Source code");
     let about_rows = [
         RowText::new(
-            format!("Spotifast {}", env!("CARGO_PKG_VERSION")),
+            format!("Spotiphile {}", env!("CARGO_PKG_VERSION")),
             built_with.clone(),
         ),
         RowText::new(
@@ -1874,7 +1975,7 @@ pub fn show(app: &mut App, ui: &mut egui::Ui) {
                 ui.vertical(|ui| {
                     theme::text(
                         ui,
-                        format!("Spotifast {}", env!("CARGO_PKG_VERSION")),
+                        format!("Spotiphile {}", env!("CARGO_PKG_VERSION")),
                         theme::semibold(15.0),
                         palette.text,
                     );

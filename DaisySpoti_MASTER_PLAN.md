@@ -603,18 +603,18 @@ Sections:
 
 Actions:
 
-- [ ] Play Next.
-- [ ] Play Later.
-- [ ] Add to Queue.
+- [x] Play Next.
+- [x] Play Later.
+- [x] Add to Queue.
 - [ ] Replace Queue.
 - [ ] Pin Next.
-- [ ] move top/bottom.
-- [ ] drag reorder.
-- [ ] multi-select block drag.
-- [ ] remove selected.
-- [ ] clear manual queue.
-- [ ] preserve context queue.
-- [ ] undo/redo.
+- [x] move top/bottom.
+- [x] drag reorder.
+- [x] multi-select block drag.
+- [x] remove selected.
+- [x] clear manual queue.
+- [x] preserve context queue.
+- [~] undo/redo.
 - [ ] save queue as playlist.
 - [ ] save queue as Session Capsule.
 - [ ] shuffle selected subsection.
@@ -623,13 +623,13 @@ Actions:
 
 Desktop behavior:
 
-- [ ] Ctrl/Cmd+A
-- [ ] Ctrl/Cmd+C
-- [ ] Ctrl/Cmd+X
-- [ ] Ctrl/Cmd+V
-- [ ] Shift range select
-- [ ] Ctrl/Cmd toggle select
-- [ ] keyboard reorder
+- [x] Ctrl/Cmd+A
+- [x] Ctrl/Cmd+C
+- [x] Ctrl/Cmd+X
+- [x] Ctrl/Cmd+V
+- [x] Shift range select
+- [x] Ctrl/Cmd toggle select
+- [x] keyboard reorder
 
 Remote capability UX:
 
@@ -638,6 +638,8 @@ Remote capability UX:
 - [ ] no fake queue operations that the provider cannot guarantee.
 
 ---
+
+Validation scope: [queue selection, Play Later and inherited queue controls](docs/features/queue-batch-validation.md). These checks cover existing native local controls, not the proposed five-layer queue redesign or authenticated remote playlist creation.
 
 # 11. SESSION CAPSULES — BOLD DIFFERENTIATOR
 
@@ -2228,32 +2230,80 @@ Release:
 
 ## Phase 1 — Figma / Design System / Shell
 
-- [ ] Figma foundations.
-- [ ] tokens.
-- [ ] components.
-- [ ] shell.
-- [ ] nav.
-- [ ] player bar.
-- [ ] inspector.
-- [ ] themes.
-- [ ] density.
-- [ ] loading/error states.
-- [ ] accessibility foundation.
+Progress, 2026-10-10: the rejected 25:2 study is labeled as history. A further
+visual refinement, before/after captures and interaction checks are recorded in
+`docs/design/README.md` and `refinement-validation.json`. Twenty-seven layout
+cases passed; review-found narrow naming, selection and filtering issues were
+fixed. This is unapproved prototype work, not a new native restyle or completed
+Figma foundation. Phase 1 checkboxes remain in progress.
+
+
+Progress, 2026-10-09: a new composition proposal and editable Figma study
+(node 25:2) are recorded in `docs/design/README.md`. Twenty-seven geometry cases
+passed. Native popup regressions, final Windows tests/Clippy/docs and release
+build passed. Visual approval, translation synchronization and bound Figma
+variables/components remain outstanding. Phase 1 stays in progress.
+
+
+Design status, 2026-10-08: Daisy rejected the first shell draft and cream/gold
+palette. Comparative desktop-music UI research and a replacement visual review
+are recorded in `docs/design/`. Daisy selected **Spotiphile** as the product name
+and authorized continuing Phase 1 native implementation after the replacement
+review. Package, profile, credential and updater identities are not migrated.
+Daisy subsequently rejected the replacement prototype/native composition as
+unprofessional. Further broad native styling is paused pending a stronger
+full-screen design review. Daisy also rejected the subsequent 25:2 composition
+proposal on 2026-10-09; further visual refinement remains in progress.
+The selected Spotiphile name and theme requirement
+remain. See `docs/design/PROFESSIONAL_DESIGN_REVIEW.md`. Passing implementation
+checks does not count as visual approval.
+
+- [~] Figma foundations.
+- [~] tokens.
+- [~] components.
+- [~] shell.
+- [~] nav.
+- [~] player bar.
+- [~] inspector.
+- [~] themes.
+- [~] density.
+- [~] loading/error states.
+- [~] accessibility foundation.
 
 **Exit:** New Daisy UI can drive existing backend.
 
 ## Phase 2 — Core Control
 
+Scope update, 2026-10-10: Daisy explicitly paused visual redesign and authorized
+queue/playback feature work through the existing native controls. Phase 1 visual
+approval remains outstanding; this authorizes focused Play Next, Play Later, manual queue selection, shortcuts and
+batch/edge controls before Phase 1 completion, not an automatic transition through the
+remaining roadmap.
+Play Next is limited to the active local player; remote Add to Queue keeps append
+semantics. No Pure Shuffle, new UI shell or audio-engine expansion is included.
+
+
 - [ ] Pure Shuffle.
 - [ ] Fresh Shuffle.
 - [ ] Queue 2.0.
-- [ ] Play Next.
-- [ ] Play Later.
-- [ ] multiselect.
-- [ ] shortcuts.
+- [x] Play Next.
+- [x] Play Later.
+- [x] multiselect.
+- [x] shortcuts.
 - [ ] Ctrl+K.
 - [ ] capability model.
 - [ ] Session Capsules.
+
+Play Next validation: [local action, native menu clicks, queue regressions and
+Windows checks](docs/features/play-next-validation.md). This completes the
+focused local action only; Queue 2.0 and the Phase 2 exit criterion remain open.
+
+Manual queue edge controls validation: [top/bottom moves, occurrence guards and
+Windows checks](docs/features/queue-edge-validation.md).
+
+Queue selection and Play Later validation: [native input events, occurrence edits,
+clipboard, capability guards and Windows checks](docs/features/queue-batch-validation.md).
+The shortcuts checkbox covers the queue; global command-palette work remains open.
 
 **Exit:** Daisy beats Spotify on deterministic playback control.
 

@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-08",
+  "fileKey": "QY3qv8UVxL4PhHPEs0xHJo",
+  "product": "Spotiphile",
+  "status": "blocked_official_write_quota",
+  "operation": "Read-only discovery using figma_use_figma: pages, local collections, available Inter fonts and API capability types",
+  "response": {
+    "isError": true,
+    "error_code": "INVALID_ARGUMENT",
+    "message": "You've reached the Figma MCP tool call limit on the Starter plan. Upgrade your plan for more tool calls: https://www.figma.com/files/team/1502434246888342961/all-projects?upgrade=mcp_rate_limit_paywall"
+  },
+  "createdNodeIds": [],
+  "mutatedNodeIds": [],
+  "createdVariables": [],
+  "createdComponents": [],
+  "validation": {
+    "newFigmaPages": false,
+    "boundVariables": false,
+    "reusableComponents": false,
+    "newScreenshots": false,
+    "nativeTokenSourceInspected": true
+  },
+  "sources": ["DaisySpoti_MASTER_PLAN.md", "docs/design/research-tokens.json", "src/theme.rs", "src/settings.rs"],
+  "existingHistoricalNodesPreserved": true,
+  "retry": "Resume with a read-only discovery when official use_figma access is available. Do not infer write access from successful get_metadata. No automatic upgrade or repeated quota retries.",
+  "localRelayLimitation": "The available primitive relay cannot create actual Figma variables or reusable component definitions, so it is not an equivalent implementation of these foundations."
+}

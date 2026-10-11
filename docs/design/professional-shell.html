@@ -1,0 +1,1893 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spotiphile Professional Shell Review</title>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("research-assets/InterVariable.ttf") format("truetype");
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      color-scheme: dark;
+      --review-bg: #090a0c;
+      --review-panel: #121417;
+      --review-line: #2a2e35;
+      --review-text: #f2f4f6;
+      --review-muted: #9aa2ac;
+      --app-bg: #17191d;
+      --chrome: #101216;
+      --surface: #1c1f24;
+      --surface-2: #24282e;
+      --surface-3: #232830;
+      --surface-4: #2b313a;
+      --line: #30363f;
+      --soft-line: rgba(255, 255, 255, 0.07);
+      --hairline: rgba(255, 255, 255, 0.045);
+      --text: #edf0f4;
+      --text-2: #c7cdd3;
+      --muted: #8e98a4;
+      --faint: #909ba8;
+      --accent: #5b9dff;
+      --accent-soft: rgba(91, 157, 255, 0.16);
+      --accent-row: rgba(91, 157, 255, 0.1);
+      --on-accent: #061327;
+      --shadow: rgba(0, 0, 0, 0.32);
+      --art-shadow: 0 18px 42px rgba(0, 0, 0, 0.33);
+      --focus: 0 0 0 2px var(--app-bg), 0 0 0 4px var(--accent);
+      --topbar: 54px;
+      --player: 88px;
+      --sidebar: 224px;
+      --inspector: 308px;
+      --gap: 14px;
+      --row: 46px;
+      --radius: 8px;
+      --radius-sm: 6px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    [data-theme="light"] {
+      color-scheme: light;
+      --review-bg: #eceff2;
+      --review-panel: #ffffff;
+      --review-line: #d2d7df;
+      --review-text: #12161b;
+      --review-muted: #606b78;
+      --app-bg: #f2f4f5;
+      --chrome: #ffffff;
+      --surface: #ffffff;
+      --surface-2: #eef1f3;
+      --surface-3: #e4e9ed;
+      --surface-4: #d9e0e7;
+      --line: #cbd2d9;
+      --soft-line: rgba(17, 24, 39, 0.08);
+      --hairline: rgba(17, 24, 39, 0.055);
+      --text: #111417;
+      --text-2: #3d4752;
+      --muted: #63707e;
+      --faint: #63707e;
+      --accent: #285cc8;
+      --accent-soft: rgba(40, 92, 200, 0.12);
+      --accent-row: rgba(40, 92, 200, 0.075);
+      --on-accent: #ffffff;
+      --shadow: rgba(30, 38, 48, 0.11);
+      --art-shadow: 0 18px 34px rgba(31, 42, 55, 0.18);
+    }
+
+    [data-theme="oled"] {
+      --app-bg: #000000;
+      --chrome: #050607;
+      --surface: #08090b;
+      --surface-2: #0f1114;
+      --surface-3: #171b20;
+      --surface-4: #20252d;
+      --line: #242a31;
+      --soft-line: rgba(255, 255, 255, 0.06);
+      --hairline: rgba(255, 255, 255, 0.04);
+      --shadow: rgba(0, 0, 0, 0.6);
+    }
+
+    [data-accent="teal"] {
+      --accent: #3fb7ad;
+      --accent-soft: rgba(63, 183, 173, 0.17);
+      --on-accent: #031312;
+    }
+
+    [data-accent="coral"] {
+      --accent: #d9798d;
+      --accent-soft: rgba(217, 121, 141, 0.15);
+      --on-accent: #22070d;
+    }
+
+    [data-accent="neutral"] {
+      --accent: #d7dde4;
+      --accent-soft: rgba(215, 221, 228, 0.13);
+      --on-accent: #111417;
+    }
+
+    [data-theme="light"][data-accent="teal"] {
+      --accent: #087f78;
+      --on-accent: #ffffff;
+    }
+
+    [data-theme="light"][data-accent="coral"] {
+      --accent: #b73f59;
+      --on-accent: #ffffff;
+    }
+
+    [data-theme="light"][data-accent="neutral"] {
+      --accent: #404852;
+      --on-accent: #ffffff;
+    }
+
+    [data-density="compact"] {
+      --topbar: 50px;
+      --player: 78px;
+      --gap: 8px;
+      --row: 38px;
+    }
+
+    [data-density="comfortable"] {
+      --topbar: 58px;
+      --player: 96px;
+      --gap: 16px;
+      --row: 54px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+    }
+
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: var(--review-bg);
+      color: var(--review-text);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button,
+    select {
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    [tabindex]:focus-visible {
+      outline: none;
+      box-shadow: var(--focus);
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 6px;
+      font-size: 28px;
+      line-height: 34px;
+      letter-spacing: 0;
+      font-weight: 620;
+    }
+
+    h2 {
+      margin-bottom: 0;
+      font-size: 16px;
+      line-height: 22px;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin-bottom: 0;
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 600;
+      letter-spacing: 0;
+    }
+
+    .icon {
+      width: 18px;
+      height: 18px;
+      display: block;
+      flex: 0 0 auto;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .review {
+      height: 100vh;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .review-bar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--review-line);
+      background: var(--review-panel);
+    }
+
+    [data-presentation="true"] .review-bar { display: none; }
+    [data-presentation="true"] .review { grid-template-rows: minmax(0, 1fr); }
+
+    .review-title {
+      min-width: 0;
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .review-title strong {
+      color: var(--review-text);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .review-title span {
+      min-width: 0;
+      overflow: hidden;
+      color: var(--review-muted);
+      font-size: 12px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .review-controls {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .review-controls button,
+    .review-controls select {
+      height: 30px;
+      border: 1px solid var(--review-line);
+      border-radius: 6px;
+      background: transparent;
+      color: var(--review-text);
+      padding: 0 9px;
+    }
+
+    .review-controls button[aria-pressed="true"] {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: var(--on-accent);
+      font-weight: 760;
+    }
+
+    .spotiphile {
+      min-height: 0;
+      display: grid;
+      grid-template-rows: var(--topbar) minmax(0, 1fr) var(--player);
+      background: var(--app-bg);
+      color: var(--text);
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(86px, auto) minmax(220px, 640px) auto;
+      align-items: center;
+      gap: 12px;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--hairline);
+      background: color-mix(in srgb, var(--chrome) 92%, var(--surface-2));
+    }
+
+    .window-actions,
+    .top-tools,
+    .player-left,
+    .player-controls,
+    .player-right,
+    .actions,
+    .segmented {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .search {
+      min-width: 0;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      border: 1px solid var(--soft-line);
+      border-radius: var(--radius-sm);
+      background: color-mix(in srgb, var(--surface) 86%, var(--surface-2));
+      color: var(--muted);
+      padding: 0 11px;
+    }
+
+    .search input {
+      min-width: 0;
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text);
+    }
+
+    .search input::placeholder {
+      color: var(--faint);
+    }
+
+    .shell {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: var(--sidebar) minmax(0, 1fr) var(--inspector);
+    }
+
+    [data-inspector="closed"] .shell {
+      grid-template-columns: var(--sidebar) minmax(0, 1fr);
+    }
+
+    .sidebar {
+      min-width: 0;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      gap: 14px;
+      padding: 14px 10px 12px;
+      border-right: 1px solid var(--hairline);
+      background: linear-gradient(180deg, color-mix(in srgb, var(--chrome) 94%, var(--surface-2)), var(--chrome));
+    }
+
+    .brand {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: 32px minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+      padding: 0 8px 14px;
+      border-bottom: 1px solid var(--soft-line);
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--soft-line));
+      border-radius: 8px;
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .brand b,
+    .title,
+    .sub,
+    .truncate {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .brand b {
+      display: block;
+      font-size: 15px;
+      line-height: 1.15;
+      font-weight: 650;
+    }
+
+    .brand span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .nav,
+    .sidebar-list,
+    .queue-list {
+      min-width: 0;
+      display: grid;
+      gap: 3px;
+    }
+
+    .nav {
+      gap: 4px;
+    }
+
+    .nav-button,
+    .side-row,
+    .icon-button,
+    .text-button,
+    .tab-button,
+    .album,
+    .browser-option,
+    .track-row,
+    .queue-item {
+      border: 1px solid transparent;
+      color: inherit;
+    }
+
+    .nav-button,
+    .side-row {
+      min-width: 0;
+      min-height: 40px;
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--text-2);
+      text-align: left;
+      padding: 0 9px;
+      font-weight: 500;
+    }
+
+    .nav-button[aria-current="page"] {
+      border-color: transparent;
+      background: var(--accent-soft);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .nav-button:hover,
+    .side-row:hover,
+    .icon-button:hover,
+    .text-button:hover,
+    .tab-button:hover,
+    .album:hover,
+    .browser-option:hover,
+    .track-row:hover,
+    .queue-item:hover {
+      background: color-mix(in srgb, var(--surface-3) 78%, transparent);
+    }
+
+    .side-scroll {
+      min-height: 0;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .section-label {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 16px;
+      font-weight: 600;
+      letter-spacing: 0;
+      text-transform: none;
+      padding: 8px 8px 4px;
+    }
+
+    .side-row .count {
+      color: var(--faint);
+      font-size: 12px;
+    }
+
+    .workspace {
+      min-width: 0;
+      overflow: auto;
+      padding: 20px 24px 26px;
+      background: var(--app-bg);
+    }
+
+    .page {
+      display: none;
+      min-width: 0;
+    }
+
+    [data-page="home"] .page-home,
+    [data-page="library"] .page-library,
+    [data-page="playlist"] .page-playlist {
+      display: grid;
+      gap: var(--gap);
+    }
+
+    .page-head {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .overline {
+      margin-bottom: 4px;
+      color: var(--faint);
+      font-size: 12px;
+      line-height: 16px;
+      font-weight: 600;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .meta {
+      margin-bottom: 0;
+      color: var(--muted);
+      line-height: 20px;
+    }
+
+    .layout-home {
+      display: grid;
+      grid-template-columns: minmax(0, 0.88fr) minmax(420px, 1.12fr);
+      gap: var(--gap);
+      align-items: start;
+    }
+
+    .home-composition {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel,
+    .record,
+    .playlist-head,
+    .browser {
+      min-width: 0;
+      border: 1px solid var(--soft-line);
+      border-radius: var(--radius);
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .panel {
+      overflow: hidden;
+    }
+
+    .home-section {
+      min-width: 0;
+      display: grid;
+      gap: 12px;
+    }
+
+    .home-section-head {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .record {
+      display: grid;
+      grid-template-columns: minmax(150px, 190px) minmax(0, 1fr);
+      gap: 16px;
+      padding: 14px;
+      background:
+        linear-gradient(135deg, color-mix(in srgb, var(--accent) 13%, transparent), transparent 42%),
+        color-mix(in srgb, var(--surface) 82%, transparent);
+    }
+
+    .cover-large,
+    .cover-medium,
+    .cover-small,
+    .cover-tiny {
+      overflow: hidden;
+      border: 1px solid var(--soft-line);
+      background: var(--surface-2);
+      box-shadow: 0 6px 18px color-mix(in srgb, var(--shadow) 55%, transparent);
+    }
+
+    .cover-large {
+      aspect-ratio: 1;
+      border-radius: 7px;
+    }
+
+    .cover-medium {
+      width: 86px;
+      height: 86px;
+      border-radius: 7px;
+    }
+
+    .cover-small {
+      width: 42px;
+      height: 42px;
+      border-radius: 6px;
+    }
+
+    .cover-tiny {
+      width: 32px;
+      height: 32px;
+      border-radius: 5px;
+    }
+
+    .side-art {
+      width: 26px;
+      height: 26px;
+      overflow: hidden;
+      border: 1px solid var(--soft-line);
+      border-radius: 4px;
+      background: var(--surface-2);
+      box-shadow: 0 3px 8px color-mix(in srgb, var(--shadow) 38%, transparent);
+    }
+
+    .record-copy {
+      min-width: 0;
+      align-self: center;
+      display: grid;
+      gap: 12px;
+    }
+
+    .record-title {
+      margin: 0;
+      font-size: clamp(24px, 3vw, 36px);
+      line-height: 1.05;
+      letter-spacing: 0;
+      font-weight: 600;
+    }
+
+    .actions {
+      flex-wrap: wrap;
+    }
+
+    .icon-button,
+    .text-button,
+    .tab-button {
+      min-height: 34px;
+      border-color: var(--soft-line);
+      border-radius: var(--radius-sm);
+      background: color-mix(in srgb, var(--surface-2) 86%, transparent);
+      color: var(--text-2);
+      transition: background 120ms ease, border-color 120ms ease, color 120ms ease, transform 120ms ease;
+    }
+
+    .icon-button {
+      width: 34px;
+      padding: 0;
+      display: inline-grid;
+      place-items: center;
+    }
+
+    .icon-button.plain {
+      border-color: transparent;
+      background: transparent;
+    }
+
+    .text-button,
+    .tab-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .text-button.primary,
+    .icon-button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--on-accent);
+      font-weight: 650;
+    }
+
+    .icon-button.play {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+    }
+
+    .panel-head {
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 14px 0 16px;
+      border-bottom: 1px solid var(--soft-line);
+      background: color-mix(in srgb, var(--surface-2) 54%, transparent);
+    }
+
+    .panel-head .search {
+      width: min(280px, 48%);
+      height: 32px;
+    }
+
+    .album-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      padding: 14px;
+    }
+
+    .art-grid {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 208px));
+      gap: 24px;
+    }
+
+    .album,
+    .art-tile {
+      min-width: 0;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      text-align: left;
+    }
+
+    .album {
+      display: grid;
+      grid-template-columns: 74px minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+      padding: 6px;
+    }
+
+    .art-tile {
+      display: grid;
+      gap: 10px;
+      padding: 0;
+      border: 0;
+      color: var(--text-2);
+    }
+
+    .album .cover-medium {
+      width: 74px;
+      height: 74px;
+    }
+
+    .art-tile .cover-large {
+      width: 100%;
+      min-width: 0;
+      transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+    }
+
+    .art-tile:hover .cover-large,
+    .art-tile:focus-visible .cover-large {
+      border-color: color-mix(in srgb, var(--accent) 34%, var(--soft-line));
+      box-shadow: var(--art-shadow);
+      transform: translateY(-2px);
+    }
+
+    .title {
+      display: block;
+      color: var(--text);
+      font-weight: 560;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sub {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 16px;
+    }
+
+    .track-table {
+      min-width: 0;
+      overflow: auto;
+      background: transparent;
+    }
+
+    .track-row {
+      min-height: var(--row);
+      display: grid;
+      grid-template-columns: 34px minmax(160px, 1.4fr) minmax(80px, 0.7fr) minmax(90px, 0.9fr) 52px 32px;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--hairline);
+      background: transparent;
+      color: var(--text-2);
+    }
+
+    .track-row:last-child {
+      border-bottom: 0;
+    }
+
+    .track-row.header {
+      min-height: 32px;
+      background: color-mix(in srgb, var(--surface-2) 72%, transparent);
+      color: var(--faint);
+      font-size: 12px;
+      line-height: 16px;
+      font-weight: 600;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .track-row.current {
+      background: var(--accent-row);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .track-row button {
+      width: 32px;
+      min-width: 0;
+      opacity: 0.72;
+    }
+
+    .track-row:hover button,
+    .track-row:focus-within button {
+      opacity: 1;
+    }
+
+    .track-title {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: 32px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+    }
+
+    .track-row > span, .track-title > span { min-width: 0; }
+    .track-row > span:not(.track-title) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .track-title .sub { display: none; }
+    @media (max-width: 840px) { .track-title .sub { display: block; } }
+
+    .is-current {
+      color: var(--accent);
+    }
+
+    .browser {
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .browser-col {
+      min-width: 0;
+      border-right: 1px solid var(--soft-line);
+    }
+
+    .browser-col:last-child {
+      border-right: 0;
+    }
+
+    .browser-title {
+      height: 34px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      border-bottom: 1px solid var(--soft-line);
+      background: color-mix(in srgb, var(--surface-2) 64%, transparent);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 16px;
+      font-weight: 600;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+
+    .browser-option {
+      width: 100%;
+      min-width: 0;
+      min-height: 38px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      border-radius: 0;
+      border-bottom: 1px solid var(--soft-line);
+      background: transparent;
+      color: var(--text-2);
+      text-align: left;
+      padding: 0 12px;
+    }
+
+    .browser-option.active {
+      background: var(--accent-soft);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .playlist-head {
+      display: grid;
+      grid-template-columns: 128px minmax(0, 1fr);
+      gap: 18px;
+      align-items: center;
+      padding: 14px;
+      overflow: hidden;
+    }
+
+    .playlist-head .cover-large {
+      width: 128px;
+    }
+
+    .inspector {
+      min-width: 0;
+      overflow: hidden;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      border-left: 1px solid var(--line);
+      background: linear-gradient(180deg, color-mix(in srgb, var(--chrome) 96%, var(--surface-2)), var(--chrome));
+    }
+
+    [data-inspector="closed"] .inspector {
+      display: none;
+    }
+
+    .inspector-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .inspector-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      order: 2;
+      margin-left: auto;
+    }
+
+    .inspector-menu { position: relative; }
+    .inspector-menu summary { list-style: none; cursor: pointer; }
+    .inspector-menu summary::-webkit-details-marker { display: none; }
+    .inspector-menu > div { position: absolute; right: 0; top: 38px; width: 220px; z-index: 3; padding: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; box-shadow: 0 16px 32px var(--shadow); }
+    .inspector-menu > div button { display: block; width: 100%; padding: 9px 10px; text-align: left; background: transparent; color: var(--text); }
+    .inspector-menu > div button:hover { background: var(--surface-2); }
+
+    .segmented {
+      order: 1;
+      padding: 3px;
+      border: 1px solid var(--soft-line);
+      border-radius: var(--radius-sm);
+      background: color-mix(in srgb, var(--surface) 82%, transparent);
+    }
+
+    .tab-button {
+      flex: 1 1 0;
+      min-height: 30px;
+      border: 0;
+      background: transparent;
+    }
+
+    .tab-button[aria-selected="true"] {
+      background: var(--surface-3);
+      color: var(--text);
+      box-shadow: inset 0 0 0 1px var(--soft-line);
+    }
+
+    .inspector-body {
+      min-height: 0;
+      overflow: auto;
+      padding: 12px;
+    }
+
+    .tab-panel[hidden] {
+      display: none;
+    }
+
+    .queue-item {
+      min-width: 0;
+      min-height: 48px;
+      display: grid;
+      grid-template-columns: 24px 32px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      border-radius: var(--radius-sm);
+      background: transparent;
+      color: var(--text-2);
+      padding: 6px;
+    }
+
+    .queue-item.current {
+      background: var(--accent-soft);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .lyrics {
+      display: grid;
+      gap: 14px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .lyrics p {
+      margin-bottom: 0;
+    }
+
+    .lyrics .active {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .player {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: minmax(190px, 0.92fr) minmax(280px, 1.16fr) minmax(180px, 0.92fr);
+      align-items: center;
+      gap: 16px;
+      padding: 0 16px;
+      border-top: 1px solid var(--hairline);
+      background: color-mix(in srgb, var(--chrome) 94%, var(--surface-2));
+    }
+
+    .player-left {
+      min-width: 0;
+      gap: 10px;
+    }
+
+    .player-center {
+      min-width: 0;
+      display: grid;
+      gap: 7px;
+    }
+
+    .player-controls {
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .seek {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr) 42px;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .meter {
+      position: relative;
+      height: 4px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: var(--surface-4);
+    }
+
+    .meter::before {
+      content: "";
+      position: absolute;
+      inset: 0 62% 0 0;
+      border-radius: inherit;
+      background: var(--accent);
+    }
+
+    .volume {
+      width: 82px;
+    }
+
+    .volume::before {
+      right: 30%;
+    }
+
+    .player-right {
+      justify-content: flex-end;
+      min-width: 0;
+    }
+
+    .state-layer {
+      display: none;
+      min-height: 180px;
+      place-items: center;
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+      background: color-mix(in srgb, var(--surface) 86%, transparent);
+      color: var(--muted);
+      padding: 24px;
+      text-align: center;
+    }
+
+    [data-state="loading"] .state-loading,
+    [data-state="empty"] .state-empty,
+    [data-state="error"] .state-error {
+      display: grid;
+    }
+
+    [data-state="loading"] .ready-content,
+    [data-state="empty"] .ready-content,
+    [data-state="error"] .ready-content {
+      display: none;
+    }
+
+    .skeletons {
+      width: min(330px, 70vw);
+      display: grid;
+      gap: 8px;
+      margin: 16px auto 0;
+    }
+
+    .skeletons span {
+      height: 10px;
+      border-radius: 999px;
+      background: var(--surface-3);
+    }
+
+    .page-home { row-gap: 16px !important; }
+    .home-section-head { margin-bottom: 4px; }
+    .home-section-head h2 { font-size: 20px; font-weight: 600; }
+    .home-section-head .text-button { background: transparent; border-color: transparent; color: var(--muted); font-weight: 450; }
+    .art-tile .title { font-size: 16px; line-height: 24px; font-weight: 550; }
+    .art-tile .sub { font-size: 13px; line-height: 20px; }
+    .collage { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+    .collage img { min-height: 0; }
+    .page-home .panel { border: 0; border-radius: 0; }
+    .page-home .panel-head { padding-left: 0; padding-right: 0; background: transparent; border-bottom: 0; }
+    .page-home .track-row { padding-left: 0; padding-right: 0; }
+    .page-home .track-row.header { background: transparent; }
+    .track-row .title { font-weight: 450; }
+    .track-row > :nth-child(5), .seek, .count { font-variant-numeric: tabular-nums; }
+    .playlist-head { border: 0; background: transparent; box-shadow: none; padding-left: 0; }
+    .playlist-head h1 { font-size: 38px; line-height: 46px; font-weight: 650; letter-spacing: -.8px; }
+    .player .cover-small { width: 48px; height: 48px; }
+    .player .title { font-weight: 550; }
+    .player .icon-button.plain { color: var(--muted); }
+    .player .icon-button.plain:hover { color: var(--text); }
+
+    .track-row[data-selected="true"] { background: var(--accent-soft); border-color: transparent; }
+    .track-row[hidden] { display: none; }
+    .track-row:not(.header):focus-visible { position: relative; z-index: 1; }
+    .track-row > [role="cell"]:last-child { display: flex; justify-content: flex-end; }
+    .row-selection { width: 28px !important; min-height: 28px; border: 0; padding: 0; background: transparent; color: inherit; text-align: left; }
+    .row-selection:focus-visible { box-shadow: none; outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 4px; }
+    .row-selection[aria-pressed="true"] { color: var(--accent); font-weight: 650; }
+    .filter-empty { padding: 24px 14px; color: var(--muted); margin: 0; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+
+    .desktop-only {
+      display: inline-flex;
+    }
+
+    @media (max-width: 1180px) {
+      :root {
+        --sidebar: 190px;
+        --inspector: 288px;
+      }
+
+      .layout-home {
+        grid-template-columns: 1fr;
+      }
+
+      .home-composition {
+        grid-template-columns: 1fr;
+      }
+
+      .album-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .art-grid {
+        grid-template-columns: repeat(4, minmax(100px, 1fr));
+      }
+
+      .track-row {
+        grid-template-columns: 34px minmax(170px, 1.5fr) minmax(90px, 0.7fr) 56px 36px;
+      }
+
+      .track-row > :nth-child(4) {
+        display: none;
+      }
+    }
+
+    @media (max-width: 840px) {
+      :root {
+        --topbar: 52px;
+        --player: 112px;
+        --sidebar: 64px;
+        --inspector: min(320px, 100vw);
+      }
+
+      .review-bar {
+        grid-template-columns: 1fr;
+      }
+
+      .review-title span {
+        display: none;
+      }
+
+      .topbar {
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        padding: 0 10px;
+      }
+
+      .window-actions .icon-button:nth-child(n+3),
+      .top-tools .text-button,
+      .desktop-only,
+      .brand div:last-child,
+      .nav-button span:not(.count),
+      .side-row span:not(.count):not(.side-art),
+      .side-row .count,
+      .nav-button .count,
+      .section-label {
+        display: none;
+      }
+
+      .sidebar {
+        padding: 12px 8px;
+      }
+
+      .brand {
+        grid-template-columns: 32px;
+        justify-content: center;
+        padding: 0 0 10px;
+      }
+
+      .nav-button,
+      .side-row {
+        grid-template-columns: 1fr;
+        place-items: center;
+        padding: 0;
+      }
+
+      .side-art {
+        width: 28px;
+        height: 28px;
+      }
+
+      .shell {
+        position: relative;
+      }
+
+      [data-inspector="open"] .shell {
+        grid-template-columns: var(--sidebar) minmax(0, 1fr);
+      }
+
+      [data-inspector="open"] .inspector {
+        position: absolute;
+        z-index: 4;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: min(320px, calc(100vw - var(--sidebar)));
+        box-shadow: -18px 0 34px var(--shadow);
+      }
+
+      .workspace {
+        padding: 14px 12px 18px;
+      }
+
+      .page-head,
+      .record {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .focus-art {
+        grid-template-columns: 112px minmax(0, 1fr);
+      }
+
+      .playlist-head { grid-template-columns: 96px minmax(0, 1fr); gap: 16px; padding: 12px; }
+      .playlist-head .cover-large { width: 96px; }
+
+      .record {
+        grid-template-columns: 104px minmax(0, 1fr);
+      }
+
+      .record-title {
+        font-size: 24px;
+      }
+
+      .browser {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .browser-col {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .browser-col:last-child {
+        border-bottom: 0;
+      }
+
+      .album-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .art-grid {
+        grid-template-columns: repeat(4, minmax(100px, 1fr));
+        gap: 14px;
+      }
+
+      .track-row {
+        grid-template-columns: 28px minmax(0, 1fr) 48px 32px;
+        gap: 8px;
+        padding: 0 10px;
+      }
+
+      .track-row > :nth-child(3),
+      .track-row > :nth-child(4) {
+        display: none;
+      }
+
+      .track-row.header > :nth-child(5) {
+        display: block;
+      }
+
+      .panel-head .search {
+        width: min(240px, 48%);
+      }
+
+      .player {
+        grid-template-columns: minmax(0, 1fr) auto;
+        grid-template-rows: auto auto;
+        gap: 6px 12px;
+        padding: 8px 10px;
+      }
+
+      .player-center {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        gap: 4px;
+      }
+
+      .player .cover-small { width: 36px; height: 36px; }
+      .player-controls .icon-button { width: 28px; height: 28px; min-height: 28px; }
+      .player-controls .icon-button.play { width: 32px; height: 32px; min-height: 32px; }
+      .seek { font-size: 12px; line-height: 14px; }
+
+      .player-right {
+        grid-column: 2;
+        grid-row: 1;
+      }
+
+      .player-right .volume,
+      .player-right .icon-button:nth-child(n+3) {
+        display: none;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .review-controls select {
+        width: 108px;
+      }
+
+      .topbar {
+        grid-template-columns: auto minmax(0, 1fr);
+      }
+
+      .top-tools {
+        display: none;
+      }
+
+      .record {
+        grid-template-columns: 1fr;
+      }
+
+      .focus-art {
+        grid-template-columns: 1fr;
+      }
+
+      .record .cover-large {
+        width: min(210px, 100%);
+      }
+
+      .focus-art .cover-large {
+        width: min(210px, 100%);
+      }
+
+      .art-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body data-page="home" data-theme="dark" data-accent="blue" data-density="default" data-inspector="closed" data-tab="queue" data-state="ready">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m16.5 16.5 4 4"/></symbol>
+    <symbol id="i-library" viewBox="0 0 24 24"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/><path d="M8 5v14"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 14a4 4 0 0 0 4-4V6a4 4 0 0 0-8 0v4a4 4 0 0 0 4 4Z"/><path d="M19 10a7 7 0 0 1-14 0"/><path d="M12 17v4"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1A2 2 0 1 1 4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1A2 2 0 1 1 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3h.1A1.7 1.7 0 0 0 10 3.1V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6h.1a1.7 1.7 0 0 0 1.9-.3l.1-.1A2 2 0 1 1 19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9v.1a1.7 1.7 0 0 0 1.6.9h.1a2 2 0 1 1 0 4H21a1.7 1.7 0 0 0-1.6 1Z"/></symbol>
+    <symbol id="i-wave" viewBox="0 0 24 24"><path d="M3 12h2l2-6 4 12 4-12 2 6h4"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><path d="M4 4h6v6H4z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6H4z"/><path d="M14 14h6v6h-6z"/></symbol>
+    <symbol id="i-disc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/><path d="M12 3v5"/><path d="M17 17l3 3"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7Z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14"/><path d="M16 5v14"/></symbol>
+    <symbol id="i-prev" viewBox="0 0 24 24"><path d="m11 12 8-7v14Z"/><path d="M5 19V5"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="M13 12 5 5v14Z"/><path d="M19 5v14"/></symbol>
+    <symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="m4 4 5 5"/></symbol>
+    <symbol id="i-repeat" viewBox="0 0 24 24"><path d="m17 2 4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="m7 22-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19.5 12.6 12 20l-7.5-7.4A5 5 0 1 1 12 6a5 5 0 1 1 7.5 6.6Z"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+    <symbol id="i-cast" viewBox="0 0 24 24"><path d="M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"/><path d="M2 12a8 8 0 0 1 8 8"/><path d="M2 16a4 4 0 0 1 4 4"/><path d="M2 20h.01"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  </svg>
+
+  <main class="review">
+    <div class="review-bar" aria-label="Review controls">
+      <div class="review-title">
+        <strong>Spotiphile shell review</strong>
+        <span>Desktop music workspace prototype. Review controls are outside the app.</span>
+      </div>
+      <div class="review-controls">
+        <button type="button" data-set-page="home" aria-pressed="true">Home</button>
+        <button type="button" data-set-page="library" aria-pressed="false">Library</button>
+        <button type="button" data-set-page="playlist" aria-pressed="false">Playlist</button>
+        <button type="button" data-set-theme="dark" aria-pressed="true">Dark</button>
+        <button type="button" data-set-theme="light" aria-pressed="false">Light</button>
+        <button type="button" data-set-theme="oled" aria-pressed="false">OLED</button>
+        <select id="accentSelect" aria-label="Accent">
+          <option value="blue">Blue</option>
+          <option value="teal">Teal</option>
+          <option value="coral">Coral</option>
+          <option value="neutral">Neutral</option>
+        </select>
+        <select id="densitySelect" aria-label="Density">
+          <option value="default">Default</option>
+          <option value="compact">Compact</option>
+          <option value="comfortable">Comfortable</option>
+        </select>
+        <select id="stateSelect" aria-label="State">
+          <option value="ready">Ready</option>
+          <option value="loading">Loading</option>
+          <option value="empty">Empty</option>
+          <option value="error">Error</option>
+        </select>
+      </div>
+    </div>
+
+    <section class="spotiphile" aria-label="Spotiphile desktop shell">
+      <header class="topbar">
+        <div class="window-actions" aria-label="History">
+          <button class="icon-button plain" type="button" aria-label="Back"><svg class="icon" style="transform:rotate(180deg)"><use href="#i-chevron"></use></svg></button>
+          <button class="icon-button plain" type="button" aria-label="Forward"><svg class="icon"><use href="#i-chevron"></use></svg></button>
+        </div>
+        <label class="search">
+          <svg class="icon"><use href="#i-search"></use></svg>
+          <input aria-label="Search Spotiphile" placeholder="Search music, albums, playlists">
+        </label>
+          <div class="top-tools">
+            <button class="text-button desktop-only" type="button">This computer</button>
+          <button class="icon-button" type="button" aria-label="Settings"><svg class="icon"><use href="#i-settings"></use></svg></button>
+        </div>
+      </header>
+
+      <div class="shell">
+        <aside class="sidebar" aria-label="Navigation">
+          <div class="brand">
+            <div class="brand-mark"><svg class="icon" aria-hidden="true"><use href="#i-wave"></use></svg></div>
+            <div>
+              <b>Spotiphile</b>
+            </div>
+          </div>
+          <nav class="nav" aria-label="Primary">
+            <button class="nav-button" type="button" data-nav-page="home" aria-current="page"><svg class="icon"><use href="#i-home"></use></svg><span>Home</span><span class="count"></span></button>
+            <button class="nav-button" type="button"><svg class="icon"><use href="#i-search"></use></svg><span>Search</span><span class="count"></span></button>
+            <button class="nav-button" type="button" data-nav-page="library"><svg class="icon"><use href="#i-library"></use></svg><span>Library</span><span class="count"></span></button>
+            <button class="nav-button" type="button" data-nav-page="playlist"><svg class="icon"><use href="#i-list"></use></svg><span>Playlists</span><span class="count">18</span></button>
+          </nav>
+          <div class="side-scroll">
+            <div class="section-label">Playlists</div>
+            <div class="sidebar-list">
+              <button class="side-row" type="button" data-nav-page="playlist"><span class="side-art"><img src="research-assets/glass-cover.png" alt=""></span><span class="truncate">Late drive</span><span class="count">128</span></button>
+              <button class="side-row" type="button"><span class="side-art"><img src="research-assets/shoreline-cover.png" alt=""></span><span class="truncate">Fresh saves</span><span class="count">42</span></button>
+              <button class="side-row" type="button"><span class="side-art"><img src="research-assets/architecture-cover.png" alt=""></span><span class="truncate">MilkDrop nights</span><span class="count">96</span></button>
+              <button class="side-row" type="button"><span class="side-art"><img src="research-assets/glass-cover.png" alt=""></span><span class="truncate">Late drive extended edits and night runs</span><span class="count">73</span></button>
+            </div>
+            <div class="section-label">Tools</div>
+            <div class="sidebar-list">
+              <button class="side-row" type="button"><svg class="icon"><use href="#i-wave"></use></svg><span class="truncate">MilkDrop</span><span class="count"></span></button>
+              <button class="side-row" type="button"><svg class="icon"><use href="#i-grid"></use></svg><span class="truncate">Winamp</span><span class="count"></span></button>
+            </div>
+          </div>
+          <button class="side-row" type="button"><svg class="icon"><use href="#i-settings"></use></svg><span>Settings</span><span class="count"></span></button>
+        </aside>
+
+        <section class="workspace" aria-label="Main content">
+          <div class="ready-content">
+            <article class="page page-home">
+              <div class="page-head">
+                <div>
+                  <h1>Home</h1>
+
+                </div>
+              </div>
+              <section class="home-composition" aria-label="Recently played collections">
+                <section class="home-section" aria-label="Albums and playlists">
+                  <div class="home-section-head">
+                    <h2>In your rotation</h2>
+                    <button class="text-button" type="button" data-nav-page="library">View library</button>
+                  </div>
+                  <div class="art-grid">
+                    <button class="art-tile" type="button"><span class="cover-large"><img src="research-assets/glass-cover.png" alt=""></span><span><span class="title">Late drive</span><span class="sub">128 tracks</span></span></button>
+                    <button class="art-tile" type="button"><span class="cover-large"><img src="research-assets/architecture-cover.png" alt=""></span><span><span class="title">North Index</span><span class="sub">Artist</span></span></button>
+                    <button class="art-tile" type="button"><span class="cover-large"><img src="research-assets/shoreline-cover.png" alt=""></span><span><span class="title">Fresh saves</span><span class="sub">42 tracks</span></span></button>
+                    <button class="art-tile" type="button" data-nav-page="playlist"><span class="cover-large collage"><img src="research-assets/architecture-cover.png" alt=""><img src="research-assets/glass-cover.png" alt=""><img src="research-assets/shoreline-cover.png" alt=""><img src="research-assets/architecture-cover.png" alt=""></span><span><span class="title">MilkDrop nights</span><span class="sub">Playlist · 96 tracks</span></span></button>
+                  </div>
+                </section>
+              </section>
+              <section class="panel" aria-label="Recent plays">
+                <div class="panel-head">
+                  <h2>Recent tracks</h2>
+                  <label class="search"><svg class="icon"><use href="#i-search"></use></svg><input aria-label="Filter recent plays" placeholder="Filter"></label>
+                </div>
+                <div class="track-table">
+                  <div class="track-row header"><span>#</span><span>Title</span><span>Artist</span><span>Album</span><span>Time</span><span></span></div>
+                  <div class="track-row"><span>1</span><span class="track-title"><span class="cover-tiny"><img src="research-assets/glass-cover.png" alt=""></span><span><span class="title">Glass Weather</span><span class="sub">Late drive</span></span></span><span>Mara Vale</span><span>Late drive</span><span>4:11</span><button class="icon-button plain" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                  <div class="track-row"><span>2</span><span class="track-title"><span class="cover-tiny"><img src="research-assets/architecture-cover.png" alt=""></span><span><span class="title">Signal Garden</span><span class="sub">MilkDrop nights</span></span></span><span>North Index</span><span>MilkDrop nights</span><span>5:01</span><button class="icon-button plain" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                  <div class="track-row"><span>3</span><span class="track-title"><span class="cover-tiny"><img src="research-assets/shoreline-cover.png" alt=""></span><span><span class="title">Counterpart</span><span class="sub">Saved tracks</span></span></span><span>Orchid Machine</span><span>Untitled</span><span>6:42</span><button class="icon-button plain" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                </div>
+              </section>
+            </article>
+
+            <article class="page page-library">
+              <div class="page-head">
+                <div>
+                                    <h1>Your library</h1>
+                  <p class="meta">Saved tracks, albums and artists.</p>
+                </div>
+                <div class="actions">
+                  <button class="text-button primary" type="button"><svg class="icon"><use href="#i-play"></use></svg>Play selection</button>
+                  <button class="icon-button" type="button" aria-label="More library actions"><svg class="icon"><use href="#i-more"></use></svg></button>
+                </div>
+              </div>
+              <section class="browser" aria-label="Library browser">
+                <div class="browser-col">
+                  <div class="browser-title">Collection</div>
+                  <button class="browser-option active" type="button"><span class="truncate">Saved tracks</span><span>42k</span></button>
+                  <button class="browser-option" type="button"><span class="truncate">Albums</span><span>2.4k</span></button>
+                  <button class="browser-option" type="button"><span class="truncate">Artists</span><span>812</span></button>
+                </div>
+                <div class="browser-col">
+                  <div class="browser-title">Artist</div>
+                  <button class="browser-option active" type="button"><span class="truncate">All artists</span><span></span></button>
+                  <button class="browser-option" type="button"><span class="truncate">Riverline</span><span>19</span></button>
+                  <button class="browser-option" type="button"><span class="truncate">Mara Vale</span><span>14</span></button>
+                </div>
+                <div class="browser-col">
+                  <div class="browser-title">Sort</div>
+                  <button class="browser-option active" type="button"><span class="truncate">Recently played</span><span></span></button>
+                  <button class="browser-option" type="button"><span class="truncate">Recently added</span><span></span></button>
+                  <button class="browser-option" type="button"><span class="truncate">Title</span><span></span></button>
+                </div>
+              </section>
+              <section class="panel" aria-label="Library tracks">
+                <div class="panel-head">
+                  <h2>Tracks</h2>
+                  <label class="search"><svg class="icon"><use href="#i-search"></use></svg><input aria-label="Filter shown tracks" placeholder="Filter rows"></label>
+                </div>
+                <div class="track-table">
+                  <div class="track-row header"><span>#</span><span>Title</span><span>Artist</span><span>Album</span><span>Time</span><span></span></div>
+                  <div class="track-row current"><span class="is-current"><svg class="icon"><use href="#i-wave"></use></svg></span><span class="track-title"><span class="cover-tiny"><img src="research-assets/shoreline-cover.png" alt=""></span><span><span class="title">Paralyzed</span><span class="sub">Playing</span></span></span><span>Riverline</span><span>Paralyzed</span><span>3:42</span><button class="icon-button plain" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                  <div class="track-row"><span>2</span><span class="track-title"><span class="cover-tiny"><img src="research-assets/glass-cover.png" alt=""></span><span><span class="title">Static Bloom</span><span class="sub">Saved</span></span></span><span>Orchid Machine</span><span>Static Bloom</span><span>4:19</span><button class="icon-button plain" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                  <div class="track-row"><span>3</span><span class="track-title"><span class="cover-tiny"><img src="research-assets/architecture-cover.png" alt=""></span><span><span class="title">Low Orbit</span><span class="sub">Saved</span></span></span><span>Etta Sound</span><span>Low Orbit</span><span>3:58</span><button class="icon-button plain" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                  <div class="track-row"><span>4</span><span class="track-title"><span class="cover-tiny"><img src="research-assets/shoreline-cover.png" alt=""></span><span><span class="title">After the rain</span><span class="sub">Saved</span></span></span><span>Riverline</span><span>Night window</span><span>3:39</span><button class="icon-button plain" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                  <div class="track-row"><span>5</span><span class="track-title"><span class="cover-tiny"><img src="research-assets/glass-cover.png" alt=""></span><span><span class="title">Closer</span><span class="sub">Saved</span></span></span><span>Mara Vale</span><span>Glass Weather</span><span>6:05</span><button class="icon-button plain" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                </div>
+              </section>
+            </article>
+
+            <article class="page page-playlist">
+              <section class="playlist-head" aria-label="Playlist header">
+                <div class="cover-large"><img src="research-assets/glass-cover.png" alt=""></div>
+                <div>
+                  <p class="overline">Playlist</p>
+                  <h1>Late drive</h1>
+                  <p class="meta">128 tracks</p>
+                  <div class="actions" style="margin-top:12px">
+                    <button class="icon-button play primary" type="button" aria-label="Pause playlist"><svg class="icon"><use href="#i-pause"></use></svg></button>
+                    <button class="text-button" type="button"><svg class="icon"><use href="#i-shuffle"></use></svg>Shuffle</button>
+                    <button class="icon-button" type="button" aria-label="Save playlist"><svg class="icon"><use href="#i-heart"></use></svg></button>
+                    <button class="icon-button" type="button" aria-label="More playlist actions"><svg class="icon"><use href="#i-more"></use></svg></button>
+                  </div>
+                </div>
+              </section>
+              <section class="panel" aria-label="Playlist tracks">
+                <div class="panel-head">
+                  <h2>Tracks</h2>
+                  <label class="search"><svg class="icon"><use href="#i-search"></use></svg><input aria-label="Filter playlist" placeholder="Filter playlist"></label>
+                </div>
+                <div class="track-table">
+                  <div class="track-row header"><span>#</span><span>Title</span><span>Artist</span><span>Album</span><span>Time</span><span></span></div>
+                  <div class="track-row current"><span class="is-current"><svg class="icon"><use href="#i-wave"></use></svg></span><span class="track-title"><span class="cover-tiny"><img src="research-assets/shoreline-cover.png" alt=""></span><span><span class="title">Paralyzed</span><span class="sub">Playing from this computer</span></span></span><span>Riverline</span><span>Paralyzed</span><span>3:42</span><button class="icon-button plain" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                  <div class="track-row"><span>2</span><span class="track-title"><span class="cover-tiny"><img src="research-assets/glass-cover.png" alt=""></span><span><span class="title">Glass Weather</span><span class="sub">Added by Daisy</span></span></span><span>Mara Vale</span><span>Late drive</span><span>4:11</span><button class="icon-button plain" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                  <div class="track-row"><span>3</span><span class="track-title"><span class="cover-tiny"><img src="research-assets/architecture-cover.png" alt=""></span><span><span class="title">Signal Garden</span><span class="sub">Added by Daisy</span></span></span><span>North Index</span><span>MilkDrop nights</span><span>5:01</span><button class="icon-button plain" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                  <div class="track-row"><span>4</span><span class="track-title"><span class="cover-tiny"><img src="research-assets/shoreline-cover.png" alt=""></span><span><span class="title">Counterpart</span><span class="sub">Added by Daisy</span></span></span><span>Orchid Machine</span><span>Untitled</span><span>6:42</span><button class="icon-button plain" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                  <div class="track-row"><span>5</span><span class="track-title"><span class="cover-tiny"><img src="research-assets/glass-cover.png" alt=""></span><span><span class="title">Turnpike lights, through the last town before dawn</span><span class="sub">Added by Daisy</span></span></span><span>Orchid Machine</span><span>Static Bloom</span><span>4:36</span><button class="icon-button plain" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                </div>
+              </section>
+            </article>
+          </div>
+
+          <section class="state-layer state-loading" aria-live="polite">
+            <div>
+              <h2>Loading library</h2>
+              <p class="meta">Getting your saved music.</p>
+              <div class="skeletons"><span></span><span style="width:86%"></span><span style="width:72%"></span></div>
+            </div>
+          </section>
+          <section class="state-layer state-empty">
+            <div>
+              <h2>No tracks match</h2>
+              <p class="meta">Clear the current filter or choose a broader column.</p>
+              <button class="text-button primary" type="button">Clear filter</button>
+            </div>
+          </section>
+          <section class="state-layer state-error">
+            <div>
+              <h2>Could not refresh</h2>
+              <p class="meta">Check your connection and try again.</p>
+              <button class="text-button primary" type="button">Retry</button>
+            </div>
+          </section>
+        </section>
+
+        <aside class="inspector" id="playback-inspector" aria-label="Playback inspector">
+          <div class="inspector-head">
+            <div class="inspector-title">
+              <details class="inspector-menu"><summary class="icon-button plain" aria-label="Queue actions"><svg class="icon"><use href="#i-more"></use></svg></summary><div><button type="button">Save queue as playlist</button><button type="button">Recently played</button></div></details>
+              <button class="icon-button plain" type="button" data-close-inspector aria-label="Close inspector"><svg class="icon"><use href="#i-x"></use></svg></button>
+            </div>
+            <div class="segmented" role="tablist" aria-label="Inspector tabs">
+              <button class="tab-button" id="queue-tab" type="button" role="tab" data-tab-target="queue" aria-controls="queue-content" aria-selected="true" tabindex="0">Queue</button>
+              <button class="tab-button" id="lyrics-tab" type="button" role="tab" data-tab-target="lyrics" aria-controls="lyrics-content" aria-selected="false" tabindex="-1">Lyrics</button>
+            </div>
+          </div>
+          <div class="inspector-body">
+            <div class="tab-panel tab-queue" id="queue-content" role="tabpanel" aria-labelledby="queue-tab">
+              <div class="section-label">Now playing</div>
+              <div class="queue-list">
+                <div class="queue-item current"><span class="is-current"><svg class="icon"><use href="#i-wave"></use></svg></span><span class="cover-tiny"><img src="research-assets/shoreline-cover.png" alt=""></span><span><span class="title">Paralyzed</span><span class="sub">Riverline</span></span><span class="sub">3:42</span></div>
+                <div class="queue-item"><span>2</span><span class="cover-tiny"><img src="research-assets/glass-cover.png" alt=""></span><span><span class="title">Glass Weather</span><span class="sub">Mara Vale</span></span><span class="sub">4:11</span></div>
+                <div class="queue-item"><span>3</span><span class="cover-tiny"><img src="research-assets/architecture-cover.png" alt=""></span><span><span class="title">Signal Garden</span><span class="sub">North Index</span></span><span class="sub">5:01</span></div>
+                <div class="queue-item"><span>4</span><span class="cover-tiny"><img src="research-assets/shoreline-cover.png" alt=""></span><span><span class="title">Counterpart</span><span class="sub">Orchid Machine</span></span><span class="sub">6:42</span></div>
+              </div>
+            </div>
+            <div class="tab-panel tab-lyrics" id="lyrics-content" role="tabpanel" aria-labelledby="lyrics-tab" hidden>
+              <div class="lyrics">
+                <p>Low light on the console</p>
+                <p class="active">I keep the signal clean enough to find you</p>
+                <p>Every street repeats the chorus</p>
+                <p>And the room starts moving in time</p>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <footer class="player" aria-label="Player">
+        <div class="player-left">
+          <span class="cover-small"><img src="research-assets/shoreline-cover.png" alt=""></span>
+          <span class="truncate"><span class="title">Paralyzed</span><span class="sub">Riverline</span></span>
+          <button class="icon-button plain" type="button" aria-label="Save Paralyzed"><svg class="icon"><use href="#i-heart"></use></svg></button>
+        </div>
+        <div class="player-center">
+          <div class="player-controls">
+            <button class="icon-button plain" type="button" aria-label="Shuffle"><svg class="icon"><use href="#i-shuffle"></use></svg></button>
+            <button class="icon-button plain" type="button" aria-label="Previous"><svg class="icon"><use href="#i-prev"></use></svg></button>
+            <button class="icon-button play primary" type="button" aria-label="Pause"><svg class="icon"><use href="#i-pause"></use></svg></button>
+            <button class="icon-button plain" type="button" aria-label="Next"><svg class="icon"><use href="#i-next"></use></svg></button>
+            <button class="icon-button plain" type="button" aria-label="Repeat"><svg class="icon"><use href="#i-repeat"></use></svg></button>
+          </div>
+          <div class="seek"><span>1:21</span><span class="meter" aria-hidden="true"></span><span>3:42</span></div>
+        </div>
+        <div class="player-right">
+          <button class="icon-button" type="button" data-open-inspector aria-label="Open queue"><svg class="icon"><use href="#i-list"></use></svg></button>
+          <button class="icon-button" type="button" aria-label="Devices"><svg class="icon"><use href="#i-cast"></use></svg></button>
+          <span class="meter volume" role="meter" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="70"></span>
+        </div>
+      </footer>
+    </section>
+  </main>
+
+  <script>
+    const body = document.body;
+    const query = new URLSearchParams(location.search);
+    if (query.get("presentation") === "1") body.dataset.presentation = "true";
+    document.querySelectorAll('.track-row:not(.header)').forEach(row => {
+      const sub = row.querySelector('.track-title .sub');
+      if (sub) sub.textContent = row.children[2]?.textContent.trim() || '';
+    });
+    document.querySelectorAll('.title, .truncate').forEach(text => { text.title = text.textContent.trim(); });
+    const upcomingLabel = document.createElement('div');
+    upcomingLabel.className = 'section-label';
+    upcomingLabel.textContent = 'Next up';
+    document.querySelector('.queue-item.current').after(upcomingLabel);
+    document.querySelectorAll('.nav-button, .side-row').forEach(button => {
+      const label = button.querySelector('span:not(.count):not(.side-art)')?.textContent.trim();
+      if (label) { button.setAttribute('aria-label', label); button.title = label; }
+    });
+
+    function setPage(page) {
+      body.dataset.page = page;
+      document.querySelectorAll("[data-set-page]").forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.setPage === page));
+      });
+      document.querySelectorAll("[data-nav-page]").forEach((button) => {
+        if (button.dataset.navPage === page) {
+          button.setAttribute("aria-current", "page");
+        } else {
+          button.removeAttribute("aria-current");
+        }
+      });
+    }
+
+    document.querySelectorAll("[data-set-page], [data-nav-page]").forEach((button) => {
+      button.addEventListener("click", () => setPage(button.dataset.setPage || button.dataset.navPage));
+    });
+
+    document.querySelectorAll("[data-set-theme]").forEach((button) => {
+      button.addEventListener("click", () => {
+        body.dataset.theme = button.dataset.setTheme;
+        document.querySelectorAll("[data-set-theme]").forEach((item) => {
+          item.setAttribute("aria-pressed", String(item === button));
+        });
+      });
+    });
+
+    document.getElementById("accentSelect").addEventListener("change", (event) => {
+      body.dataset.accent = event.target.value;
+    });
+
+    document.getElementById("densitySelect").addEventListener("change", (event) => {
+      body.dataset.density = event.target.value;
+    });
+
+    document.getElementById("stateSelect").addEventListener("change", (event) => {
+      body.dataset.state = event.target.value;
+    });
+
+    let inspectorOpener;
+    document.querySelectorAll("[data-open-inspector]").forEach((button) => {
+      button.setAttribute('aria-controls', 'playback-inspector');
+      button.setAttribute('aria-expanded', 'false');
+      button.addEventListener("click", () => {
+        inspectorOpener = button;
+        body.dataset.inspector = "open";
+        document.querySelectorAll('[data-open-inspector]').forEach(item => item.setAttribute('aria-expanded', 'true'));
+        document.querySelector('[data-tab-target][aria-selected="true"]').focus();
+      });
+    });
+
+    document.querySelectorAll("[data-close-inspector]").forEach((button) => {
+      button.addEventListener("click", () => {
+        body.dataset.inspector = "closed";
+        document.querySelectorAll('[data-open-inspector]').forEach(item => item.setAttribute('aria-expanded', 'false'));
+        inspectorOpener?.focus();
+      });
+    });
+
+    const tabs = [...document.querySelectorAll("[data-tab-target]")];
+    tabs.forEach((tab, index) => {
+      tab.addEventListener("click", () => {
+        body.dataset.tab = tab.dataset.tabTarget;
+        tabs.forEach((item) => {
+          item.setAttribute("aria-selected", String(item === tab));
+          item.tabIndex = item === tab ? 0 : -1;
+        });
+        document.querySelectorAll(".tab-panel").forEach((panel) => {
+          panel.hidden = !panel.classList.contains(`tab-${tab.dataset.tabTarget}`);
+        });
+      });
+
+      tab.addEventListener("keydown", (event) => {
+        const next =
+          event.key === "ArrowRight" ? (index + 1) % tabs.length :
+          event.key === "ArrowLeft" ? (index - 1 + tabs.length) % tabs.length :
+          event.key === "Home" ? 0 :
+          event.key === "End" ? tabs.length - 1 :
+          null;
+
+        if (next === null) return;
+        event.preventDefault();
+        tabs[next].click();
+        tabs[next].focus();
+      });
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && body.dataset.inspector === "open") {
+        body.dataset.inspector = "closed";
+        document.querySelectorAll('[data-open-inspector]').forEach(item => item.setAttribute('aria-expanded', 'false'));
+        inspectorOpener?.focus();
+      }
+    });
+
+    document.querySelectorAll('.track-table').forEach(table => {
+      table.setAttribute('role', 'table');
+      table.setAttribute('aria-label', table.closest('section').getAttribute('aria-label') || 'Tracks');
+      const rows = [...table.querySelectorAll('.track-row')];
+      rows.forEach(row => {
+        row.setAttribute('role', 'row');
+        [...row.children].forEach(cell => {
+          if (cell.tagName === 'BUTTON') {
+            const wrapper = document.createElement('span');
+            row.insertBefore(wrapper, cell); wrapper.append(cell); cell = wrapper;
+          }
+          cell.setAttribute('role', row.classList.contains('header') ? 'columnheader' : 'cell');
+        });
+        if (row.classList.contains('header')) return;
+        row.tabIndex = 0;
+        const title = row.querySelector('.title').textContent.trim();
+        row.querySelector('button')?.setAttribute('aria-label', 'More actions for ' + title);
+        const cell = row.firstElementChild;
+        const original = cell.innerHTML;
+        const selectButton = document.createElement('button');
+        selectButton.type = 'button'; selectButton.className = 'row-selection';
+        selectButton.setAttribute('aria-label', 'Select ' + title);
+        selectButton.setAttribute('aria-pressed', 'false');
+        selectButton.innerHTML = original; cell.replaceChildren(selectButton);
+        function select(event) {
+          const wasSelected = row.dataset.selected === 'true';
+          if (!event.ctrlKey && !event.metaKey) rows.forEach(item => {
+            delete item.dataset.selected;
+            const control = item.querySelector('.row-selection');
+            if (control) control.setAttribute('aria-pressed', 'false');
+          });
+          row.dataset.selected = String(!wasSelected);
+          rows.forEach(item => {
+            const control = item.querySelector('.row-selection');
+            if (control) control.setAttribute('aria-pressed', String(item.dataset.selected === 'true'));
+          });
+        }
+        selectButton.addEventListener('click', select);
+        row.addEventListener('keydown', event => {
+          if (event.target !== row || event.key !== ' ') return;
+          event.preventDefault(); select(event);
+        });
+        row.addEventListener('click', event => {
+          if (event.target.closest('button')) return;
+          select(event);
+        });
+      });
+      const empty = document.createElement('p');
+      empty.className = 'filter-empty'; empty.textContent = 'No matching tracks'; empty.hidden = true;
+      table.after(empty);
+      const filter = table.closest('section').querySelector('input');
+      filter?.addEventListener('input', () => {
+        const term = filter.value.trim().toLocaleLowerCase();
+        rows.filter(row => !row.classList.contains('header')).forEach(row => row.hidden = !row.textContent.toLocaleLowerCase().includes(term));
+        empty.hidden = rows.some(row => !row.classList.contains('header') && !row.hidden);
+      });
+    });
+
+    if (["home", "library", "playlist"].includes(query.get("page"))) setPage(query.get("page"));
+    if (["dark", "light", "oled"].includes(query.get("theme"))) {
+      document.querySelector(`[data-set-theme="${query.get("theme")}"]`).click();
+    }
+  </script>
+</body>
+</html>

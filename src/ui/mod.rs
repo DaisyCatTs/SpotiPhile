@@ -90,7 +90,7 @@ pub fn show(app: &mut App, ui: &mut egui::Ui) {
 /// The main window's narrowest width with these panels open: their least
 /// widths and the page's.
 fn main_min_width(page: f32, sidebar: bool, right_panel: bool) -> f32 {
-    let sidebar = if sidebar { SIDEBAR_MIN_WIDTH } else { 0.0 };
+    let sidebar = if sidebar { sidebar::RAIL_WIDTH } else { 0.0 };
     let right = if right_panel {
         theme::SIDE_PANEL_MIN_WIDTH
     } else {
@@ -104,7 +104,8 @@ pub(crate) const SIDEBAR_MIN_WIDTH: f32 = 210.0;
 
 /// Raise the window's minimum width while the Queue or Lyrics panel is open,
 /// so even at its narrowest the page beside the panels keeps the room its
-/// top bar needs (#624), and lower it again once they close. Window managers
+/// top bar needs. The navigation rail can replace the expanded sidebar, so
+/// its expanded width must not prevent narrowing the window. Window managers
 /// that tile ignore the minimum; the panels still give way there.
 fn keep_room_for_panels(app: &App, ctx: &Context) {
     if crate::window::fixed_size() {
@@ -728,6 +729,18 @@ mod window_chrome_tests {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn compact_navigation_keeps_window_minimum_below_expanded_panel_budget() {
+        let page = 440.0;
+        let minimum = main_min_width(page, true, true);
+        assert!(minimum >= page + sidebar::RAIL_WIDTH + theme::SIDE_PANEL_MIN_WIDTH);
+        assert!(minimum < page + SIDEBAR_MIN_WIDTH + theme::SIDE_PANEL_MIN_WIDTH);
+        assert_eq!(
+            main_min_width(page, true, false),
+            crate::window::MAIN_MIN_SIZE[0]
+        );
+    }
 
     /// The header casts a shadow only on a page scrolled under it, and it
     /// is black in both themes, never the page's own colour.

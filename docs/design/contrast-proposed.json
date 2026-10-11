@@ -1,0 +1,149 @@
+{
+  "scope": "Proposed flat-color text and focus pairs only; not a complete accessibility audit",
+  "pairs": [
+    {
+      "theme": "dark",
+      "foreground": "text",
+      "background": "window",
+      "ratio": 17.03,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "theme": "dark",
+      "foreground": "text",
+      "background": "panel",
+      "ratio": 15.97,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "theme": "dark",
+      "foreground": "secondary",
+      "background": "panel",
+      "ratio": 9.03,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "theme": "dark",
+      "foreground": "secondary",
+      "background": "surface",
+      "ratio": 8.19,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "theme": "dark",
+      "foreground": "on_accent",
+      "background": "accent",
+      "ratio": 11.83,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "theme": "dark",
+      "foreground": "focus",
+      "background": "window",
+      "ratio": 13.31,
+      "threshold": 3,
+      "pass": true
+    },
+    {
+      "theme": "light",
+      "foreground": "text",
+      "background": "window",
+      "ratio": 15.82,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "theme": "light",
+      "foreground": "text",
+      "background": "panel",
+      "ratio": 17.24,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "theme": "light",
+      "foreground": "secondary",
+      "background": "panel",
+      "ratio": 6.81,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "theme": "light",
+      "foreground": "secondary",
+      "background": "surface",
+      "ratio": 5.82,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "theme": "light",
+      "foreground": "on_accent",
+      "background": "accent",
+      "ratio": 7.24,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "theme": "light",
+      "foreground": "focus",
+      "background": "window",
+      "ratio": 6.64,
+      "threshold": 3,
+      "pass": true
+    },
+    {
+      "theme": "oled",
+      "foreground": "text",
+      "background": "window",
+      "ratio": 19.26,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "theme": "oled",
+      "foreground": "text",
+      "background": "panel",
+      "ratio": 18.26,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "theme": "oled",
+      "foreground": "secondary",
+      "background": "panel",
+      "ratio": 10.04,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "theme": "oled",
+      "foreground": "secondary",
+      "background": "surface",
+      "ratio": 9.21,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "theme": "oled",
+      "foreground": "on_accent",
+      "background": "accent",
+      "ratio": 11.83,
+      "threshold": 4.5,
+      "pass": true
+    },
+    {
+      "theme": "oled",
+      "foreground": "focus",
+      "background": "window",
+      "ratio": 14.91,
+      "threshold": 3,
+      "pass": true
+    }
+  ]
+}

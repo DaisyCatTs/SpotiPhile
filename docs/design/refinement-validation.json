@@ -1,0 +1,430 @@
+{
+  "date": "2026-10-10",
+  "status": "unapproved visual refinement",
+  "browser": "installed Playwright Chromium; shared T3 automation host unavailable",
+  "cases": [
+    {
+      "page": "home",
+      "theme": "dark",
+      "width": 760,
+      "height": 800,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 791.25,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "home",
+      "theme": "light",
+      "width": 760,
+      "height": 800,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 791.25,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "home",
+      "theme": "oled",
+      "width": 760,
+      "height": 800,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 791.25,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "library",
+      "theme": "dark",
+      "width": 760,
+      "height": 800,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 791.25,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "library",
+      "theme": "light",
+      "width": 760,
+      "height": 800,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 791.25,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "library",
+      "theme": "oled",
+      "width": 760,
+      "height": 800,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 791.25,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "playlist",
+      "theme": "dark",
+      "width": 760,
+      "height": 800,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 791.25,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "playlist",
+      "theme": "light",
+      "width": 760,
+      "height": 800,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 791.25,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "playlist",
+      "theme": "oled",
+      "width": 760,
+      "height": 800,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 791.25,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "home",
+      "theme": "dark",
+      "width": 1280,
+      "height": 800,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 789.09375,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "home",
+      "theme": "light",
+      "width": 1280,
+      "height": 800,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 789.09375,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "home",
+      "theme": "oled",
+      "width": 1280,
+      "height": 800,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 789.09375,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "library",
+      "theme": "dark",
+      "width": 1280,
+      "height": 800,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 789.09375,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "library",
+      "theme": "light",
+      "width": 1280,
+      "height": 800,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 789.09375,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "library",
+      "theme": "oled",
+      "width": 1280,
+      "height": 800,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 789.09375,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "playlist",
+      "theme": "dark",
+      "width": 1280,
+      "height": 800,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 789.09375,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "playlist",
+      "theme": "light",
+      "width": 1280,
+      "height": 800,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 789.09375,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "playlist",
+      "theme": "oled",
+      "width": 1280,
+      "height": 800,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 789.09375,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "home",
+      "theme": "dark",
+      "width": 1440,
+      "height": 900,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 889.09375,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "home",
+      "theme": "light",
+      "width": 1440,
+      "height": 900,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 889.09375,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "home",
+      "theme": "oled",
+      "width": 1440,
+      "height": 900,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 889.09375,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "library",
+      "theme": "dark",
+      "width": 1440,
+      "height": 900,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 889.09375,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "library",
+      "theme": "light",
+      "width": 1440,
+      "height": 900,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 889.09375,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "library",
+      "theme": "oled",
+      "width": 1440,
+      "height": 900,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 889.09375,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "playlist",
+      "theme": "dark",
+      "width": 1440,
+      "height": 900,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 889.09375,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "playlist",
+      "theme": "light",
+      "width": 1440,
+      "height": 900,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 889.09375,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    },
+    {
+      "page": "playlist",
+      "theme": "oled",
+      "width": 1440,
+      "height": 900,
+      "documentOverflow": false,
+      "tableOverflow": false,
+      "seekBottom": 889.09375,
+      "brokenImages": 0,
+      "fontLoaded": true,
+      "homeFits": true
+    }
+  ],
+  "captures": [
+    {
+      "route": "home",
+      "theme": "dark",
+      "width": 1280,
+      "height": 800,
+      "file": "docs/design/refinement-captures/after-home-dark-1280.png"
+    },
+    {
+      "route": "home",
+      "theme": "light",
+      "width": 1280,
+      "height": 800,
+      "file": "docs/design/refinement-captures/after-home-light-1280.png"
+    },
+    {
+      "route": "library",
+      "theme": "dark",
+      "width": 1280,
+      "height": 800,
+      "file": "docs/design/refinement-captures/after-library-dark-1280.png"
+    },
+    {
+      "route": "playlist",
+      "theme": "dark",
+      "width": 1280,
+      "height": 800,
+      "file": "docs/design/refinement-captures/after-playlist-dark-1280.png"
+    },
+    {
+      "route": "playlist",
+      "theme": "light",
+      "width": 760,
+      "height": 800,
+      "file": "docs/design/refinement-captures/after-playlist-light-760.png"
+    },
+    {
+      "route": "playlist",
+      "theme": "oled",
+      "width": 1440,
+      "height": 900,
+      "file": "docs/design/refinement-captures/after-playlist-oled-1440.png"
+    }
+  ],
+  "interactions": [
+    {
+      "test": "filter narrows recent tracks",
+      "visibleRows": 1
+    },
+    {
+      "test": "filter empty state",
+      "visible": true
+    },
+    {
+      "test": "keyboard row selection",
+      "selected": "true"
+    },
+    {
+      "test": "modifier keyboard multi-selection",
+      "first": "true",
+      "second": "true"
+    },
+    {
+      "test": "keyboard deselection",
+      "selected": "false"
+    },
+    {
+      "test": "narrow filter remains available",
+      "visible": true
+    },
+    {
+      "test": "narrow filter can clear rows",
+      "rows": 3
+    },
+    {
+      "test": "narrow thumbnail accessible names",
+      "named": true
+    },
+    {
+      "test": "inspector tab arrow",
+      "lyricsSelected": "true"
+    },
+    {
+      "test": "inspector escape focus",
+      "closed": true,
+      "focusReturned": true
+    },
+    {
+      "test": "comparison before",
+      "source": "refinement-captures/before-home-dark-1280.png"
+    }
+  ],
+  "pageErrors": [],
+  "failures": [],
+  "limits": [
+    "Fictional-data prototype, not production playback",
+    "No native Rust changes in this visual pass",
+    "Geometry checks do not establish visual approval or full accessibility certification"
+  ]
+}

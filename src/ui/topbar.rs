@@ -374,6 +374,9 @@ pub fn show(app: &mut App, ui: &mut egui::Ui) {
                     .unwrap_or_default();
                 let (rect, response) =
                     ui.allocate_exact_size(Vec2::splat(AVATAR_SIZE), Sense::click());
+                response.widget_info(|| {
+                    egui::WidgetInfo::labeled(egui::WidgetType::Button, ui.is_enabled(), &name)
+                });
                 if ui.is_rect_visible(rect) {
                     let fill = if response.hovered() {
                         palette.surface_hover
@@ -411,6 +414,7 @@ pub fn show(app: &mut App, ui: &mut egui::Ui) {
                         }
                     }
                 }
+                theme::focus_ring(ui, &response);
                 let response = response.on_hover_text(&name);
                 egui::Popup::menu(&response)
                     .frame(super::widgets::menu_frame(&palette))

@@ -29,7 +29,41 @@ changed in Phase 0. Documentation and CI are the first Daisy-owned work.
 The policy/CI change is committed as
 `a073de4f3e7367c021294c65e0b6293167608613` on dev. Main remains at the baseline.
 
+## Development feature divergence (2026-10-10)
+
+The user paused further UI redesign and authorized queue features first.
+`feature/play-next` preserves the pending Phase 1 changes and adds a Daisy-owned
+local Play Next action. `src/model.rs`, the action fold and insertion helper in
+`src/app.rs`, and the existing menus in `src/ui/widgets.rs` are its integration
+boundaries. The helper retains upstream drag-insert fallback/debounce behavior;
+Play Next independently checks capabilities and never becomes remote append.
+Occurrence indexes, optimistic queue state and stale-answer guards remain
+supplier-sensitive invariants. Review those paths when porting future upstream
+queue fixes. This feature changes no Spotify request, playback engine command,
+credential namespace or stored schema. It is not an upstream port.
+
+Application/menu regression tests, the queue contract, README, master checklist
+and gettext catalogs accompany the feature. Catalogs also synchronize pending
+Phase 1 labels; existing translations are preserved. See
+[Play Next validation](../features/play-next-validation.md) for executed checks
+and platform limits. The broader Phase 1 visual proposal remains unapproved.
+
+The subsequent `feature/queue-controls` work adds manual **Move to top/bottom**
+menus and `Action::MoveQueueToEdge`, delegating to upstream's existing positional
+move action. Its full displayed-prefix and action snapshot guards are Daisy-owned;
+pending occurrence shifts and queue resync remain inherited integration boundaries.
+See [queue edge validation](../features/queue-edge-validation.md). It changes no
+Spotify request, stored schema or player engine command.
+
 ## Future ownership boundaries (recommendation, not implemented)
+
+Queue selection, occurrence mapping (`src/queue_edit.rs`), batch edit actions,
+clipboard/keyboard ownership and local Play Later are also Daisy-owned. They
+reuse inherited optimistic queue reconciliation and local engine clear/re-add.
+When porting upstream queue or collection changes, preserve exact selected
+occurrences, pending indexes, context continuation, snapshot guards and focus
+ownership. These changes introduce no auth or persistence migration. See
+[queue batch validation](../features/queue-batch-validation.md).
 
 Daisy owns product semantics, design system, UI, capabilities and its future
 library overlay. Spotify protocol compatibility, protected credential mechanisms,

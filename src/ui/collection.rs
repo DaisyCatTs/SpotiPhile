@@ -67,13 +67,13 @@ pub(super) fn hero(app: &mut App, ui: &mut egui::Ui, hero: Hero<'_>) {
         .thumbnail
         .and_then(|uri| app.softened_covers.texture(ui.ctx(), &art, uri));
     ui.add_space(12.0);
-    let cover_size = if ui.available_width() > 720.0 {
-        212.0
+    let cover_size = if ui.available_width() > 560.0 {
+        128.0
     } else {
-        160.0
+        96.0
     };
     ui.horizontal(|ui| {
-        ui.spacing_mut().item_spacing.x = 24.0;
+        ui.spacing_mut().item_spacing.x = 18.0;
         let (rect, _) = ui.allocate_exact_size(Vec2::splat(cover_size), Sense::hover());
         let radius = if hero.round { cover_size / 2.0 } else { 6.0 };
         widgets::paint_shadow(ui, &palette, rect, radius);
@@ -102,19 +102,19 @@ pub(super) fn hero(app: &mut App, ui: &mut egui::Ui, hero: Hero<'_>) {
             ui.spacing_mut().item_spacing.y = 6.0;
             ui.add_space(cover_size * 0.08);
             theme::text(ui, hero.kind.as_ref(), theme::medium(12.5), palette.text);
-            let mut size = if cover_size > 200.0 { 56.0 } else { 40.0 };
+            let mut size = if cover_size > 100.0 { 32.0 } else { 26.0 };
             loop {
                 let galley = ui.painter().layout_no_wrap(
                     hero.title.to_string(),
                     theme::bold(size),
                     palette.text,
                 );
-                if galley.size().x <= width || size <= 22.0 {
+                if galley.size().x <= width || size <= 20.0 {
                     break;
                 }
-                size -= 6.0;
+                size -= 2.0;
             }
-            theme::text(ui, hero.title, theme::bold(size), palette.text);
+            theme::text(ui, hero.title, theme::bold(size), palette.text).on_hover_text(hero.title);
             if let Some(description) = &hero.description
                 && !description.is_empty()
             {
@@ -566,11 +566,16 @@ pub fn table(app: &mut App, ui: &mut egui::Ui, table: Table<'_>) {
     );
     let thin = app.settings.tracklist_compact;
     let show_cover = !thin && table.show_cover;
-    let row_height = if thin {
-        theme::THIN_ROW_HEIGHT
-    } else {
-        theme::ROW_HEIGHT
-    };
+    let row_height = app.settings.daisy_density.map_or_else(
+        || {
+            if thin {
+                theme::THIN_ROW_HEIGHT
+            } else {
+                theme::ROW_HEIGHT
+            }
+        },
+        |density| theme::Geometry::for_density(density).row,
+    );
 
     let finite = table
         .pagination
@@ -912,6 +917,12 @@ fn list_shortcuts(
     picked_songs: Vec<PlayableItem>,
 ) {
     if ui.ctx().text_edit_focused() || app.dialog.is_some() {
+        return;
+    }
+    if app.show_queue_panel
+        && app.queue_tab == crate::model::QueueTab::Queue
+        && super::queue::owns_keyboard_focus(ui.ctx())
+    {
         return;
     }
     let editable = match &table.context {

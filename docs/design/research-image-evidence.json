@@ -1,0 +1,77 @@
+{
+  "method": "Official published images downloaded for local inspection; competitor images remain in ignored scratch and are not shipped as product assets",
+  "records": [
+    {
+      "source_url": "https://help.apple.com/assets/6902615183A45471560E0523/69026152B11975C6BF022247/en_US/e677eb31c18a51932f0084fa64f940ed.png",
+      "access_date": "2026-10-08",
+      "publication_date": "Not established from image alone",
+      "sha256": "71684F6DA92771AEA4B02361725091557ADA97CA0B7BCAFC22C2683C37FEB92C",
+      "visually_inspected": true,
+      "observation": "Stable song columns and category filters above the table"
+    },
+    {
+      "source_url": "https://audirvana.com/sitev8/wp-content/uploads/2026/05/Interface.png",
+      "access_date": "2026-10-08",
+      "publication_date": "Not established from image alone",
+      "sha256": "8F9AF93D50F80B2348F1EED32B32D6235FB1936BAE114F70857AC7D2C73B36F2",
+      "visually_inspected": true,
+      "observation": "Processing control panel separated from library browsing"
+    },
+    {
+      "source_url": "https://audirvana.com/sitev8/wp-content/uploads/2025/12/Studio-01-1024x768.jpg",
+      "access_date": "2026-10-08",
+      "publication_date": "Not established from image alone",
+      "sha256": "ABFE79F3D474401CDA83E72F4474AD8EB77B319C4136B3905BEA48442111D5F3",
+      "visually_inspected": true,
+      "observation": "Artist grid and compact shell in angled promotional photograph"
+    },
+    {
+      "source_url": "https://help.roonlabs.com/galleryDocuments/edbsn127cf9877246c2b80cdef285692dad18212a62909883e60345b5b028a3efb7970a82997b44bd67298ee044bd78704455?inline=true",
+      "access_date": "2026-10-08",
+      "publication_date": "Not established from image alone",
+      "sha256": "EC74525E8F144BC31CCC27CB5C09C68D96EE4C02CE0820C16525C4655AED4570",
+      "visually_inspected": true,
+      "observation": "Album identity, contextual play menu, metadata and track tabs"
+    },
+    {
+      "source_url": "https://www.foobar2000.org/images/screenshots-windows/albumlist-dark.webp",
+      "access_date": "2026-10-08",
+      "publication_date": "Not established from image alone",
+      "sha256": "1D597E22705C91602DC24830E231E45667A7E6C03CBB4927D4DFEF2470E4345D",
+      "visually_inspected": true,
+      "observation": "Dense hierarchical album list with local filter"
+    },
+    {
+      "source_url": "https://www.foobar2000.org/images/screenshots-windows/example-layout.png",
+      "access_date": "2026-10-08",
+      "publication_date": "Not established from image alone",
+      "sha256": "F1801B80B7FB0735CFA87A83035F67C46E87B631C04C9CE69AEA9EC26073C422",
+      "visually_inspected": true,
+      "observation": "Grouped track table with cover art and optional spectrum"
+    },
+    {
+      "source_url": "https://getmusicbee.com/img/hero_img/hero-img-top-min.png",
+      "access_date": "2026-10-08",
+      "publication_date": "Not established from image alone",
+      "sha256": "7613EB8914DEFF0DF3532D52CA85BF363B574A335F1E305E349F0A696DB066B6",
+      "visually_inspected": true,
+      "observation": "Cover shelf, contextual album tracks and right-side information"
+    },
+    {
+      "source_url": "https://getmusicbee.com/img/hero_img/hero-img-skin-min.png",
+      "access_date": "2026-10-08",
+      "publication_date": "Not established from image alone",
+      "sha256": "611F46FCF95718FC9A2D19194777042E475753B6B090356D9787CAEAC8D878FB",
+      "visually_inspected": true,
+      "observation": "Illustrated theme variants; not a complete current runtime screenshot"
+    },
+    {
+      "source_url": "https://www.plex.tv/wp-content/uploads/2022/09/plexamp-section-iphone-1-1024x1445.png",
+      "access_date": "2026-10-08",
+      "publication_date": "Image publication unknown; asset URL contains 2022/09",
+      "sha256": "AF54D176AFB1A74604CD01453C153A2479653E282D9FAD2D1B187D25462A5830",
+      "visually_inspected": true,
+      "observation": "Promotional mobile screenshot, album-aware dark background and compact track/art focus. Theme/personality evidence only, not desktop geometry"
+    }
+  ]
+}

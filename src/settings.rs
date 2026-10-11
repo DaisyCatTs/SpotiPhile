@@ -47,6 +47,50 @@ pub enum ThemeChoice {
     System,
 }
 
+/// Optional Spotiphile appearance overrides. Legacy readers ignore these fields.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum ThemeVariant {
+    Oled,
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum AccentChoice {
+    #[default]
+    Blue,
+    Teal,
+    Coral,
+    Neutral,
+}
+
+impl AccentChoice {
+    pub const ALL: [Self; 4] = [Self::Blue, Self::Teal, Self::Coral, Self::Neutral];
+}
+
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum DensityChoice {
+    Compact,
+    #[default]
+    Default,
+    Comfortable,
+}
+
+impl DensityChoice {
+    pub const ALL: [Self; 3] = [Self::Compact, Self::Default, Self::Comfortable];
+}
+
+/// Consume malformed or future optional preferences without rejecting other settings.
+fn read_optional_preference<'de, D, T>(deserializer: D) -> Result<Option<T>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+    T: serde::de::DeserializeOwned,
+{
+    let value = serde_json::Value::deserialize(deserializer)?;
+    Ok(serde_json::from_value(value).ok())
+}
+
 /// Whether a Home shelf is drawn. Hidden shelves still refresh normally.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(default)]
@@ -241,6 +285,25 @@ pub struct Settings {
     pub audio_cache: bool,
     pub audio_cache_mb: u64,
     pub theme: ThemeChoice,
+    /// OLED uses `theme: "dark"` as its legacy-reader fallback.
+    #[serde(
+        default,
+        deserialize_with = "read_optional_preference",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub daisy_theme_variant: Option<ThemeVariant>,
+    #[serde(
+        default,
+        deserialize_with = "read_optional_preference",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub daisy_accent: Option<AccentChoice>,
+    #[serde(
+        default,
+        deserialize_with = "read_optional_preference",
+        skip_serializing_if = "Option::is_none"
+    )]
+    pub daisy_density: Option<DensityChoice>,
     /// The interface language; older files without it follow the system.
     pub language: LanguageChoice,
     /// Filename selected from the local themes directory.
@@ -425,6 +488,9 @@ impl Default for Settings {
             audio_cache: true,
             audio_cache_mb: 1024,
             theme: ThemeChoice::System,
+            daisy_theme_variant: None,
+            daisy_accent: None,
+            daisy_density: None,
             language: LanguageChoice::System,
             custom_theme: None,
             custom_theme_cache: None,
@@ -901,6 +967,61 @@ impl ManualProxy {
 #[cfg(test)]
 mod tests {
     use super::Settings;
+
+    #[test]
+    fn appearance_preferences_preserve_legacy_theme_and_unrelated_settings() {
+        #[derive(serde::Deserialize)]
+        struct LegacySettings {
+            theme: super::ThemeChoice,
+            volume: u16,
+            custom_theme: Option<String>,
+        }
+        let settings = Settings {
+            theme: super::ThemeChoice::Dark,
+            daisy_theme_variant: Some(super::ThemeVariant::Oled),
+            daisy_accent: Some(super::AccentChoice::Teal),
+            daisy_density: Some(super::DensityChoice::Compact),
+            volume: 1234,
+            custom_theme: Some("mine.json".into()),
+            ..Settings::default()
+        };
+        let json = serde_json::to_string(&settings).unwrap();
+        let old: LegacySettings = serde_json::from_str(&json).unwrap();
+        assert_eq!(old.theme, super::ThemeChoice::Dark);
+        assert_eq!(old.volume, 1234);
+        assert_eq!(old.custom_theme.as_deref(), Some("mine.json"));
+        let new: Settings = serde_json::from_str(&json).unwrap();
+        assert_eq!(new.daisy_theme_variant, settings.daisy_theme_variant);
+        assert_eq!(new.daisy_accent, settings.daisy_accent);
+        assert_eq!(new.daisy_density, settings.daisy_density);
+        let old: Settings = serde_json::from_str(r#"{"theme":"light","volume":1234}"#).unwrap();
+        assert_eq!(old.daisy_theme_variant, None);
+        assert_eq!(old.daisy_accent, None);
+        assert_eq!(old.daisy_density, None);
+    }
+
+    #[test]
+    fn unknown_and_malformed_appearance_preferences_are_isolated() {
+        for value in [
+            serde_json::json!("future"),
+            serde_json::json!(7),
+            serde_json::json!({"bad":true}),
+            serde_json::json!(["compact"]),
+            serde_json::Value::Null,
+        ] {
+            let json = serde_json::json!({
+                "theme":"light", "volume":1234, "custom_theme":"mine.json",
+                "daisy_theme_variant":value, "daisy_accent":value, "daisy_density":value
+            });
+            let restored: Settings = serde_json::from_value(json).unwrap();
+            assert_eq!(restored.theme, super::ThemeChoice::Light);
+            assert_eq!(restored.volume, 1234);
+            assert_eq!(restored.custom_theme.as_deref(), Some("mine.json"));
+            assert_eq!(restored.daisy_theme_variant, None);
+            assert_eq!(restored.daisy_accent, None);
+            assert_eq!(restored.daisy_density, None);
+        }
+    }
 
     #[test]
     fn new_profiles_follow_the_system_and_saved_choices_are_preserved() {

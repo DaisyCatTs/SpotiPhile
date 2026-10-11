@@ -1,0 +1,1483 @@
+{
+  "date": "2026-10-09",
+  "channel": "aszfrbr6",
+  "operations": [
+    {
+      "command": "create_frame",
+      "params": {
+        "name": "03 / Composition study / 2026-10-09 / not approved",
+        "x": 80,
+        "y": 3200,
+        "width": 1280,
+        "height": 850,
+        "fillColor": {
+          "r": 0.06,
+          "g": 0.07,
+          "b": 0.08
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:2"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:2",
+        "x": 20,
+        "y": 12,
+        "text": "COMPOSITION STUDY · Artwork placeholders · Full visual review in professional-shell.html · NOT APPROVED",
+        "fontSize": 12,
+        "fontWeight": 500,
+        "fontColor": {
+          "r": 0.7,
+          "g": 0.75,
+          "b": 0.8
+        }
+      },
+      "nodeId": "25:3"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:2",
+        "name": "Workspace geometry / 1280 × 800",
+        "x": 0,
+        "y": 50,
+        "width": 1280,
+        "height": 800,
+        "fillColor": {
+          "a": 1,
+          "b": 0.054901960784313725,
+          "g": 0.047058823529411764,
+          "r": 0.043137254901960784
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:4"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:4",
+        "name": "topbar",
+        "x": 0,
+        "y": 0,
+        "width": 1280,
+        "height": 54,
+        "fillColor": {
+          "b": 0.08627450980392157,
+          "g": 0.07450980392156863,
+          "r": 0.06666666666666667
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:5"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:4",
+        "name": "search",
+        "x": 284.90625,
+        "y": 9.5,
+        "width": 620,
+        "height": 34,
+        "fillColor": {
+          "b": 0.10980392156862745,
+          "g": 0.09411764705882353,
+          "r": 0.08235294117647059
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:6"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:4",
+        "name": "text-button desktop-only",
+        "x": 916.90625,
+        "y": 9.5,
+        "width": 124.171875,
+        "height": 34,
+        "fillColor": {
+          "b": 0.1411764705882353,
+          "g": 0.12156862745098039,
+          "r": 0.10588235294117647
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:7"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:4",
+        "name": "Navigation",
+        "x": 0,
+        "y": 54,
+        "width": 208,
+        "height": 658,
+        "fillColor": {
+          "b": 0.08627450980392157,
+          "g": 0.07450980392156863,
+          "r": 0.06666666666666667
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:8"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:4",
+        "name": "Home",
+        "x": 10,
+        "y": 127,
+        "width": 187,
+        "height": 34,
+        "fillColor": {
+          "b": 0.23247058823529412,
+          "g": 0.16109803921568627,
+          "r": 0.11309803921568627
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:9"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:4",
+        "name": "Main content",
+        "x": 208,
+        "y": 54,
+        "width": 1072,
+        "height": 658,
+        "fillColor": {
+          "b": 0.054901960784313725,
+          "g": 0.047058823529411764,
+          "r": 0.043137254901960784
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:10"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:4",
+        "name": "text-button",
+        "x": 1151.015625,
+        "y": 128,
+        "width": 106.984375,
+        "height": 34,
+        "fillColor": {
+          "b": 0.1411764705882353,
+          "g": 0.12156862745098039,
+          "r": 0.10588235294117647
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:11"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:4",
+        "name": "search",
+        "x": 964,
+        "y": 426.578125,
+        "width": 280,
+        "height": 32,
+        "fillColor": {
+          "b": 0.10980392156862745,
+          "g": 0.09411764705882353,
+          "r": 0.08235294117647059
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:12"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:4",
+        "name": "track-row header",
+        "x": 230,
+        "y": 466.078125,
+        "width": 1028,
+        "height": 32,
+        "fillColor": {
+          "b": 0.1411764705882353,
+          "g": 0.12156862745098039,
+          "r": 0.10588235294117647
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:13"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:4",
+        "name": "Player",
+        "x": 0,
+        "y": 712,
+        "width": 1280,
+        "height": 88,
+        "fillColor": {
+          "b": 0.08627450980392157,
+          "g": 0.07450980392156863,
+          "r": 0.06666666666666667
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:14"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:4",
+        "name": "Pause",
+        "x": 618.984375,
+        "y": 723.90625,
+        "width": 42,
+        "height": 42,
+        "fillColor": {
+          "b": 1,
+          "g": 0.615686274509804,
+          "r": 0.3568627450980392
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:15"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:4",
+        "name": "Artwork placeholder / shoreline-cover.png",
+        "x": 231,
+        "y": 173,
+        "width": 188,
+        "height": 188,
+        "fillColor": {
+          "b": 0.2,
+          "g": 0.17,
+          "r": 0.14
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:16"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:4",
+        "name": "Artwork placeholder / glass-cover.png",
+        "x": 445,
+        "y": 173,
+        "width": 188,
+        "height": 188,
+        "fillColor": {
+          "b": 0.2,
+          "g": 0.17,
+          "r": 0.14
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:17"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:4",
+        "name": "Artwork placeholder / architecture-cover.png",
+        "x": 659,
+        "y": 173,
+        "width": 188,
+        "height": 188,
+        "fillColor": {
+          "b": 0.2,
+          "g": 0.17,
+          "r": 0.14
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:18"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:4",
+        "name": "Artwork placeholder / glass-cover.png",
+        "x": 873,
+        "y": 173,
+        "width": 188,
+        "height": 188,
+        "fillColor": {
+          "b": 0.2,
+          "g": 0.17,
+          "r": 0.14
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:19"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:4",
+        "name": "Artwork placeholder / glass-cover.png",
+        "x": 290,
+        "y": 506.078125,
+        "width": 30,
+        "height": 30,
+        "fillColor": {
+          "b": 0.2,
+          "g": 0.17,
+          "r": 0.14
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:20"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:4",
+        "name": "Artwork placeholder / architecture-cover.png",
+        "x": 290,
+        "y": 552.078125,
+        "width": 30,
+        "height": 30,
+        "fillColor": {
+          "b": 0.2,
+          "g": 0.17,
+          "r": 0.14
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:21"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:4",
+        "name": "Artwork placeholder / shoreline-cover.png",
+        "x": 290,
+        "y": 598.578125,
+        "width": 30,
+        "height": 30,
+        "fillColor": {
+          "b": 0.2,
+          "g": 0.17,
+          "r": 0.14
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:22"
+    },
+    {
+      "command": "create_frame",
+      "params": {
+        "parentId": "25:4",
+        "name": "Artwork placeholder / shoreline-cover.png",
+        "x": 17,
+        "y": 736.5,
+        "width": 40,
+        "height": 40,
+        "fillColor": {
+          "b": 0.2,
+          "g": 0.17,
+          "r": 0.14
+        },
+        "layoutMode": "NONE"
+      },
+      "nodeId": "25:23"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "This computer",
+        "x": 929.90625,
+        "y": 17.046875,
+        "text": "This computer",
+        "fontSize": 14,
+        "fontWeight": 600,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:24"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Spotiphile",
+        "x": 60,
+        "y": 74.375,
+        "text": "Spotiphile",
+        "fontSize": 15,
+        "fontWeight": 700,
+        "fontColor": {
+          "a": 1,
+          "b": 0.9607843137254902,
+          "g": 0.9568627450980393,
+          "r": 0.9529411764705882
+        }
+      },
+      "nodeId": "25:25"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Home",
+        "x": 49,
+        "y": 134.546875,
+        "text": "Home",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.9607843137254902,
+          "g": 0.9568627450980393,
+          "r": 0.9529411764705882
+        }
+      },
+      "nodeId": "25:26"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Search",
+        "x": 49,
+        "y": 172.546875,
+        "text": "Search",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:27"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Library",
+        "x": 49,
+        "y": 210.546875,
+        "text": "Library",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:28"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Playlists",
+        "x": 49,
+        "y": 248.546875,
+        "text": "Playlists",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:29"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "18",
+        "x": 169.84375,
+        "y": 248.546875,
+        "text": "18",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:30"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Playlists",
+        "x": 18,
+        "y": 293,
+        "text": "Playlists",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "fontColor": {
+          "a": 1,
+          "b": 0.6588235294117647,
+          "g": 0.6078431372549019,
+          "r": 0.5647058823529412
+        }
+      },
+      "nodeId": "25:31"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Late drive",
+        "x": 49,
+        "y": 319.390625,
+        "text": "Late drive",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:32"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "128",
+        "x": 162.65625,
+        "y": 320.75,
+        "text": "128",
+        "fontSize": 12,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.6588235294117647,
+          "g": 0.6078431372549019,
+          "r": 0.5647058823529412
+        }
+      },
+      "nodeId": "25:33"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Fresh saves",
+        "x": 49,
+        "y": 356.390625,
+        "text": "Fresh saves",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:34"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "42",
+        "x": 170.4375,
+        "y": 357.75,
+        "text": "42",
+        "fontSize": 12,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.6588235294117647,
+          "g": 0.6078431372549019,
+          "r": 0.5647058823529412
+        }
+      },
+      "nodeId": "25:35"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "MilkDrop nights",
+        "x": 49,
+        "y": 393.390625,
+        "text": "MilkDrop nights",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:36"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "96",
+        "x": 170.4375,
+        "y": 394.75,
+        "text": "96",
+        "fontSize": 12,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.6588235294117647,
+          "g": 0.6078431372549019,
+          "r": 0.5647058823529412
+        }
+      },
+      "nodeId": "25:37"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Late drive extended edits and night runs",
+        "x": 49,
+        "y": 430.390625,
+        "text": "Late drive exte…",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:38"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "73",
+        "x": 170.4375,
+        "y": 431.75,
+        "text": "73",
+        "fontSize": 12,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.6588235294117647,
+          "g": 0.6078431372549019,
+          "r": 0.5647058823529412
+        }
+      },
+      "nodeId": "25:39"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Tools",
+        "x": 18,
+        "y": 460.84375,
+        "text": "Tools",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "fontColor": {
+          "a": 1,
+          "b": 0.6588235294117647,
+          "g": 0.6078431372549019,
+          "r": 0.5647058823529412
+        }
+      },
+      "nodeId": "25:40"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "MilkDrop",
+        "x": 49,
+        "y": 487.234375,
+        "text": "MilkDrop",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:41"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Winamp",
+        "x": 49,
+        "y": 524.234375,
+        "text": "Winamp",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:42"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Settings",
+        "x": 49,
+        "y": 671.546875,
+        "text": "Settings",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:43"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Home",
+        "x": 230,
+        "y": 72,
+        "text": "Home",
+        "fontSize": 30,
+        "fontWeight": 650,
+        "fontColor": {
+          "a": 1,
+          "b": 0.9607843137254902,
+          "g": 0.9568627450980393,
+          "r": 0.9529411764705882
+        }
+      },
+      "nodeId": "25:44"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Recently played",
+        "x": 230,
+        "y": 134.796875,
+        "text": "Recently played",
+        "fontSize": 17,
+        "fontWeight": 620,
+        "fontColor": {
+          "a": 1,
+          "b": 0.9607843137254902,
+          "g": 0.9568627450980393,
+          "r": 0.9529411764705882
+        }
+      },
+      "nodeId": "25:45"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "View library",
+        "x": 1164.015625,
+        "y": 135.546875,
+        "text": "View library",
+        "fontSize": 14,
+        "fontWeight": 600,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:46"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Fresh saves",
+        "x": 230,
+        "y": 371,
+        "text": "Fresh saves",
+        "fontSize": 14,
+        "fontWeight": 550,
+        "fontColor": {
+          "a": 1,
+          "b": 0.9607843137254902,
+          "g": 0.9568627450980393,
+          "r": 0.9529411764705882
+        }
+      },
+      "nodeId": "25:47"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "42 tracks",
+        "x": 230,
+        "y": 389.890625,
+        "text": "42 tracks",
+        "fontSize": 12,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.6431372549019608,
+          "g": 0.596078431372549,
+          "r": 0.5568627450980392
+        }
+      },
+      "nodeId": "25:48"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Late drive",
+        "x": 444,
+        "y": 371,
+        "text": "Late drive",
+        "fontSize": 14,
+        "fontWeight": 550,
+        "fontColor": {
+          "a": 1,
+          "b": 0.9607843137254902,
+          "g": 0.9568627450980393,
+          "r": 0.9529411764705882
+        }
+      },
+      "nodeId": "25:49"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "128 tracks",
+        "x": 444,
+        "y": 389.890625,
+        "text": "128 tracks",
+        "fontSize": 12,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.6431372549019608,
+          "g": 0.596078431372549,
+          "r": 0.5568627450980392
+        }
+      },
+      "nodeId": "25:50"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "North Index",
+        "x": 658,
+        "y": 371,
+        "text": "North Index",
+        "fontSize": 14,
+        "fontWeight": 550,
+        "fontColor": {
+          "a": 1,
+          "b": 0.9607843137254902,
+          "g": 0.9568627450980393,
+          "r": 0.9529411764705882
+        }
+      },
+      "nodeId": "25:51"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Artist",
+        "x": 658,
+        "y": 389.890625,
+        "text": "Artist",
+        "fontSize": 12,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.6431372549019608,
+          "g": 0.596078431372549,
+          "r": 0.5568627450980392
+        }
+      },
+      "nodeId": "25:52"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Static Bloom",
+        "x": 872,
+        "y": 371,
+        "text": "Static Bloom",
+        "fontSize": 14,
+        "fontWeight": 550,
+        "fontColor": {
+          "a": 1,
+          "b": 0.9607843137254902,
+          "g": 0.9568627450980393,
+          "r": 0.9529411764705882
+        }
+      },
+      "nodeId": "25:53"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Album",
+        "x": 872,
+        "y": 389.890625,
+        "text": "Album",
+        "fontSize": 12,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.6431372549019608,
+          "g": 0.596078431372549,
+          "r": 0.5568627450980392
+        }
+      },
+      "nodeId": "25:54"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Recent tracks",
+        "x": 244,
+        "y": 432.375,
+        "text": "Recent tracks",
+        "fontSize": 17,
+        "fontWeight": 620,
+        "fontColor": {
+          "a": 1,
+          "b": 0.9607843137254902,
+          "g": 0.9568627450980393,
+          "r": 0.9529411764705882
+        }
+      },
+      "nodeId": "25:55"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "#",
+        "x": 245,
+        "y": 474.65625,
+        "text": "#",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "fontColor": {
+          "a": 1,
+          "b": 0.6588235294117647,
+          "g": 0.6078431372549019,
+          "r": 0.5647058823529412
+        }
+      },
+      "nodeId": "25:56"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Title",
+        "x": 289,
+        "y": 474.65625,
+        "text": "Title",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "fontColor": {
+          "a": 1,
+          "b": 0.6588235294117647,
+          "g": 0.6078431372549019,
+          "r": 0.5647058823529412
+        }
+      },
+      "nodeId": "25:57"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Artist",
+        "x": 686.328125,
+        "y": 474.65625,
+        "text": "Artist",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "fontColor": {
+          "a": 1,
+          "b": 0.6588235294117647,
+          "g": 0.6078431372549019,
+          "r": 0.5647058823529412
+        }
+      },
+      "nodeId": "25:58"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Album",
+        "x": 889.984375,
+        "y": 474.65625,
+        "text": "Album",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "fontColor": {
+          "a": 1,
+          "b": 0.6588235294117647,
+          "g": 0.6078431372549019,
+          "r": 0.5647058823529412
+        }
+      },
+      "nodeId": "25:59"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Time",
+        "x": 1148.984375,
+        "y": 474.65625,
+        "text": "Time",
+        "fontSize": 11,
+        "fontWeight": 600,
+        "fontColor": {
+          "a": 1,
+          "b": 0.6588235294117647,
+          "g": 0.6078431372549019,
+          "r": 0.5647058823529412
+        }
+      },
+      "nodeId": "25:60"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "1",
+        "x": 245,
+        "y": 511.625,
+        "text": "1",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:61"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Glass Weather",
+        "x": 331,
+        "y": 511.625,
+        "text": "Glass Weather",
+        "fontSize": 14,
+        "fontWeight": 550,
+        "fontColor": {
+          "a": 1,
+          "b": 0.9607843137254902,
+          "g": 0.9568627450980393,
+          "r": 0.9529411764705882
+        }
+      },
+      "nodeId": "25:62"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Mara Vale",
+        "x": 686.328125,
+        "y": 511.625,
+        "text": "Mara Vale",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:63"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Late drive",
+        "x": 889.984375,
+        "y": 511.625,
+        "text": "Late drive",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:64"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "4:11",
+        "x": 1148.984375,
+        "y": 511.625,
+        "text": "4:11",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:65"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "2",
+        "x": 245,
+        "y": 557.625,
+        "text": "2",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:66"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Signal Garden",
+        "x": 331,
+        "y": 557.625,
+        "text": "Signal Garden",
+        "fontSize": 14,
+        "fontWeight": 550,
+        "fontColor": {
+          "a": 1,
+          "b": 0.9607843137254902,
+          "g": 0.9568627450980393,
+          "r": 0.9529411764705882
+        }
+      },
+      "nodeId": "25:67"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "North Index",
+        "x": 686.328125,
+        "y": 557.625,
+        "text": "North Index",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:68"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "MilkDrop nights",
+        "x": 889.984375,
+        "y": 557.625,
+        "text": "MilkDrop nights",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:69"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "5:01",
+        "x": 1148.984375,
+        "y": 557.625,
+        "text": "5:01",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:70"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "3",
+        "x": 245,
+        "y": 604.125,
+        "text": "3",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:71"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Counterpart",
+        "x": 331,
+        "y": 604.125,
+        "text": "Counterpart",
+        "fontSize": 14,
+        "fontWeight": 550,
+        "fontColor": {
+          "a": 1,
+          "b": 0.9607843137254902,
+          "g": 0.9568627450980393,
+          "r": 0.9529411764705882
+        }
+      },
+      "nodeId": "25:72"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Orchid Machine",
+        "x": 686.328125,
+        "y": 604.125,
+        "text": "Orchid Machine",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:73"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Untitled",
+        "x": 889.984375,
+        "y": 604.125,
+        "text": "Untitled",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:74"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "6:42",
+        "x": 1148.984375,
+        "y": 604.125,
+        "text": "6:42",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.8274509803921568,
+          "g": 0.803921568627451,
+          "r": 0.7803921568627451
+        }
+      },
+      "nodeId": "25:75"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Paralyzed",
+        "x": 66,
+        "y": 738.953125,
+        "text": "Paralyzed",
+        "fontSize": 14,
+        "fontWeight": 550,
+        "fontColor": {
+          "a": 1,
+          "b": 0.9607843137254902,
+          "g": 0.9568627450980393,
+          "r": 0.9529411764705882
+        }
+      },
+      "nodeId": "25:76"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Riverline",
+        "x": 66,
+        "y": 757.84375,
+        "text": "Riverline",
+        "fontSize": 12,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.6431372549019608,
+          "g": 0.596078431372549,
+          "r": 0.5568627450980392
+        }
+      },
+      "nodeId": "25:77"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "1:21",
+        "x": 404.90625,
+        "y": 772.90625,
+        "text": "1:21",
+        "fontSize": 12,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.6431372549019608,
+          "g": 0.596078431372549,
+          "r": 0.5568627450980392
+        }
+      },
+      "nodeId": "25:78"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "3:42",
+        "x": 833.078125,
+        "y": 772.90625,
+        "text": "3:42",
+        "fontSize": 12,
+        "fontWeight": 400,
+        "fontColor": {
+          "a": 1,
+          "b": 0.6431372549019608,
+          "g": 0.596078431372549,
+          "r": 0.5568627450980392
+        }
+      },
+      "nodeId": "25:79"
+    },
+    {
+      "command": "create_text",
+      "params": {
+        "parentId": "25:4",
+        "name": "Global search placeholder",
+        "x": 323.90625,
+        "y": 16.046875,
+        "text": "Search music, albums, playlists",
+        "fontSize": 14,
+        "fontWeight": 400,
+        "fontColor": {
+          "b": 0.6588235294117647,
+          "g": 0.6078431372549019,
+          "r": 0.5647058823529412
+        }
+      },
+      "nodeId": "25:80"
+    }
+  ]
+}

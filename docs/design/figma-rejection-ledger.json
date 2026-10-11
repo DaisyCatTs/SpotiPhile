@@ -1,0 +1,34 @@
+{
+  "date": "2026-10-09",
+  "nodeId": "25:3",
+  "frameId": "25:2",
+  "command": "set_text_content",
+  "readback": {
+    "id": "25:3",
+    "name": "COMPOSITION STUDY · Artwork placeholders · Full visual review in professional-shell.html · NOT APPROVED",
+    "type": "TEXT",
+    "fills": [
+      {
+        "blendMode": "NORMAL",
+        "type": "SOLID",
+        "color": "#b2bfcc"
+      }
+    ],
+    "absoluteBoundingBox": {
+      "x": 100,
+      "y": 3212,
+      "width": 484,
+      "height": 15
+    },
+    "characters": "REJECTED COMPOSITION · 2026-10-09 · Retained as history · Artwork placeholders",
+    "style": {
+      "fontFamily": "Inter",
+      "fontStyle": "Medium",
+      "fontWeight": 500,
+      "fontSize": 12,
+      "textAlignHorizontal": "LEFT",
+      "letterSpacing": 0,
+      "lineHeightPx": 14.522727012634277
+    }
+  }
+}

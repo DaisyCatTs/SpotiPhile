@@ -139,3 +139,74 @@ counts once, and the notification reports only the rows actually added.
     target: it plays from the current context, not from a list Spotifast
     can rewrite. While *Playing next* is empty, drop the song on the player
     bar's Queue button instead.
+
+## Spotiphile Play Next (development)
+
+Right-click a song or episode, or a selected group of rows, and choose **Play
+next** while this computer is the active player. The selected playable rows go
+before existing manually queued songs, in their displayed order. Repeated rows
+remain separate occurrences. The current song and its paused/playing state stay
+unchanged, and the playlist or album continues after the manual queue.
+
+Unavailable tracks, missing entries and Spotify local-file rows are skipped.
+The action is disabled when another device is active or local playback is not
+active; its tooltip explains that playback must be on this computer. **Add to
+queue** retains its existing append behavior on local and remote devices.
+
+A repeated Play Next click on the same selection within 1.5 seconds counts once
+while the manual queue remains unchanged.
+That debounce is separate from Add to Queue, so deliberately placing a new copy
+at the front after adding it to the tail works. Clear queue and sign-out reset
+this click guard. Pending additions retain their occurrence indexes when rows
+are inserted before them, and stale queue answers cannot undo the insertion.
+
+The action uses the same local clear-and-re-add mechanism as queue dragging.
+It adds no Spotify request, grant or storage format. This development feature is
+not a claim of full Queue 2.0, priority pinning, undo/redo or remote insertion.
+
+## Manual queue edge controls (development)
+
+Right-click a row under **Playing next** and choose **Move to top** or **Move to
+bottom**. The selected occurrence moves to that end of the manual queue; other
+rows keep their relative order. Copies of the same song remain separate rows.
+The current song, paused/playing state and the context's **Next up** rows stay
+unchanged. A row already at the requested end has that command disabled.
+
+These commands require active playback on this computer. They are disabled for
+remote playback and absent from context rows. If the manual queue changes after
+the menu emits its action, the old action is ignored rather than moving the row
+now occupying that index. Pending-add occurrence indexes and stale queue answers
+use the same guards as local dragging. The commands do not change remote
+append behavior, add network requests, or change stored queue formats.
+
+## Spotiphile queue selection and Play Later
+
+Play Later appends playable selected tracks/episodes to the manual queue before
+the context continues. It never starts playback or claims remote positional
+control. Repeated explicit invocations create new copies.
+
+Upcoming queue selection is separate from collection selection. Click selects a
+row, Ctrl/Cmd toggles it, Shift selects a range and Ctrl/Cmd+A selects upcoming
+rows. Copy preserves ordered duplicate links. Cut/Delete remove selected manual
+occurrences; Paste appends Spotify track/episode links. Ctrl/Cmd+Up/Down and
+dragging move selected manual rows as one ordered block. The native selection
+menu also moves a block to the top/bottom. On macOS Backspace is the delete key.
+
+All selected rows must be manual for an edit. Context rows can be copied but are
+not silently filtered from a mixed edit. Local active playback, an exact displayed
+manual prefix and the action's queue snapshot are rechecked before positional
+edits. A stale drag cannot become a copy insertion. Text editors, dialogs and
+popups retain keyboard ownership. A focused queue inspector takes precedence
+over the central collection's shortcuts.
+
+See [batch validation](../features/queue-batch-validation.md) for executed checks
+and limitations. Session Capsules remain separate work.
+
+## Local queue undo/redo
+
+Use Undo/Redo or Ctrl/Cmd+Z and Ctrl/Cmd+Shift+Z (also Ctrl/Cmd+Y) to reverse
+manual queue edits. Playback advancement and context/device changes invalidate
+the in-memory history, so it cannot resurrect consumed songs. Pausing and seeking
+retain valid history. History is bounded to 20 edits, with snapshot row limits;
+queues over 4,096 upcoming rows remain editable without undo recording. See
+[history validation](../features/queue-history-validation.md) for exact scope.

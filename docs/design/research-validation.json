@@ -1,0 +1,644 @@
+{
+  "updated": "2026-10-08",
+  "url": "http://127.0.0.1:8766/design/research-shell.html",
+  "cases": [
+    {
+      "name": "research-760-light-library",
+      "width": 760,
+      "height": 800,
+      "theme": "light",
+      "accent": "teal",
+      "density": "compact",
+      "page": "library",
+      "inspector": "closed",
+      "state": "ready",
+      "screenshot": "docs/design/captures/research-760-light-library.png",
+      "consoleErrors": [],
+      "failed": [],
+      "info": {
+        "fontReady": true,
+        "fontFamily": "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "documentOverflowX": false,
+        "app": {
+          "x": 0,
+          "y": 42,
+          "width": 760,
+          "height": 758,
+          "top": 42,
+          "right": 760,
+          "bottom": 800,
+          "left": 0
+        },
+        "player": {
+          "x": 0,
+          "y": 722,
+          "width": 760,
+          "height": 78,
+          "top": 722,
+          "right": 760,
+          "bottom": 800,
+          "left": 0
+        },
+        "inspector": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "notes": {
+          "x": 188,
+          "y": 4,
+          "width": 256.734375,
+          "height": 34.890625,
+          "top": 4,
+          "right": 444.734375,
+          "bottom": 38.890625,
+          "left": 188
+        },
+        "activeElement": "Home",
+        "focusVisibleBoxShadow": "rgb(13, 16, 20) 0px 0px 0px 2px, rgb(96, 165, 250) 0px 0px 0px 4px",
+        "namedButtons": 69,
+        "buttonCount": 69,
+        "reducedMotionAnimationName": "none",
+        "libraryRows": 18
+      }
+    },
+    {
+      "name": "research-1280-dark-home",
+      "width": 1280,
+      "height": 800,
+      "theme": "dark",
+      "accent": "blue",
+      "density": "default",
+      "page": "home",
+      "inspector": "open",
+      "state": "ready",
+      "screenshot": "docs/design/captures/research-1280-dark-home.png",
+      "consoleErrors": [],
+      "failed": [],
+      "info": {
+        "fontReady": true,
+        "fontFamily": "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "documentOverflowX": false,
+        "app": {
+          "x": 0,
+          "y": 42,
+          "width": 1280,
+          "height": 758,
+          "top": 42,
+          "right": 1280,
+          "bottom": 800,
+          "left": 0
+        },
+        "player": {
+          "x": 0,
+          "y": 712,
+          "width": 1280,
+          "height": 88,
+          "top": 712,
+          "right": 1280,
+          "bottom": 800,
+          "left": 0
+        },
+        "inspector": {
+          "x": 972,
+          "y": 96,
+          "width": 308,
+          "height": 616,
+          "top": 96,
+          "right": 1280,
+          "bottom": 712,
+          "left": 972
+        },
+        "notes": {
+          "x": 188,
+          "y": 4,
+          "width": 256.734375,
+          "height": 34.890625,
+          "top": 4,
+          "right": 444.734375,
+          "bottom": 38.890625,
+          "left": 188
+        },
+        "activeElement": "Home",
+        "focusVisibleBoxShadow": "rgb(13, 16, 20) 0px 0px 0px 2px, rgb(96, 165, 250) 0px 0px 0px 4px",
+        "namedButtons": 69,
+        "buttonCount": 69,
+        "reducedMotionAnimationName": "none",
+        "libraryRows": 18
+      }
+    },
+    {
+      "name": "research-1440-oled-playlist",
+      "width": 1440,
+      "height": 900,
+      "theme": "oled",
+      "accent": "coral",
+      "density": "comfortable",
+      "page": "playlist",
+      "inspector": "open",
+      "state": "ready",
+      "screenshot": "docs/design/captures/research-1440-oled-playlist.png",
+      "consoleErrors": [],
+      "failed": [],
+      "info": {
+        "fontReady": true,
+        "fontFamily": "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "documentOverflowX": false,
+        "app": {
+          "x": 0,
+          "y": 42,
+          "width": 1440,
+          "height": 858,
+          "top": 42,
+          "right": 1440,
+          "bottom": 900,
+          "left": 0
+        },
+        "player": {
+          "x": 0,
+          "y": 804,
+          "width": 1440,
+          "height": 96,
+          "top": 804,
+          "right": 1440,
+          "bottom": 900,
+          "left": 0
+        },
+        "inspector": {
+          "x": 1132,
+          "y": 100,
+          "width": 308,
+          "height": 704,
+          "top": 100,
+          "right": 1440,
+          "bottom": 804,
+          "left": 1132
+        },
+        "notes": {
+          "x": 188,
+          "y": 4,
+          "width": 256.734375,
+          "height": 34.890625,
+          "top": 4,
+          "right": 444.734375,
+          "bottom": 38.890625,
+          "left": 188
+        },
+        "activeElement": "Home",
+        "focusVisibleBoxShadow": "rgb(13, 16, 20) 0px 0px 0px 2px, rgb(96, 165, 250) 0px 0px 0px 4px",
+        "namedButtons": 69,
+        "buttonCount": 69,
+        "reducedMotionAnimationName": "none",
+        "libraryRows": 18
+      }
+    },
+    {
+      "name": "research-2560-dark-library",
+      "width": 2560,
+      "height": 1440,
+      "theme": "dark",
+      "accent": "teal",
+      "density": "compact",
+      "page": "library",
+      "inspector": "open",
+      "state": "ready",
+      "screenshot": "docs/design/captures/research-2560-dark-library.png",
+      "consoleErrors": [],
+      "failed": [],
+      "info": {
+        "fontReady": true,
+        "fontFamily": "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "documentOverflowX": false,
+        "app": {
+          "x": 0,
+          "y": 42,
+          "width": 2560,
+          "height": 1398,
+          "top": 42,
+          "right": 2560,
+          "bottom": 1440,
+          "left": 0
+        },
+        "player": {
+          "x": 0,
+          "y": 1362,
+          "width": 2560,
+          "height": 78,
+          "top": 1362,
+          "right": 2560,
+          "bottom": 1440,
+          "left": 0
+        },
+        "inspector": {
+          "x": 2252,
+          "y": 92,
+          "width": 308,
+          "height": 1270,
+          "top": 92,
+          "right": 2560,
+          "bottom": 1362,
+          "left": 2252
+        },
+        "notes": {
+          "x": 188,
+          "y": 4,
+          "width": 256.734375,
+          "height": 34.890625,
+          "top": 4,
+          "right": 444.734375,
+          "bottom": 38.890625,
+          "left": 188
+        },
+        "activeElement": "Home",
+        "focusVisibleBoxShadow": "rgb(13, 16, 20) 0px 0px 0px 2px, rgb(96, 165, 250) 0px 0px 0px 4px",
+        "namedButtons": 69,
+        "buttonCount": 69,
+        "reducedMotionAnimationName": "none",
+        "libraryRows": 18
+      }
+    },
+    {
+      "name": "research-1280-light-error",
+      "width": 1280,
+      "height": 800,
+      "theme": "light",
+      "accent": "blue",
+      "density": "default",
+      "page": "library",
+      "inspector": "open",
+      "state": "error",
+      "screenshot": "docs/design/captures/research-1280-light-error.png",
+      "consoleErrors": [],
+      "failed": [],
+      "info": {
+        "fontReady": true,
+        "fontFamily": "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "documentOverflowX": false,
+        "app": {
+          "x": 0,
+          "y": 42,
+          "width": 1280,
+          "height": 758,
+          "top": 42,
+          "right": 1280,
+          "bottom": 800,
+          "left": 0
+        },
+        "player": {
+          "x": 0,
+          "y": 712,
+          "width": 1280,
+          "height": 88,
+          "top": 712,
+          "right": 1280,
+          "bottom": 800,
+          "left": 0
+        },
+        "inspector": {
+          "x": 972,
+          "y": 96,
+          "width": 308,
+          "height": 616,
+          "top": 96,
+          "right": 1280,
+          "bottom": 712,
+          "left": 972
+        },
+        "notes": {
+          "x": 188,
+          "y": 4,
+          "width": 256.734375,
+          "height": 34.890625,
+          "top": 4,
+          "right": 444.734375,
+          "bottom": 38.890625,
+          "left": 188
+        },
+        "activeElement": "Home",
+        "focusVisibleBoxShadow": "rgb(13, 16, 20) 0px 0px 0px 2px, rgb(96, 165, 250) 0px 0px 0px 4px",
+        "namedButtons": 69,
+        "buttonCount": 69,
+        "reducedMotionAnimationName": "none",
+        "libraryRows": 18
+      }
+    },
+    {
+      "name": "research-1280-dark-empty",
+      "width": 1280,
+      "height": 800,
+      "theme": "dark",
+      "accent": "neutral",
+      "density": "default",
+      "page": "playlist",
+      "inspector": "closed",
+      "state": "empty",
+      "screenshot": "docs/design/captures/research-1280-dark-empty.png",
+      "consoleErrors": [],
+      "failed": [],
+      "info": {
+        "fontReady": true,
+        "fontFamily": "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "documentOverflowX": false,
+        "app": {
+          "x": 0,
+          "y": 42,
+          "width": 1280,
+          "height": 758,
+          "top": 42,
+          "right": 1280,
+          "bottom": 800,
+          "left": 0
+        },
+        "player": {
+          "x": 0,
+          "y": 712,
+          "width": 1280,
+          "height": 88,
+          "top": 712,
+          "right": 1280,
+          "bottom": 800,
+          "left": 0
+        },
+        "inspector": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "notes": {
+          "x": 188,
+          "y": 4,
+          "width": 256.734375,
+          "height": 34.890625,
+          "top": 4,
+          "right": 444.734375,
+          "bottom": 38.890625,
+          "left": 188
+        },
+        "activeElement": "Home",
+        "focusVisibleBoxShadow": "rgb(13, 16, 20) 0px 0px 0px 2px, rgb(96, 165, 250) 0px 0px 0px 4px",
+        "namedButtons": 69,
+        "buttonCount": 69,
+        "reducedMotionAnimationName": "none",
+        "libraryRows": 18
+      }
+    },
+    {
+      "name": "research-1280-oled-loading",
+      "width": 1280,
+      "height": 800,
+      "theme": "oled",
+      "accent": "teal",
+      "density": "default",
+      "page": "home",
+      "inspector": "open",
+      "state": "loading",
+      "screenshot": "docs/design/captures/research-1280-oled-loading.png",
+      "consoleErrors": [],
+      "failed": [],
+      "info": {
+        "fontReady": true,
+        "fontFamily": "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "documentOverflowX": false,
+        "app": {
+          "x": 0,
+          "y": 42,
+          "width": 1280,
+          "height": 758,
+          "top": 42,
+          "right": 1280,
+          "bottom": 800,
+          "left": 0
+        },
+        "player": {
+          "x": 0,
+          "y": 712,
+          "width": 1280,
+          "height": 88,
+          "top": 712,
+          "right": 1280,
+          "bottom": 800,
+          "left": 0
+        },
+        "inspector": {
+          "x": 972,
+          "y": 96,
+          "width": 308,
+          "height": 616,
+          "top": 96,
+          "right": 1280,
+          "bottom": 712,
+          "left": 972
+        },
+        "notes": {
+          "x": 188,
+          "y": 4,
+          "width": 256.734375,
+          "height": 34.890625,
+          "top": 4,
+          "right": 444.734375,
+          "bottom": 38.890625,
+          "left": 188
+        },
+        "activeElement": "Home",
+        "focusVisibleBoxShadow": "rgb(13, 16, 20) 0px 0px 0px 2px, rgb(96, 165, 250) 0px 0px 0px 4px",
+        "namedButtons": 69,
+        "buttonCount": 69,
+        "reducedMotionAnimationName": "none",
+        "libraryRows": 18
+      }
+    }
+  ],
+  "contrast": [
+    {
+      "theme": "dark",
+      "accent": "blue",
+      "checks": {
+        "textOnWindow": 17.568477045382018,
+        "mutedOnWindow": 9.407849109275965,
+        "dimOnPanel": 5.5762324441555595,
+        "dimOnSurface": 4.66408721304043,
+        "textOnPanel": 16.394654158528574,
+        "onAccent": 7.504799170973275,
+        "focusOnWindow": 7.499869774639215,
+        "focusOnSurface": 5.8539318261418645
+      },
+      "pass": true
+    },
+    {
+      "theme": "dark",
+      "accent": "teal",
+      "checks": {
+        "textOnWindow": 17.568477045382018,
+        "mutedOnWindow": 9.407849109275965,
+        "dimOnPanel": 5.5762324441555595,
+        "dimOnSurface": 4.66408721304043,
+        "textOnPanel": 16.394654158528574,
+        "onAccent": 10.138947156619318,
+        "focusOnWindow": 10.243323631102516,
+        "focusOnSurface": 7.99530125340965
+      },
+      "pass": true
+    },
+    {
+      "theme": "dark",
+      "accent": "coral",
+      "checks": {
+        "textOnWindow": 17.568477045382018,
+        "mutedOnWindow": 9.407849109275965,
+        "dimOnPanel": 5.5762324441555595,
+        "dimOnSurface": 4.66408721304043,
+        "textOnPanel": 16.394654158528574,
+        "onAccent": 7.131464189058064,
+        "focusOnWindow": 7.084689978564048,
+        "focusOnSurface": 5.529868303061235
+      },
+      "pass": true
+    },
+    {
+      "theme": "dark",
+      "accent": "neutral",
+      "checks": {
+        "textOnWindow": 17.568477045382018,
+        "mutedOnWindow": 9.407849109275965,
+        "dimOnPanel": 5.5762324441555595,
+        "dimOnSurface": 4.66408721304043,
+        "textOnPanel": 16.394654158528574,
+        "onAccent": 11.948333368856327,
+        "focusOnWindow": 12.842871007684735,
+        "focusOnSurface": 10.024346234003369
+      },
+      "pass": true
+    },
+    {
+      "theme": "light",
+      "accent": "blue",
+      "checks": {
+        "textOnWindow": 17.213420929692987,
+        "mutedOnWindow": 6.902660871016435,
+        "dimOnPanel": 5.653876192724501,
+        "dimOnSurface": 4.759520987864173,
+        "textOnPanel": 18.009985826393038,
+        "onAccent": 5.168555560022562,
+        "focusOnWindow": 4.939955162140827,
+        "focusOnSurface": 4.350970524703906
+      },
+      "pass": true
+    },
+    {
+      "theme": "light",
+      "accent": "teal",
+      "checks": {
+        "textOnWindow": 17.213420929692987,
+        "mutedOnWindow": 6.902660871016435,
+        "dimOnPanel": 5.653876192724501,
+        "dimOnSurface": 4.759520987864173,
+        "textOnPanel": 18.009985826393038,
+        "onAccent": 5.473250081210842,
+        "focusOnWindow": 5.23117332848158,
+        "focusOnSurface": 4.6074671155470135
+      },
+      "pass": true
+    },
+    {
+      "theme": "light",
+      "accent": "coral",
+      "checks": {
+        "textOnWindow": 17.213420929692987,
+        "mutedOnWindow": 6.902660871016435,
+        "dimOnPanel": 5.653876192724501,
+        "dimOnSurface": 4.759520987864173,
+        "textOnPanel": 18.009985826393038,
+        "onAccent": 4.829404522659002,
+        "focusOnWindow": 4.615804459238792,
+        "focusOnSurface": 4.06546790219071
+      },
+      "pass": true
+    },
+    {
+      "theme": "light",
+      "accent": "neutral",
+      "checks": {
+        "textOnWindow": 17.213420929692987,
+        "mutedOnWindow": 6.902660871016435,
+        "dimOnPanel": 5.653876192724501,
+        "dimOnSurface": 4.759520987864173,
+        "textOnPanel": 18.009985826393038,
+        "onAccent": 7.577663953533317,
+        "focusOnWindow": 7.242510935504382,
+        "focusOnSurface": 6.378995470794709
+      },
+      "pass": true
+    },
+    {
+      "theme": "oled",
+      "accent": "blue",
+      "checks": {
+        "textOnWindow": 19.34870635463099,
+        "mutedOnWindow": 10.361154775900454,
+        "dimOnPanel": 6.354928818023001,
+        "dimOnSurface": 5.930600335205291,
+        "textOnPanel": 18.68409561777719,
+        "onAccent": 7.504799170973275,
+        "focusOnWindow": 8.259838208663083,
+        "focusOnSurface": 7.443542211929244
+      },
+      "pass": true
+    },
+    {
+      "theme": "oled",
+      "accent": "teal",
+      "checks": {
+        "textOnWindow": 19.34870635463099,
+        "mutedOnWindow": 10.361154775900454,
+        "dimOnPanel": 6.354928818023001,
+        "dimOnSurface": 5.930600335205291,
+        "textOnPanel": 18.68409561777719,
+        "onAccent": 10.138947156619318,
+        "focusOnWindow": 11.28128866956922,
+        "focusOnSurface": 10.166391434740852
+      },
+      "pass": true
+    },
+    {
+      "theme": "oled",
+      "accent": "coral",
+      "checks": {
+        "textOnWindow": 19.34870635463099,
+        "mutedOnWindow": 10.361154775900454,
+        "dimOnPanel": 6.354928818023001,
+        "dimOnSurface": 5.930600335205291,
+        "textOnPanel": 18.68409561777719,
+        "onAccent": 7.131464189058064,
+        "focusOnWindow": 7.802587876839611,
+        "focusOnSurface": 7.031480612129752
+      },
+      "pass": true
+    },
+    {
+      "theme": "oled",
+      "accent": "neutral",
+      "checks": {
+        "textOnWindow": 19.34870635463099,
+        "mutedOnWindow": 10.361154775900454,
+        "dimOnPanel": 6.354928818023001,
+        "dimOnSurface": 5.930600335205291,
+        "textOnPanel": 18.68409561777719,
+        "onAccent": 11.948333368856327,
+        "focusOnWindow": 14.144250479776998,
+        "focusOnSurface": 12.7464149832738
+      },
+      "pass": true
+    }
+  ],
+  "pass": true
+}

@@ -1,0 +1,260 @@
+{
+  "method": "Headless Chromium fallback after T3 preview explicitly reported unavailable",
+  "results": [
+    {
+      "width": 760,
+      "theme": "dark",
+      "density": "compact",
+      "overflow": false,
+      "rowHeight": 38,
+      "rowsAbovePlayer": 6,
+      "notesClosed": true
+    },
+    {
+      "width": 760,
+      "theme": "dark",
+      "density": "default",
+      "overflow": false,
+      "rowHeight": 46,
+      "rowsAbovePlayer": 5,
+      "notesClosed": true
+    },
+    {
+      "width": 760,
+      "theme": "dark",
+      "density": "comfortable",
+      "overflow": false,
+      "rowHeight": 54,
+      "rowsAbovePlayer": 4,
+      "notesClosed": true
+    },
+    {
+      "width": 760,
+      "theme": "light",
+      "density": "compact",
+      "overflow": false,
+      "rowHeight": 38,
+      "rowsAbovePlayer": 6,
+      "notesClosed": true
+    },
+    {
+      "width": 760,
+      "theme": "light",
+      "density": "default",
+      "overflow": false,
+      "rowHeight": 46,
+      "rowsAbovePlayer": 5,
+      "notesClosed": true
+    },
+    {
+      "width": 760,
+      "theme": "light",
+      "density": "comfortable",
+      "overflow": false,
+      "rowHeight": 54,
+      "rowsAbovePlayer": 4,
+      "notesClosed": true
+    },
+    {
+      "width": 760,
+      "theme": "oled",
+      "density": "compact",
+      "overflow": false,
+      "rowHeight": 38,
+      "rowsAbovePlayer": 6,
+      "notesClosed": true
+    },
+    {
+      "width": 760,
+      "theme": "oled",
+      "density": "default",
+      "overflow": false,
+      "rowHeight": 46,
+      "rowsAbovePlayer": 5,
+      "notesClosed": true
+    },
+    {
+      "width": 760,
+      "theme": "oled",
+      "density": "comfortable",
+      "overflow": false,
+      "rowHeight": 54,
+      "rowsAbovePlayer": 4,
+      "notesClosed": true
+    },
+    {
+      "width": 1280,
+      "theme": "dark",
+      "density": "compact",
+      "overflow": false,
+      "rowHeight": 38,
+      "rowsAbovePlayer": 8,
+      "notesClosed": true
+    },
+    {
+      "width": 1280,
+      "theme": "dark",
+      "density": "default",
+      "overflow": false,
+      "rowHeight": 46,
+      "rowsAbovePlayer": 8,
+      "notesClosed": true
+    },
+    {
+      "width": 1280,
+      "theme": "dark",
+      "density": "comfortable",
+      "overflow": false,
+      "rowHeight": 54,
+      "rowsAbovePlayer": 7,
+      "notesClosed": true
+    },
+    {
+      "width": 1280,
+      "theme": "light",
+      "density": "compact",
+      "overflow": false,
+      "rowHeight": 38,
+      "rowsAbovePlayer": 8,
+      "notesClosed": true
+    },
+    {
+      "width": 1280,
+      "theme": "light",
+      "density": "default",
+      "overflow": false,
+      "rowHeight": 46,
+      "rowsAbovePlayer": 8,
+      "notesClosed": true
+    },
+    {
+      "width": 1280,
+      "theme": "light",
+      "density": "comfortable",
+      "overflow": false,
+      "rowHeight": 54,
+      "rowsAbovePlayer": 7,
+      "notesClosed": true
+    },
+    {
+      "width": 1280,
+      "theme": "oled",
+      "density": "compact",
+      "overflow": false,
+      "rowHeight": 38,
+      "rowsAbovePlayer": 8,
+      "notesClosed": true
+    },
+    {
+      "width": 1280,
+      "theme": "oled",
+      "density": "default",
+      "overflow": false,
+      "rowHeight": 46,
+      "rowsAbovePlayer": 8,
+      "notesClosed": true
+    },
+    {
+      "width": 1280,
+      "theme": "oled",
+      "density": "comfortable",
+      "overflow": false,
+      "rowHeight": 54,
+      "rowsAbovePlayer": 7,
+      "notesClosed": true
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "density": "compact",
+      "overflow": false,
+      "rowHeight": 38,
+      "rowsAbovePlayer": 8,
+      "notesClosed": true
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "density": "default",
+      "overflow": false,
+      "rowHeight": 46,
+      "rowsAbovePlayer": 8,
+      "notesClosed": true
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "density": "comfortable",
+      "overflow": false,
+      "rowHeight": 54,
+      "rowsAbovePlayer": 8,
+      "notesClosed": true
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "density": "compact",
+      "overflow": false,
+      "rowHeight": 38,
+      "rowsAbovePlayer": 8,
+      "notesClosed": true
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "density": "default",
+      "overflow": false,
+      "rowHeight": 46,
+      "rowsAbovePlayer": 8,
+      "notesClosed": true
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "density": "comfortable",
+      "overflow": false,
+      "rowHeight": 54,
+      "rowsAbovePlayer": 8,
+      "notesClosed": true
+    },
+    {
+      "width": 1440,
+      "theme": "oled",
+      "density": "compact",
+      "overflow": false,
+      "rowHeight": 38,
+      "rowsAbovePlayer": 8,
+      "notesClosed": true
+    },
+    {
+      "width": 1440,
+      "theme": "oled",
+      "density": "default",
+      "overflow": false,
+      "rowHeight": 46,
+      "rowsAbovePlayer": 8,
+      "notesClosed": true
+    },
+    {
+      "width": 1440,
+      "theme": "oled",
+      "density": "comfortable",
+      "overflow": false,
+      "rowHeight": 54,
+      "rowsAbovePlayer": 8,
+      "notesClosed": true
+    }
+  ],
+  "checks": {
+    "themes": true,
+    "densities": true,
+    "inspectorCloseAndReopen": true,
+    "tabKeyboardSelection": true,
+    "escapeAndFocusReturn": true,
+    "manualStateSelection": true,
+    "reducedMotion": true
+  },
+  "errors": [],
+  "externalRequests": [],
+  "limits": "Design prototype only; no native UI, real playback, complete accessibility audit or backend integration validated."
+}

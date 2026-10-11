@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DaisySpoti Phase 1 design comparison</title>
+<style>
+body{margin:0;padding:24px;background:#111214;color:#f3f4f6;font:14px system-ui,sans-serif}h1{font-size:24px}p{max-width:900px;line-height:1.6;color:#b6bac2}a{color:#ded2a8}label,button{margin-right:12px}select,button{padding:8px;background:#202226;color:#f3f4f6;border:1px solid #464b54;border-radius:6px}button[aria-pressed=true]{border-color:#ded2a8}*:focus-visible{outline:2px solid #e7d9ab;outline-offset:3px}img{display:block;max-width:100%;height:auto;margin-top:16px;border:1px solid #464b54}#caption{margin-top:16px}nav{display:flex;gap:16px;flex-wrap:wrap;margin:20px 0}
+</style>
+<h1>Phase 1 shell design review</h1>
+<p>Before shows the native Phase 0 demo. Proposed shows the HTML design prototype,
+not a modified native application. Both use fictional data; labels and sample
+content differ. These captures compare visual scope, not playback behavior.</p>
+<nav><a href="phase1-shell.html">Interactive prototype</a><a href="README.md">Scope and handoff</a><a href="https://www.figma.com/design/QY3qv8UVxL4PhHPEs0xHJo">Editable Figma layout drafts</a></nav>
+<label>Theme <select id="theme"><option>dark</option><option>light</option></select></label>
+<label>Width <select id="width"><option value="1280">1280 × 800</option><option value="760">760 × 800</option></select></label>
+<label>Proposed inspector <select id="inspector"><option value="open">Open</option><option value="closed">Closed</option></select></label>
+<div style="margin-top:16px"><button id="before" aria-pressed="false">Before</button><button id="after" aria-pressed="true">Proposed draft</button></div>
+<div id="caption" role="status"></div><img id="capture" alt="Design comparison capture">
+<script>
+const theme=document.querySelector('#theme'),width=document.querySelector('#width'),inspector=document.querySelector('#inspector'),before=document.querySelector('#before'),after=document.querySelector('#after'),capture=document.querySelector('#capture'),caption=document.querySelector('#caption');let proposed=true;
+function render(){const t=theme.value,w=width.value;before.setAttribute('aria-pressed',String(!proposed));after.setAttribute('aria-pressed',String(proposed));capture.src=proposed?`captures/review-${w}-${t}${inspector.value==='open'?'-inspector':''}.png`:`../upstream/evidence/${w==='1280'?'desktop':'narrow'}-${t}.png`;caption.textContent=proposed?`Proposed ${t}, ${w}px. Inspector ${inspector.value}${w==='760'&&inspector.value==='open'?' as overlay':''}. Review draft only.`:`Native Phase 0 ${t}, ${w}px. Existing queue panel visible.`;capture.alt=caption.textContent;}
+for(const control of [theme,width,inspector])control.addEventListener('change',render);before.addEventListener('click',()=>{proposed=false;render()});after.addEventListener('click',()=>{proposed=true;render()});render();
+</script>
+</html>

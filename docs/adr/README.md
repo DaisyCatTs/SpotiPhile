@@ -9,6 +9,7 @@ not that a future feature has been implemented or validated.
 | [0001](0001-upstream-and-branches.md) | Accepted | Frozen supplier baseline, selective ports, stable main and development branch |
 | [0002](0002-native-and-preserved-subsystems.md) | Accepted | Preserve native Rust, Winamp, MilkDrop and existing action/runtime boundaries |
 | [0003](0003-credentials-and-identity.md) | Accepted | Preserve protected grants and defer identity migration until explicitly designed |
+| [0004](0004-appearance-and-product-name.md) | Accepted | Spotiphile display name and backward-compatible appearance preferences |
 
 No provider abstraction, database choice, new audio graph, plugin SDK, Pure
 Shuffle design or new UI architecture is decided by Phase 0. Write those ADRs

@@ -12,6 +12,20 @@ use crate::theme::{self, Icon, Palette};
 const DEFAULT_ROW_HEIGHT: f32 = 60.0;
 const COMPACT_ROW_HEIGHT: f32 = 32.0;
 
+pub(super) const RAIL_WIDTH: f32 = 64.0;
+const PAGE_COMFORT_WIDTH: f32 = 560.0;
+
+/// Choose geometry from the full remaining shell width, not last frame's
+/// clamped panel state. Narrowing never overwrites the preferred library width.
+fn compact_navigation(room: f32, chosen: f32, right_panel: bool, page_min: f32) -> bool {
+    let right = if right_panel {
+        theme::SIDE_PANEL_MIN_WIDTH
+    } else {
+        0.0
+    };
+    room < chosen.clamp(super::SIDEBAR_MIN_WIDTH, 600.0) + right + PAGE_COMFORT_WIDTH.max(page_min)
+}
+
 struct Entry {
     image: Option<String>,
     grid_image: Option<String>,
@@ -472,6 +486,15 @@ fn order_entries(app: &App, shelf: Filter, sort: LibrarySort, entries: &mut [Ent
 }
 
 pub fn show(app: &mut App, ui: &mut egui::Ui) {
+    if compact_navigation(
+        ui.available_width(),
+        app.settings.sidebar_width,
+        app.show_queue_panel || app.show_lyrics_panel,
+        super::topbar::least_width(ui.ctx()),
+    ) {
+        rail(app, ui);
+        return;
+    }
     let palette = app.palette;
     let expanded_art = has_expanded_art(app);
     let floating_art = app.settings.sidebar_grid && expanded_art;
@@ -520,6 +543,142 @@ pub fn show(app: &mut App, ui: &mut egui::Ui) {
     {
         app.settings.sidebar_width = width;
         app.actions.push(Action::SettingsChanged);
+    }
+}
+
+/// Keep primary navigation and the complete existing library reachable while
+/// leaving the page room to breathe. Use a separate panel id so its fixed
+/// width cannot enter the expanded sidebar's persisted resize state.
+fn rail(app: &mut App, ui: &mut egui::Ui) {
+    let palette = app.palette;
+    let locale = app.locale;
+    let top = 12 + theme::titlebar_inset(ui.ctx()) as i8;
+    egui::Panel::left("navigation-rail")
+        .exact_size(RAIL_WIDTH)
+        .resizable(false)
+        .show_separator_line(false)
+        .frame(Frame::new().fill(palette.panel).inner_margin(Margin {
+            left: 10,
+            right: 10,
+            top,
+            bottom: 8,
+        }))
+        .show(ui, |ui| {
+            for (icon, label, page, action) in [
+                (
+                    Icon::House,
+                    gettext(locale, "Home"),
+                    Page::Home,
+                    Action::Open(Page::Home),
+                ),
+                (
+                    Icon::Search,
+                    gettext(locale, "Search"),
+                    Page::Search,
+                    Action::FocusSearch,
+                ),
+            ] {
+                let selected = app.page() == &page;
+                let response = rail_button(ui, &palette, icon, &label, selected);
+                if response.clicked() {
+                    app.actions.push(action);
+                }
+                ui.add_space(8.0);
+            }
+            let library = rail_button(
+                ui,
+                &palette,
+                Icon::Library,
+                &gettext(locale, "Your Library"),
+                matches!(
+                    app.page(),
+                    Page::LikedSongs
+                        | Page::Albums
+                        | Page::Artists
+                        | Page::Podcasts
+                        | Page::Episodes
+                        | Page::Playlist(_)
+                        | Page::Album(_)
+                        | Page::Artist(_)
+                        | Page::Show(_)
+                ),
+            );
+            egui::Popup::menu(&library)
+                // Searching, sorting and folder expansion are interactions
+                // within the library, not menu choices that dismiss it.
+                .close_behavior(egui::PopupCloseBehavior::CloseOnClickOutside)
+                .frame(super::widgets::menu_frame(&palette))
+                .show(|ui| {
+                    let content = ui.ctx().content_rect();
+                    let popup_top = library.rect.bottom().max(content.top());
+                    let available_height =
+                        (content.bottom() - theme::PLAYER_BAR_HEIGHT - 8.0 - popup_top).max(200.0);
+                    ui.set_width(app.settings.sidebar_width.clamp(280.0, 400.0));
+                    ui.set_height((content.height() - 120.0).max(200.0).min(available_height));
+                    contents(app, ui, None);
+                });
+        });
+}
+
+fn rail_button(
+    ui: &mut egui::Ui,
+    palette: &Palette,
+    icon: Icon,
+    label: &str,
+    selected: bool,
+) -> egui::Response {
+    let (rect, response) = ui.allocate_exact_size(vec2(44.0, 44.0), Sense::click());
+    if ui.is_rect_visible(rect) {
+        if selected || response.hovered() {
+            ui.painter().rect_filled(rect, 8.0, palette.surface_hover);
+        }
+        icon.image(
+            if selected {
+                palette.accent
+            } else {
+                palette.secondary
+            },
+            22.0,
+        )
+        .paint_at(ui, Rect::from_center_size(rect.center(), Vec2::splat(22.0)));
+    }
+    response.widget_info(|| {
+        egui::WidgetInfo::selected(egui::WidgetType::Button, ui.is_enabled(), selected, label)
+    });
+    theme::focus_ring(ui, &response);
+    response.on_hover_text(label)
+}
+
+#[cfg(test)]
+mod responsive_navigation_tests {
+    use super::*;
+
+    #[test]
+    fn narrow_then_wide_restores_expanded_navigation_with_inspector() {
+        let chosen = 300.0;
+        let page_min = 440.0;
+        assert!(compact_navigation(760.0, chosen, false, page_min));
+        assert!(!compact_navigation(1000.0, chosen, false, page_min));
+        assert!(compact_navigation(1000.0, chosen, true, page_min));
+        assert!(!compact_navigation(1440.0, chosen, true, page_min));
+        assert!(compact_navigation(760.0, chosen, true, page_min));
+        assert!(!compact_navigation(1440.0, chosen, true, page_min));
+    }
+
+    #[test]
+    fn unusually_wide_toolbar_is_reserved_before_expanding_library() {
+        assert!(!compact_navigation(900.0, 250.0, false, 440.0));
+        assert!(compact_navigation(900.0, 250.0, false, 700.0));
+        assert!(!compact_navigation(960.0, 250.0, false, 700.0));
+    }
+
+    #[test]
+    fn saved_library_width_controls_expansion_threshold() {
+        assert!(!compact_navigation(1000.0, 250.0, false, 440.0));
+        assert!(compact_navigation(1000.0, 600.0, false, 440.0));
+        // The same preference remains usable after narrowing: only geometry
+        // changes, and the decision does not consume a clamped panel width.
+        assert!(!compact_navigation(1440.0, 600.0, false, 440.0));
     }
 }
 
@@ -1237,12 +1396,18 @@ fn contents(app: &mut App, ui: &mut egui::Ui, grid_art: Option<Rect>) {
             // Calculate drop positions from fixed row height because rows shift
             // before drawing.
             let list_top = ui.cursor().top();
-            let pointer = ui.ctx().pointer_latest_pos().filter(|pos| {
-                ui.clip_rect().contains(*pos) && ui.rect_contains_pointer(ui.clip_rect())
-            });
             // Tracks may drop on Liked Songs or playlists that take songs
             // from this account.
             let dragging_song = egui::DragAndDrop::has_payload_of_type::<DragTrack>(ui.ctx());
+            // Sidebar entries, including Liked Songs, drop between rows.
+            let reordering = egui::DragAndDrop::has_payload_of_type::<DragEntry>(ui.ctx());
+            let dragging_library_item = dragging_song || reordering;
+            let pointer = ui.ctx().pointer_latest_pos().filter(|pos| {
+                ui.clip_rect().contains(*pos)
+                    && (ui.rect_contains_pointer(ui.clip_rect())
+                        || (dragging_library_item
+                            && ui.ctx().layer_id_at(*pos) == Some(ui.layer_id())))
+            });
             let drop_target = dragging_song
                 .then_some(pointer)
                 .flatten()
@@ -1250,8 +1415,6 @@ fn contents(app: &mut App, ui: &mut egui::Ui, grid_art: Option<Rect>) {
                 .filter(|row| *row >= 0.0 && *row < entries.len() as f32)
                 .map(|row| row as usize)
                 .filter(|row| entries[*row].liked || entries[*row].editable);
-            // Sidebar entries, including Liked Songs, drop between rows.
-            let reordering = egui::DragAndDrop::has_payload_of_type::<DragEntry>(ui.ctx());
             let reorder_slot = reordering.then_some(pointer).flatten().map(|pos| {
                 (((pos.y - list_top) / row_height).round().max(0.0) as usize).min(entries.len())
             });
@@ -1607,13 +1770,15 @@ fn library_grid(
     let current_page = app.page().clone();
     let layout = grid_layout(ui.available_width());
     let origin = ui.cursor().min;
-    let pointer = ui.ctx().pointer_latest_pos().filter(|pos| {
-        ui.clip_rect().contains(*pos)
-            && ui.rect_contains_pointer(ui.clip_rect())
-            && !grid_art.is_some_and(|art| art.contains(*pos))
-    });
     let dragging_song = egui::DragAndDrop::has_payload_of_type::<DragTrack>(ui.ctx());
     let reordering = egui::DragAndDrop::has_payload_of_type::<DragEntry>(ui.ctx());
+    let dragging_library_item = dragging_song || reordering;
+    let pointer = ui.ctx().pointer_latest_pos().filter(|pos| {
+        ui.clip_rect().contains(*pos)
+            && (ui.rect_contains_pointer(ui.clip_rect())
+                || (dragging_library_item && ui.ctx().layer_id_at(*pos) == Some(ui.layer_id())))
+            && !grid_art.is_some_and(|art| art.contains(*pos))
+    });
     let reorder_slot = reordering
         .then_some(pointer)
         .flatten()

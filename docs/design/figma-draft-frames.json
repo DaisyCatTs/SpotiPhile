@@ -1,0 +1,27 @@
+{
+  "fileKey": "QY3qv8UVxL4PhHPEs0xHJo",
+  "stage": "editable draft, no variable bindings or reusable components yet",
+  "shells": [
+    {
+      "root": "4:2",
+      "theme": "dark",
+      "width": 1280,
+      "editable": true,
+      "componentized": false
+    },
+    {
+      "root": "4:161",
+      "theme": "light",
+      "width": 1280,
+      "editable": true,
+      "componentized": false
+    },
+    {
+      "root": "4:320",
+      "theme": "oled",
+      "width": 760,
+      "editable": true,
+      "componentized": false
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "fileKey": "QY3qv8UVxL4PhHPEs0xHJo",
+  "root": "11:459",
+  "cards": [
+    {
+      "base": "dark",
+      "accent": "blue",
+      "nodeId": "11:462"
+    },
+    {
+      "base": "dark",
+      "accent": "teal",
+      "nodeId": "11:470"
+    },
+    {
+      "base": "dark",
+      "accent": "coral",
+      "nodeId": "11:478"
+    },
+    {
+      "base": "dark",
+      "accent": "neutral",
+      "nodeId": "11:486"
+    },
+    {
+      "base": "light",
+      "accent": "blue",
+      "nodeId": "11:494"
+    },
+    {
+      "base": "light",
+      "accent": "teal",
+      "nodeId": "11:502"
+    },
+    {
+      "base": "light",
+      "accent": "coral",
+      "nodeId": "11:510"
+    },
+    {
+      "base": "light",
+      "accent": "neutral",
+      "nodeId": "11:518"
+    },
+    {
+      "base": "oled",
+      "accent": "blue",
+      "nodeId": "11:526"
+    },
+    {
+      "base": "oled",
+      "accent": "teal",
+      "nodeId": "11:534"
+    },
+    {
+      "base": "oled",
+      "accent": "coral",
+      "nodeId": "11:542"
+    },
+    {
+      "base": "oled",
+      "accent": "neutral",
+      "nodeId": "11:550"
+    }
+  ],
+  "overflow": [],
+  "status": "Editable study, not approved, no reusable component or variable bindings"
+}

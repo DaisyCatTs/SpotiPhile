@@ -1,0 +1,82 @@
+{
+  "status": "phase1_research_direction",
+  "source": "docs/design/research-shell.html",
+  "updated": "2026-10-08",
+  "font": {
+    "family": "Inter",
+    "asset": "docs/design/research-assets/InterVariable.ttf",
+    "fallback": "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif",
+    "weights": "100 900"
+  },
+  "themes": {
+    "dark": {
+      "window": "#0d1014",
+      "panel": "#14181f",
+      "panel2": "#191f27",
+      "surface": "#202832",
+      "surface2": "#26313c",
+      "line": "#303a46",
+      "text": "#f3f6f8",
+      "muted": "#aeb7c3",
+      "dim": "#87919f"
+    },
+    "light": {
+      "window": "#f8fafc",
+      "panel": "#ffffff",
+      "panel2": "#eef2f6",
+      "surface": "#e7ecf2",
+      "surface2": "#dce4ed",
+      "line": "#cdd6e1",
+      "text": "#12171d",
+      "muted": "#4e5865",
+      "dim": "#5f6873"
+    },
+    "oled": {
+      "window": "#000000",
+      "panel": "#050607",
+      "panel2": "#080a0d",
+      "surface": "#0d1117",
+      "surface2": "#131923",
+      "line": "#202936",
+      "text": "#f3f6f8",
+      "muted": "#aeb7c3",
+      "dim": "#87919f"
+    }
+  },
+  "accents": {
+    "dark": {
+      "blue": { "accent": "#60a5fa", "accent2": "#22d3ee", "onAccent": "#06101e" },
+      "teal": { "accent": "#2dd4bf", "accent2": "#38bdf8", "onAccent": "#031412" },
+      "coral": { "accent": "#fb7185", "accent2": "#f97316", "onAccent": "#22050a" },
+      "neutral": { "accent": "#cbd5e1", "accent2": "#94a3b8", "onAccent": "#111827" }
+    },
+    "light": {
+      "blue": { "accent": "#2563eb", "accent2": "#0891b2", "onAccent": "#ffffff" },
+      "teal": { "accent": "#0f766e", "accent2": "#0369a1", "onAccent": "#ffffff" },
+      "coral": { "accent": "#dc2626", "accent2": "#c2410c", "onAccent": "#ffffff" },
+      "neutral": { "accent": "#475569", "accent2": "#64748b", "onAccent": "#ffffff" }
+    },
+    "oled": {
+      "blue": { "accent": "#60a5fa", "accent2": "#22d3ee", "onAccent": "#06101e" },
+      "teal": { "accent": "#2dd4bf", "accent2": "#38bdf8", "onAccent": "#031412" },
+      "coral": { "accent": "#fb7185", "accent2": "#f97316", "onAccent": "#22050a" },
+      "neutral": { "accent": "#cbd5e1", "accent2": "#94a3b8", "onAccent": "#111827" }
+    }
+  },
+  "density": {
+    "compact": { "row": 38, "topbar": 50, "player": 78, "cardGap": 8 },
+    "default": { "row": 46, "topbar": 54, "player": 88, "cardGap": 12 },
+    "comfortable": { "row": 54, "topbar": 58, "player": 96, "cardGap": 16 }
+  },
+  "radius": {
+    "small": 6,
+    "default": 8,
+    "large": 14
+  },
+  "layout": {
+    "sidebar": 230,
+    "inspector": 308,
+    "railBreakpoint": 1080,
+    "narrowOverlayBreakpoint": 860
+  }
+}

@@ -1427,6 +1427,107 @@ mod tests {
             .expect("screen-reader tree")
     }
 
+    fn narrow_output(
+        ctx: &egui::Context,
+        app: &mut App,
+        events: Vec<egui::Event>,
+    ) -> egui::FullOutput {
+        let mut output = ctx.run_ui(
+            egui::RawInput {
+                screen_rect: Some(egui::Rect::from_min_size(
+                    egui::Pos2::ZERO,
+                    egui::vec2(760.0, 800.0),
+                )),
+                events,
+                ..Default::default()
+            },
+            |ui| app.frame_ui(ui),
+        );
+        output.textures_delta.clear();
+        output
+    }
+
+    fn narrow_frame(
+        ctx: &egui::Context,
+        app: &mut App,
+        events: Vec<egui::Event>,
+    ) -> egui::accesskit::TreeUpdate {
+        narrow_output(ctx, app, events)
+            .platform_output
+            .accesskit_update
+            .expect("screen-reader tree")
+    }
+
+    fn node_rect_where(
+        tree: &egui::accesskit::TreeUpdate,
+        label: &str,
+        role: egui::accesskit::Role,
+        keep: impl Fn(egui::accesskit::Rect) -> bool,
+    ) -> egui::Rect {
+        let bounds = tree
+            .nodes
+            .iter()
+            .find_map(|(_, node)| {
+                let bounds = node.bounds()?;
+                (node.label() == Some(label) && node.role() == role && keep(bounds))
+                    .then_some(bounds)
+            })
+            .unwrap_or_else(|| panic!("missing {label:?} with role {role:?}"));
+        egui::Rect::from_min_max(
+            egui::pos2(bounds.x0 as f32, bounds.y0 as f32),
+            egui::pos2(bounds.x1 as f32, bounds.y1 as f32),
+        )
+    }
+
+    fn narrow_library_popup(
+        ctx: &egui::Context,
+        app: &mut App,
+        expected_label: &str,
+    ) -> egui::accesskit::TreeUpdate {
+        narrow_frame(ctx, app, vec![]);
+        let tree = narrow_frame(ctx, app, vec![]);
+        let button = node_rect_where(
+            &tree,
+            "Your Library",
+            egui::accesskit::Role::Button,
+            |bounds| bounds.x1 <= 80.0,
+        );
+        let pos = button.center();
+        narrow_frame(ctx, app, vec![egui::Event::PointerMoved(pos)]);
+        narrow_frame(
+            ctx,
+            app,
+            vec![egui::Event::PointerButton {
+                pos,
+                button: egui::PointerButton::Primary,
+                pressed: true,
+                modifiers: egui::Modifiers::NONE,
+            }],
+        );
+        narrow_frame(
+            ctx,
+            app,
+            vec![egui::Event::PointerButton {
+                pos,
+                button: egui::PointerButton::Primary,
+                pressed: false,
+                modifiers: egui::Modifiers::NONE,
+            }],
+        );
+        let mut tree = narrow_frame(ctx, app, vec![]);
+        for _ in 0..2 {
+            if tree.nodes.iter().any(|(_, node)| {
+                node.role() == egui::accesskit::Role::Button
+                    && node.label() == Some(expected_label)
+                    && node.bounds().is_some_and(|bounds| bounds.x1 < 520.0)
+            }) {
+                return tree;
+            }
+            tree = narrow_frame(ctx, app, vec![]);
+        }
+        tree
+    }
+
     fn accessible_node(
         tree: &egui::accesskit::TreeUpdate,
         label: &str,
@@ -2442,6 +2543,7 @@ mod tests {
         egui::DragAndDrop::set_payload(
             &ctx,
             DragTrack {
+                queue_rows: None,
                 title: "Art drop".into(),
                 image: None,
                 items: vec![song],
@@ -2493,15 +2595,18 @@ mod tests {
             .nodes
             .iter()
             .find_map(|(_, node)| {
-                (node.role() == Role::Button && node.label() == Some("Liked Songs"))
-                    .then(|| node.bounds())
-                    .flatten()
+                (node.role() == Role::Button
+                    && node.label() == Some("Liked Songs")
+                    && node.bounds().is_some_and(|bounds| bounds.x1 < 300.0))
+                .then(|| node.bounds())
+                .flatten()
             })
             .expect("Liked Songs card");
         let pos = egui::pos2(liked.x0 as f32 + 24.0, liked.y0 as f32 + 24.0);
         egui::DragAndDrop::set_payload(
             &ctx,
             DragTrack {
+                queue_rows: None,
                 title: "Art drop".into(),
                 image: None,
                 items: vec![PlayableItem::Track(Track {
@@ -2554,6 +2659,119 @@ mod tests {
                         && rect.rect.contains(pos)
             )),
             "no accent outline on the drop target"
+        );
+        egui::DragAndDrop::clear_payload(&ctx);
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn rail_library_popup_grid_highlights_and_accepts_song_drops() {
+        use egui::accesskit::Role;
+        let (ctx, mut app) = accessible_app("rail-library-grid-drop");
+        app.open(Page::Settings);
+        app.settings.sidebar_grid = true;
+        let track_uri = "spotify:track:rail-grid-drop";
+        app.saved.insert(track_uri.into(), false);
+        let tree = narrow_library_popup(&ctx, &mut app, "Liked Songs");
+        let liked = node_rect_where(&tree, "Liked Songs", Role::Button, |bounds| {
+            bounds.x1 < 520.0
+        });
+        let target = liked.min + egui::vec2(24.0, 24.0);
+        egui::DragAndDrop::set_payload(
+            &ctx,
+            DragTrack {
+                queue_rows: None,
+                title: "Rail grid drop".into(),
+                image: None,
+                items: vec![PlayableItem::Track(Track {
+                    uri: track_uri.into(),
+                    name: "Rail grid drop".into(),
+                    ..Default::default()
+                })],
+                from: None,
+                source_playlist: None,
+            },
+        );
+        narrow_output(
+            &ctx,
+            &mut app,
+            vec![
+                egui::Event::PointerMoved(target),
+                egui::Event::PointerButton {
+                    pos: target,
+                    button: egui::PointerButton::Primary,
+                    pressed: true,
+                    modifiers: egui::Modifiers::NONE,
+                },
+            ],
+        );
+        let output = narrow_output(&ctx, &mut app, vec![egui::Event::PointerMoved(target)]);
+        assert!(ctx.input(|input| input.pointer.primary_down()));
+        assert!(
+            output.shapes.iter().any(|clipped| matches!(&clipped.shape,
+                egui::epaint::Shape::Rect(rect)
+                    if rect.stroke.width == 2.0
+                        && rect.stroke.color.a() >= 128
+                        && rect.rect.contains(target)
+            )),
+            "no rail popup accent outline on the grid drop target"
+        );
+        narrow_output(
+            &ctx,
+            &mut app,
+            vec![egui::Event::PointerButton {
+                pos: target,
+                button: egui::PointerButton::Primary,
+                pressed: false,
+                modifiers: egui::Modifiers::NONE,
+            }],
+        );
+        assert_eq!(app.is_saved(track_uri), Some(true));
+        egui::DragAndDrop::clear_payload(&ctx);
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn rail_library_popup_list_accepts_song_drops_on_editable_playlists() {
+        use egui::accesskit::Role;
+        let (ctx, mut app) = accessible_app("rail-library-list-drop");
+        app.open(Page::Settings);
+        app.settings.sidebar_grid = false;
+        let tree = narrow_library_popup(&ctx, &mut app, "Late night focus");
+        let playlist = node_rect_where(&tree, "Late night focus", Role::Button, |bounds| {
+            bounds.x1 < 520.0
+        });
+        let target = playlist.center();
+        let track_uri = "spotify:track:rail-list-drop";
+        egui::DragAndDrop::set_payload(
+            &ctx,
+            DragTrack {
+                queue_rows: None,
+                title: "Rail list drop".into(),
+                image: None,
+                items: vec![PlayableItem::Track(Track {
+                    uri: track_uri.into(),
+                    name: "Rail list drop".into(),
+                    ..Default::default()
+                })],
+                from: None,
+                source_playlist: None,
+            },
+        );
+        narrow_output(&ctx, &mut app, vec![egui::Event::PointerMoved(target)]);
+        narrow_output(
+            &ctx,
+            &mut app,
+            vec![egui::Event::PointerButton {
+                pos: target,
+                button: egui::PointerButton::Primary,
+                pressed: false,
+                modifiers: egui::Modifiers::NONE,
+            }],
+        );
+        let sent = app.backend.take_playlist_add_requests();
+        assert!(
+            matches!(sent.as_slice(), [crate::backend::ApiRequest::AddToPlaylist { playlist_id, uris, position: None, .. }] if playlist_id == "pl1" && uris == &[track_uri])
         );
         egui::DragAndDrop::clear_payload(&ctx);
         app.backend.shutdown();
@@ -5849,14 +6067,29 @@ mod tests {
             placed
         };
         let assert_same_row = |placed: &[(String, egui::Rect)], left: &str, right: &str| {
-            let at = |label: &str| {
-                placed
-                    .iter()
-                    .find(|(text, _)| text == label)
-                    .unwrap_or_else(|| panic!("{label} was never drawn: {placed:?}"))
-                    .1
-            };
-            let (left_rect, right_rect) = (at(left), at(right));
+            // Recent/Follow identify the content header. Queue/Lyrics also
+            // appear in inspector navigation, including the other panel when
+            // this fixture deliberately opens both. Paint order is not ownership.
+            let right_rect = placed
+                .iter()
+                .find(|(text, _)| text == right)
+                .unwrap_or_else(|| panic!("{right} was never drawn: {placed:?}"))
+                .1;
+            let left_rect = placed
+                .iter()
+                .filter(|(text, _)| text == left)
+                .min_by(|(_, a), (_, b)| {
+                    (a.center().y - right_rect.center().y)
+                        .abs()
+                        .total_cmp(&(b.center().y - right_rect.center().y).abs())
+                        .then_with(|| {
+                            (a.center().x - right_rect.center().x)
+                                .abs()
+                                .total_cmp(&(b.center().x - right_rect.center().x).abs())
+                        })
+                })
+                .unwrap_or_else(|| panic!("{left} was never drawn: {placed:?}"))
+                .1;
             assert!(
                 (left_rect.center().y - right_rect.center().y).abs() < 10.0
                     && (left_rect.right() <= right_rect.left()
@@ -6452,6 +6685,7 @@ mod tests {
             egui::DragAndDrop::set_payload(
                 &ctx,
                 DragTrack {
+                    queue_rows: None,
                     title: "A new song".into(),
                     image: None,
                     items: dragged.clone(),
@@ -8294,6 +8528,7 @@ mod tests {
             egui::DragAndDrop::set_payload(
                 &ctx,
                 DragTrack {
+                    queue_rows: None,
                     title: dragged[0].name().into(),
                     image: None,
                     items: dragged,
@@ -8550,7 +8785,18 @@ mod tests {
             let original = app.settings.sidebar_order.clone();
             accessible_frame(&ctx, &mut app, vec![]);
             let tree = accessible_frame(&ctx, &mut app, vec![]);
-            let first = accessible_node(&tree, "Target 0", Role::Button);
+            // Home also exposes the same collection. Drag the sidebar entry,
+            // whose body owns library reordering, rather than a Home shortcut.
+            let first = tree
+                .nodes
+                .iter()
+                .find_map(|(id, node)| {
+                    (node.role() == Role::Button
+                        && node.label() == Some("Target 0")
+                        && node.bounds().is_some_and(|bounds| bounds.x1 < 300.0))
+                    .then_some(*id)
+                })
+                .expect("sidebar Target 0");
             let bounds = tree
                 .nodes
                 .iter()
@@ -8601,6 +8847,86 @@ mod tests {
         }
     }
 
+    #[test]
+    fn rail_library_popup_dragging_entry_scrolls_to_offscreen_playlists() {
+        use egui::accesskit::Role;
+        let (ctx, mut app) = accessible_app("rail-sidebar-drag-scroll");
+        app.open(Page::Settings);
+        app.settings.sidebar_compact = false;
+        app.rootlist.clear();
+        app.settings.pinned_contexts.clear();
+        let playlists: Vec<_> = (0..60)
+            .map(|index| {
+                let mut playlist = playlist(1);
+                playlist.id = format!("target{index}");
+                playlist.uri = format!("spotify:playlist:target{index}");
+                playlist.name = format!("Target {index}");
+                playlist
+            })
+            .collect();
+        app.settings.sidebar_order = playlists
+            .iter()
+            .map(|playlist| playlist.uri.clone())
+            .collect();
+        app.library.playlists = Loadable::Loaded(playlists);
+        let original = app.settings.sidebar_order.clone();
+        let tree = narrow_library_popup(&ctx, &mut app, "Target 0");
+        let first = node_rect_where(&tree, "Target 0", Role::Button, |bounds| bounds.x1 < 520.0);
+        let start = first.center();
+        let scroll_bottom = tree
+            .nodes
+            .iter()
+            .filter_map(|(_, node)| {
+                let bounds = node.bounds()?;
+                (node.role() == Role::Button
+                    && node
+                        .label()
+                        .is_some_and(|label| label.starts_with("Target "))
+                    && bounds.x1 < 520.0)
+                    .then_some(bounds.y1 as f32)
+            })
+            .fold(start.y, f32::max)
+            .min(800.0 - crate::theme::PLAYER_BAR_HEIGHT - 8.0);
+        narrow_frame(
+            &ctx,
+            &mut app,
+            vec![
+                egui::Event::PointerMoved(start),
+                egui::Event::PointerButton {
+                    pos: start,
+                    button: egui::PointerButton::Primary,
+                    pressed: true,
+                    modifiers: egui::Modifiers::NONE,
+                },
+            ],
+        );
+        narrow_frame(
+            &ctx,
+            &mut app,
+            vec![egui::Event::PointerMoved(start + egui::vec2(12.0, 0.0))],
+        );
+        assert!(egui::DragAndDrop::has_payload_of_type::<DragEntry>(&ctx));
+        narrow_frame(
+            &ctx,
+            &mut app,
+            vec![egui::Event::PointerMoved(egui::pos2(
+                start.x,
+                scroll_bottom - 6.0,
+            ))],
+        );
+        for _ in 0..400 {
+            narrow_frame(&ctx, &mut app, vec![]);
+        }
+        let tree = narrow_frame(&ctx, &mut app, vec![]);
+        node_rect_where(&tree, "Target 59", Role::Button, |bounds| bounds.x1 < 520.0);
+        assert_eq!(
+            app.settings.sidebar_order, original,
+            "scrolling the rail popup alone must not reorder entries"
+        );
+        egui::DragAndDrop::clear_payload(&ctx);
+        app.backend.shutdown();
+    }
+
     /// Dragging a row within an owned playlist's table moves it through
     /// the same MoveInPlaylist action the menu's move items use: the slot
     /// is Spotify's insert-before, which the handler mirrors locally
@@ -8643,6 +8969,7 @@ mod tests {
         let original = order(&app);
         let from = 5usize;
         let held = |from: usize, uri: &str| DragTrack {
+            queue_rows: None,
             title: "Closer".into(),
             image: None,
             items: vec![PlayableItem::Track(Track {
@@ -8869,6 +9196,978 @@ mod tests {
         assert!(
             matches!(app.actions.as_slice(), [Action::RemoveFromPlaylist { playlist_id, uris }] if playlist_id == "pl1" && *uris == expected)
         );
+        app.backend.shutdown();
+    }
+
+    fn make_local_queue_reorderable(app: &mut App) {
+        app.remote = None;
+        app.local_ready = true;
+        app.local_device_id = Some("local-demo".into());
+        app.local.track = Some(crate::player::LocalTrack {
+            uri: "spotify:track:now".into(),
+            title: "Now".into(),
+            duration_ms: 180_000,
+            ..Default::default()
+        });
+        app.local.playback = crate::player::Playback::Paused;
+    }
+
+    fn queue_edit_frame(
+        ctx: &egui::Context,
+        app: &mut App,
+        mut events: Vec<egui::Event>,
+        modifiers: egui::Modifiers,
+    ) -> Vec<(String, egui::Rect)> {
+        events.insert(0, egui::Event::ModifiersChanged(modifiers));
+        for event in &mut events {
+            if let egui::Event::PointerButton {
+                modifiers: event_modifiers,
+                ..
+            } = event
+            {
+                *event_modifiers = modifiers;
+            }
+        }
+        let mut output = ctx.run_ui(
+            egui::RawInput {
+                screen_rect: Some(egui::Rect::from_min_size(
+                    egui::Pos2::ZERO,
+                    egui::vec2(760.0, 620.0),
+                )),
+                events,
+                ..Default::default()
+            },
+            |ui| crate::ui::queue::page(app, ui),
+        );
+        output.textures_delta.clear();
+        menu_text(&output)
+    }
+
+    fn queue_edit_key(key: egui::Key, modifiers: egui::Modifiers) -> egui::Event {
+        egui::Event::Key {
+            key,
+            physical_key: None,
+            pressed: true,
+            repeat: false,
+            modifiers,
+        }
+    }
+
+    #[test]
+    fn queue_history_native_buttons_and_shortcuts_emit_guarded_actions() {
+        let (ctx, mut app) = accessible_app("queue-history-native");
+        app.backend.set_offline(true);
+        make_local_queue_reorderable(&mut app);
+        app.apply(Action::Open(crate::model::Page::Queue), &ctx);
+        seed_queued_songs(&mut app);
+        app.apply(Action::ClearQueue, &ctx);
+        let mut text = Vec::new();
+        for _ in 0..3 {
+            text = queue_edit_frame(&ctx, &mut app, vec![], egui::Modifiers::NONE);
+        }
+        let undo = text
+            .iter()
+            .find(|(label, _)| label == "Undo")
+            .unwrap()
+            .1
+            .center();
+        queue_edit_frame(
+            &ctx,
+            &mut app,
+            pointer_click(undo, egui::PointerButton::Primary),
+            egui::Modifiers::NONE,
+        );
+        assert!(
+            app.actions
+                .iter()
+                .any(|action| matches!(action, Action::UndoQueue))
+        );
+        for action in std::mem::take(&mut app.actions) {
+            app.apply(action, &ctx);
+        }
+        assert_eq!(app.manual_queue.len(), 3);
+        ctx.memory_mut(|memory| memory.surrender_focus(memory.focused().unwrap_or(egui::Id::NULL)));
+        queue_edit_frame(
+            &ctx,
+            &mut app,
+            vec![queue_edit_key(
+                egui::Key::Z,
+                egui::Modifiers::COMMAND | egui::Modifiers::SHIFT,
+            )],
+            egui::Modifiers::COMMAND | egui::Modifiers::SHIFT,
+        );
+        assert!(
+            app.actions
+                .iter()
+                .any(|action| matches!(action, Action::RedoQueue))
+        );
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn queue_batch_native_click_range_toggle_copy_cut_and_delete() {
+        let (ctx, mut app) = accessible_app("queue-batch-native-selection");
+        app.backend.set_offline(true);
+        seed_queued_songs(&mut app);
+        app.history = vec![Page::Queue];
+        app.history_index = 0;
+        queue_edit_frame(&ctx, &mut app, vec![], egui::Modifiers::NONE);
+        let text = queue_edit_frame(&ctx, &mut app, vec![], egui::Modifiers::NONE);
+        let row = |name: &str| {
+            text.iter()
+                .find(|(label, _)| label == name)
+                .unwrap()
+                .1
+                .center()
+        };
+        let first = row("Queued 0");
+        let last = row("Queued 2");
+        queue_edit_frame(
+            &ctx,
+            &mut app,
+            pointer_click(first, egui::PointerButton::Primary),
+            egui::Modifiers::NONE,
+        );
+        assert_eq!(
+            app.queue_selection.rows.iter().copied().collect::<Vec<_>>(),
+            vec![0]
+        );
+        queue_edit_frame(
+            &ctx,
+            &mut app,
+            pointer_click(last, egui::PointerButton::Primary),
+            egui::Modifiers::SHIFT,
+        );
+        assert_eq!(
+            app.queue_selection.rows.iter().copied().collect::<Vec<_>>(),
+            vec![0, 1, 2]
+        );
+        queue_edit_frame(
+            &ctx,
+            &mut app,
+            pointer_click(first, egui::PointerButton::Primary),
+            egui::Modifiers::COMMAND,
+        );
+        assert_eq!(
+            app.queue_selection.rows.iter().copied().collect::<Vec<_>>(),
+            vec![1, 2]
+        );
+        app.actions.clear();
+        queue_edit_frame(
+            &ctx,
+            &mut app,
+            vec![egui::Event::Copy],
+            egui::Modifiers::COMMAND,
+        );
+        assert!(matches!(app.actions.as_slice(), [Action::CopySongs(items)] if items.len() == 2));
+        app.actions.clear();
+        queue_edit_frame(
+            &ctx,
+            &mut app,
+            vec![egui::Event::Cut],
+            egui::Modifiers::COMMAND,
+        );
+        assert!(
+            matches!(app.actions.as_slice(), [Action::CopySongs(items), Action::RemoveQueueRows { rows, expected_queue }] if items.len() == 2 && rows == &[1, 2] && expected_queue == &app.manual_queue)
+        );
+        app.actions.clear();
+        queue_edit_frame(
+            &ctx,
+            &mut app,
+            vec![queue_edit_key(egui::Key::Delete, egui::Modifiers::NONE)],
+            egui::Modifiers::NONE,
+        );
+        assert!(
+            matches!(app.actions.as_slice(), [Action::RemoveQueueRows { rows, .. }] if rows == &[1, 2])
+        );
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn queue_batch_shortcuts_do_not_edit_mixed_context_selection() {
+        let (ctx, mut app) = accessible_app("queue-batch-context-safety");
+        app.backend.set_offline(true);
+        seed_queued_songs(&mut app);
+        app.history = vec![Page::Queue];
+        app.history_index = 0;
+        queue_edit_frame(&ctx, &mut app, vec![], egui::Modifiers::NONE);
+        app.actions.clear();
+        queue_edit_frame(
+            &ctx,
+            &mut app,
+            vec![queue_edit_key(egui::Key::A, egui::Modifiers::COMMAND)],
+            egui::Modifiers::COMMAND,
+        );
+        assert_eq!(
+            app.queue_selection.rows.len(),
+            app.queue.get().unwrap().queue.len()
+        );
+        app.actions.clear();
+        queue_edit_frame(
+            &ctx,
+            &mut app,
+            vec![
+                egui::Event::Cut,
+                queue_edit_key(egui::Key::Delete, egui::Modifiers::NONE),
+            ],
+            egui::Modifiers::NONE,
+        );
+        assert!(app.actions.is_empty());
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn queue_batch_native_drag_snapshots_selected_occurrences_and_block_shortcut() {
+        let (ctx, mut app) = accessible_app("queue-batch-drag-snapshot");
+        app.backend.set_offline(true);
+        let expected = seed_queued_songs(&mut app);
+        app.history = vec![Page::Queue];
+        app.history_index = 0;
+        queue_edit_frame(&ctx, &mut app, vec![], egui::Modifiers::NONE);
+        let text = queue_edit_frame(&ctx, &mut app, vec![], egui::Modifiers::NONE);
+        let first = text
+            .iter()
+            .find(|(label, _)| label == "Queued 0")
+            .unwrap()
+            .1
+            .center();
+        let second = text
+            .iter()
+            .find(|(label, _)| label == "Queued 1")
+            .unwrap()
+            .1
+            .center();
+        queue_edit_frame(
+            &ctx,
+            &mut app,
+            pointer_click(first, egui::PointerButton::Primary),
+            egui::Modifiers::NONE,
+        );
+        queue_edit_frame(
+            &ctx,
+            &mut app,
+            pointer_click(second, egui::PointerButton::Primary),
+            egui::Modifiers::SHIFT,
+        );
+        app.actions.clear();
+        queue_edit_frame(
+            &ctx,
+            &mut app,
+            vec![queue_edit_key(
+                egui::Key::ArrowDown,
+                egui::Modifiers::COMMAND,
+            )],
+            egui::Modifiers::COMMAND,
+        );
+        assert!(
+            matches!(app.actions.as_slice(), [Action::MoveQueueRows { rows, position: 3, expected_queue }] if rows == &[0, 1] && expected_queue == &expected)
+        );
+        app.actions.clear();
+        queue_edit_frame(
+            &ctx,
+            &mut app,
+            vec![
+                egui::Event::PointerMoved(first),
+                egui::Event::PointerButton {
+                    pos: first,
+                    button: egui::PointerButton::Primary,
+                    pressed: true,
+                    modifiers: egui::Modifiers::NONE,
+                },
+            ],
+            egui::Modifiers::NONE,
+        );
+        queue_edit_frame(
+            &ctx,
+            &mut app,
+            vec![egui::Event::PointerMoved(first + egui::vec2(20.0, 0.0))],
+            egui::Modifiers::NONE,
+        );
+        let payload = egui::DragAndDrop::payload::<DragTrack>(&ctx)
+            .expect("selected manual rows should drag");
+        assert_eq!(payload.queue_rows, Some((vec![0, 1], expected)));
+        assert_eq!(payload.items.len(), 2);
+        egui::DragAndDrop::clear_payload(&ctx);
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn queue_batch_shortcuts_leave_text_editor_focus_untouched() {
+        let (ctx, mut app) = accessible_app("queue-batch-text-focus");
+        app.backend.set_offline(true);
+        seed_queued_songs(&mut app);
+        app.history = vec![Page::Queue];
+        app.history_index = 0;
+        app.sync_queue_selection();
+        app.pick_queue_row(0, crate::model::RowPick::Only);
+        let mut value = String::from("Search text");
+        let paint = |ctx: &egui::Context, app: &mut App, value: &mut String, events| {
+            let mut output = ctx.run_ui(
+                egui::RawInput {
+                    screen_rect: Some(egui::Rect::from_min_size(
+                        egui::Pos2::ZERO,
+                        egui::vec2(760.0, 620.0),
+                    )),
+                    events,
+                    ..Default::default()
+                },
+                |ui| {
+                    ui.text_edit_singleline(value).request_focus();
+                    crate::ui::queue::page(app, ui);
+                },
+            );
+            output.textures_delta.clear();
+        };
+        paint(&ctx, &mut app, &mut value, vec![]);
+        app.actions.clear();
+        paint(
+            &ctx,
+            &mut app,
+            &mut value,
+            vec![
+                egui::Event::Cut,
+                egui::Event::Paste("other text".into()),
+                queue_edit_key(egui::Key::Delete, egui::Modifiers::NONE),
+            ],
+        );
+        assert!(app.actions.is_empty());
+        assert_eq!(
+            app.queue_selection.rows.iter().copied().collect::<Vec<_>>(),
+            vec![0]
+        );
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn queue_batch_paste_is_local_and_shortcuts_ignore_another_page() {
+        let (ctx, mut app) = accessible_app("queue-batch-paste-scope");
+        app.backend.set_offline(true);
+        seed_queued_songs(&mut app);
+        app.history = vec![Page::Queue];
+        app.history_index = 0;
+        queue_edit_frame(&ctx, &mut app, vec![], egui::Modifiers::NONE);
+        app.actions.clear();
+        queue_edit_frame(
+            &ctx,
+            &mut app,
+            vec![egui::Event::Paste("spotify:track:copy".into())],
+            egui::Modifiers::COMMAND,
+        );
+        assert!(
+            matches!(app.actions.as_slice(), [Action::PasteQueue(text)] if text == "spotify:track:copy")
+        );
+        app.actions.clear();
+        app.manual_queue.clear();
+        if let Loadable::Loaded(queue) = &mut app.queue {
+            queue.queue.clear();
+        }
+        queue_edit_frame(
+            &ctx,
+            &mut app,
+            vec![egui::Event::Paste("spotify:track:empty-copy".into())],
+            egui::Modifiers::COMMAND,
+        );
+        assert!(
+            matches!(app.actions.as_slice(), [Action::PasteQueue(text)] if text == "spotify:track:empty-copy")
+        );
+        app.actions.clear();
+        app.history = vec![Page::Home];
+        queue_edit_frame(
+            &ctx,
+            &mut app,
+            vec![
+                queue_edit_key(egui::Key::A, egui::Modifiers::COMMAND),
+                egui::Event::Paste("spotify:track:copy".into()),
+            ],
+            egui::Modifiers::COMMAND,
+        );
+        assert!(app.actions.is_empty());
+        assert!(app.queue_selection.rows.is_empty());
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn queue_batch_inspector_focus_keeps_collection_shortcuts_from_stealing_select_all() {
+        let (ctx, mut app) = accessible_app("queue-batch-inspector-focus");
+        app.backend.set_offline(true);
+        app.open(Page::Playlist("pl1".into()));
+        app.show_queue_panel = true;
+        seed_queued_songs(&mut app);
+        for _ in 0..3 {
+            frame_events(&ctx, &mut app, vec![]);
+        }
+        let tree = accessible_frame(&ctx, &mut app, vec![]);
+        let bounds = tree
+            .nodes
+            .iter()
+            .find(|(_, node)| {
+                node.role() == egui::accesskit::Role::Button
+                    && node
+                        .label()
+                        .is_some_and(|label| label.starts_with("Play Queued 0,"))
+            })
+            .unwrap()
+            .1
+            .bounds()
+            .unwrap();
+        let center = egui::pos2(
+            bounds.x0 as f32 + 100.0,
+            ((bounds.y0 + bounds.y1) / 2.0) as f32,
+        );
+        frame_events(
+            &ctx,
+            &mut app,
+            pointer_click(center, egui::PointerButton::Primary),
+        );
+        assert!(app.queue_selection.rows.contains(&0));
+        assert!(app.selection.is_none());
+        frame_events(
+            &ctx,
+            &mut app,
+            vec![queue_edit_key(egui::Key::A, egui::Modifiers::COMMAND)],
+        );
+        assert_eq!(
+            app.queue_selection.rows.len(),
+            app.queue.get().unwrap().queue.len()
+        );
+        assert!(
+            app.selection.is_none(),
+            "queue inspector Ctrl+A must not select the central playlist"
+        );
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn queue_batch_drag_rejects_mixed_selection_and_stale_manual_prefix() {
+        for stale in [false, true] {
+            let (ctx, mut app) = accessible_app(if stale {
+                "queue-batch-stale-drag"
+            } else {
+                "queue-batch-mixed-drag"
+            });
+            app.backend.set_offline(true);
+            seed_queued_songs(&mut app);
+            app.history = vec![Page::Queue];
+            app.history_index = 0;
+            queue_edit_frame(&ctx, &mut app, vec![], egui::Modifiers::NONE);
+            let text = queue_edit_frame(&ctx, &mut app, vec![], egui::Modifiers::NONE);
+            let start = text
+                .iter()
+                .find(|(label, _)| label == "Queued 0")
+                .unwrap()
+                .1
+                .center();
+            app.pick_queue_row(0, crate::model::RowPick::Only);
+            if stale {
+                app.manual_queue[0] = "spotify:track:changed".into();
+            } else {
+                app.pick_queue_row(3, crate::model::RowPick::Toggle);
+            }
+            queue_edit_frame(
+                &ctx,
+                &mut app,
+                vec![
+                    egui::Event::PointerMoved(start),
+                    egui::Event::PointerButton {
+                        pos: start,
+                        button: egui::PointerButton::Primary,
+                        pressed: true,
+                        modifiers: egui::Modifiers::NONE,
+                    },
+                ],
+                egui::Modifiers::NONE,
+            );
+            queue_edit_frame(
+                &ctx,
+                &mut app,
+                vec![egui::Event::PointerMoved(start + egui::vec2(20.0, 0.0))],
+                egui::Modifiers::NONE,
+            );
+            assert!(
+                !egui::DragAndDrop::has_payload_of_type::<DragTrack>(&ctx),
+                "invalid queue selection must not become an insert-copy payload (stale={stale}, selection={:?}, manual={:?})",
+                app.queue_selection.rows,
+                app.manual_queue
+            );
+            app.backend.shutdown();
+        }
+    }
+
+    fn draw_item_menu(
+        ctx: &egui::Context,
+        app: &mut App,
+        item: &PlayableItem,
+        events: Vec<egui::Event>,
+    ) -> Vec<(String, egui::Rect)> {
+        let mut output = ctx.run_ui(
+            egui::RawInput {
+                screen_rect: Some(egui::Rect::from_min_size(
+                    egui::Pos2::ZERO,
+                    egui::vec2(760.0, 620.0),
+                )),
+                events,
+                ..Default::default()
+            },
+            |ui| {
+                crate::ui::widgets::item_menu(ui, app, item, None, None);
+            },
+        );
+        output.textures_delta.clear();
+        menu_text(&output)
+    }
+
+    fn draw_queue_item_menu(
+        ctx: &egui::Context,
+        app: &mut App,
+        item: &PlayableItem,
+        index: usize,
+        events: Vec<egui::Event>,
+    ) -> Vec<(String, egui::Rect)> {
+        let mut output = ctx.run_ui(
+            egui::RawInput {
+                screen_rect: Some(egui::Rect::from_min_size(
+                    egui::Pos2::ZERO,
+                    egui::vec2(760.0, 620.0),
+                )),
+                events,
+                ..Default::default()
+            },
+            |ui| {
+                let context = crate::model::RowContext::Queue;
+                crate::ui::widgets::item_menu(ui, app, item, Some(&context), Some(index));
+            },
+        );
+        output.textures_delta.clear();
+        menu_text(&output)
+    }
+
+    fn draw_picked_menu(
+        ctx: &egui::Context,
+        app: &mut App,
+        songs: &[PlayableItem],
+        events: Vec<egui::Event>,
+    ) -> Vec<(String, egui::Rect)> {
+        let mut output = ctx.run_ui(
+            egui::RawInput {
+                screen_rect: Some(egui::Rect::from_min_size(
+                    egui::Pos2::ZERO,
+                    egui::vec2(760.0, 620.0),
+                )),
+                events,
+                ..Default::default()
+            },
+            |ui| {
+                crate::ui::widgets::picked_menu(ui, app, songs, None);
+            },
+        );
+        output.textures_delta.clear();
+        menu_text(&output)
+    }
+
+    fn menu_item_center(menu: &[(String, egui::Rect)], label: &str) -> egui::Pos2 {
+        menu.iter()
+            .find(|(text, _)| text == label)
+            .unwrap_or_else(|| panic!("missing menu item {label:?}: {menu:?}"))
+            .1
+            .center()
+    }
+
+    fn install_manual_queue(app: &mut App, items: &[PlayableItem]) {
+        app.manual_queue = items.iter().map(|item| item.uri().to_string()).collect();
+        app.queue = Loadable::Loaded(Queue {
+            currently_playing: None,
+            queue: items.to_vec(),
+        });
+    }
+
+    #[test]
+    fn queue_edge_menu_emits_snapshot_for_a_middle_manual_row() {
+        let (ctx, mut app) = accessible_app("queue-edge-middle");
+        make_local_queue_reorderable(&mut app);
+        let items = vec![
+            PlayableItem::Track(track(20)),
+            PlayableItem::Track(track(21)),
+            PlayableItem::Track(track(22)),
+        ];
+        install_manual_queue(&mut app, &items);
+
+        let menu = draw_queue_item_menu(&ctx, &mut app, &items[1], 1, vec![]);
+        let move_top = menu_item_center(&menu, "Move to top");
+        let move_bottom = menu_item_center(&menu, "Move to bottom");
+        let expected_queue = app.manual_queue.clone();
+
+        app.actions.clear();
+        draw_queue_item_menu(
+            &ctx,
+            &mut app,
+            &items[1],
+            1,
+            pointer_click(move_top, egui::PointerButton::Primary),
+        );
+        assert!(
+            matches!(app.actions.as_slice(), [Action::MoveQueueToEdge { index, expected_queue: queue, to_end }]
+                if *index == 1 && queue == &expected_queue && !to_end),
+            "Move to top should snapshot the shown manual queue: {:?}",
+            app.actions
+        );
+        app.apply(app.actions[0].clone(), &ctx);
+        assert_eq!(
+            app.manual_queue,
+            vec![
+                items[1].uri().to_string(),
+                items[0].uri().to_string(),
+                items[2].uri().to_string()
+            ],
+            "applying the emitted Move to top action should reorder the manual queue"
+        );
+        assert!(
+            matches!(app.queue.get(), Some(queue)
+                if queue.queue.iter().map(|item| item.uri()).collect::<Vec<_>>()
+                    == vec![items[1].uri(), items[0].uri(), items[2].uri()]),
+            "applying the emitted Move to top action should reorder the displayed queue"
+        );
+
+        install_manual_queue(&mut app, &items);
+        app.actions.clear();
+        draw_queue_item_menu(
+            &ctx,
+            &mut app,
+            &items[1],
+            1,
+            pointer_click(move_bottom, egui::PointerButton::Primary),
+        );
+        assert!(
+            matches!(app.actions.as_slice(), [Action::MoveQueueToEdge { index, expected_queue: queue, to_end }]
+                if *index == 1 && queue == &expected_queue && *to_end),
+            "Move to bottom should snapshot the shown manual queue: {:?}",
+            app.actions
+        );
+        app.apply(app.actions[0].clone(), &ctx);
+        assert_eq!(
+            app.manual_queue,
+            vec![
+                items[0].uri().to_string(),
+                items[2].uri().to_string(),
+                items[1].uri().to_string()
+            ],
+            "applying the emitted Move to bottom action should reorder the manual queue"
+        );
+        assert!(
+            matches!(app.queue.get(), Some(queue)
+                if queue.queue.iter().map(|item| item.uri()).collect::<Vec<_>>()
+                    == vec![items[0].uri(), items[2].uri(), items[1].uri()]),
+            "applying the emitted Move to bottom action should reorder the displayed queue"
+        );
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn queue_edge_menu_disables_rows_already_at_their_edges() {
+        let (ctx, mut app) = accessible_app("queue-edge-disabled");
+        make_local_queue_reorderable(&mut app);
+        let items = vec![
+            PlayableItem::Track(track(23)),
+            PlayableItem::Track(track(24)),
+        ];
+        install_manual_queue(&mut app, &items);
+
+        let first_menu = draw_queue_item_menu(&ctx, &mut app, &items[0], 0, vec![]);
+        let move_top = menu_item_center(&first_menu, "Move to top");
+        app.actions.clear();
+        draw_queue_item_menu(
+            &ctx,
+            &mut app,
+            &items[0],
+            0,
+            pointer_click(move_top, egui::PointerButton::Primary),
+        );
+        assert!(
+            app.actions.is_empty(),
+            "first manual row must not move to top: {:?}",
+            app.actions
+        );
+
+        let last_menu = draw_queue_item_menu(&ctx, &mut app, &items[1], 1, vec![]);
+        let move_bottom = menu_item_center(&last_menu, "Move to bottom");
+        app.actions.clear();
+        draw_queue_item_menu(
+            &ctx,
+            &mut app,
+            &items[1],
+            1,
+            pointer_click(move_bottom, egui::PointerButton::Primary),
+        );
+        assert!(
+            app.actions.is_empty(),
+            "last manual row must not move to bottom: {:?}",
+            app.actions
+        );
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn queue_edge_menu_is_inert_for_remote_or_stale_queue_rows() {
+        let (ctx, mut app) = accessible_app("queue-edge-inert");
+        let items = vec![
+            PlayableItem::Track(track(25)),
+            PlayableItem::Track(track(26)),
+            PlayableItem::Track(track(27)),
+        ];
+        install_manual_queue(&mut app, &items);
+
+        let menu = draw_queue_item_menu(&ctx, &mut app, &items[1], 1, vec![]);
+        let move_top = menu_item_center(&menu, "Move to top");
+        app.actions.clear();
+        draw_queue_item_menu(
+            &ctx,
+            &mut app,
+            &items[1],
+            1,
+            pointer_click(move_top, egui::PointerButton::Primary),
+        );
+        assert!(
+            app.actions.is_empty(),
+            "remote playback must leave queue edge menu inert: {:?}",
+            app.actions
+        );
+
+        make_local_queue_reorderable(&mut app);
+        app.manual_queue[1] = items[2].uri().to_string();
+        app.manual_queue[2] = items[1].uri().to_string();
+        let stale_menu = draw_queue_item_menu(&ctx, &mut app, &items[1], 1, vec![]);
+        let stale_move_top = menu_item_center(&stale_menu, "Move to top");
+        app.actions.clear();
+        draw_queue_item_menu(
+            &ctx,
+            &mut app,
+            &items[1],
+            1,
+            pointer_click(stale_move_top, egui::PointerButton::Primary),
+        );
+        assert!(
+            app.actions.is_empty(),
+            "stale manual/displayed row mismatch must be inert: {:?}",
+            app.actions
+        );
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn queue_edge_menu_only_appears_for_displayed_queue_rows() {
+        let (ctx, mut app) = accessible_app("queue-edge-appearance");
+        make_local_queue_reorderable(&mut app);
+        let items = vec![
+            PlayableItem::Track(track(28)),
+            PlayableItem::Track(track(29)),
+        ];
+        install_manual_queue(&mut app, &items);
+
+        let normal_menu = draw_queue_item_menu(&ctx, &mut app, &items[0], 0, vec![]);
+        assert!(
+            normal_menu.iter().any(|(text, _)| text == "Move to top"),
+            "queue rows should expose Move to top: {normal_menu:?}"
+        );
+        assert!(
+            normal_menu.iter().any(|(text, _)| text == "Move to bottom"),
+            "queue rows should expose Move to bottom: {normal_menu:?}"
+        );
+
+        let context_row_menu = draw_queue_item_menu(&ctx, &mut app, &items[0], 2, vec![]);
+        for label in ["Move to top", "Move to bottom"] {
+            assert!(
+                !context_row_menu.iter().any(|(text, _)| text == label),
+                "context rows after the manual queue must not expose {label}: {context_row_menu:?}"
+            );
+        }
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn play_next_menu_on_a_song_emits_one_local_insert_action() {
+        let (ctx, mut app) = accessible_app("play-next-single");
+        make_local_queue_reorderable(&mut app);
+        let item = PlayableItem::Track(track(3));
+
+        let menu = draw_item_menu(&ctx, &mut app, &item, vec![]);
+        let play_next = menu_item_center(&menu, "Play next");
+
+        app.actions.clear();
+        draw_item_menu(
+            &ctx,
+            &mut app,
+            &item,
+            pointer_click(play_next, egui::PointerButton::Primary),
+        );
+        assert!(
+            matches!(app.actions.as_slice(), [Action::PlayNext { items }]
+                if items.as_slice() == std::slice::from_ref(&item)),
+            "single-row Play next should emit exactly that row: {:?}",
+            app.actions
+        );
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn play_next_menu_preserves_multi_select_order_and_duplicates() {
+        let (ctx, mut app) = accessible_app("play-next-picked");
+        make_local_queue_reorderable(&mut app);
+        let songs = vec![
+            PlayableItem::Track(track(5)),
+            PlayableItem::Track(track(6)),
+            PlayableItem::Track(track(5)),
+        ];
+
+        let menu = draw_picked_menu(&ctx, &mut app, &songs, vec![]);
+        let play_next = menu_item_center(&menu, "Play next");
+
+        app.actions.clear();
+        draw_picked_menu(
+            &ctx,
+            &mut app,
+            &songs,
+            pointer_click(play_next, egui::PointerButton::Primary),
+        );
+        assert!(
+            matches!(app.actions.as_slice(), [Action::PlayNext { items }] if items == &songs),
+            "multi-select Play next should preserve the picked rows: {:?}",
+            app.actions
+        );
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn play_next_menu_is_inert_without_a_local_playable_target() {
+        let (ctx, mut app) = accessible_app("play-next-disabled");
+        let playable = PlayableItem::Track(track(7));
+        let mut unavailable_track = track(8);
+        unavailable_track.is_playable = Some(false);
+        let unavailable = PlayableItem::Track(unavailable_track);
+        let mut local_track = track(9);
+        local_track.is_local = true;
+        let local_file = PlayableItem::Track(local_track);
+
+        let assert_no_action = |app: &mut App, item: &PlayableItem, reason: &str| {
+            let menu = draw_item_menu(&ctx, app, item, vec![]);
+            let play_next = menu_item_center(&menu, "Play next");
+            app.actions.clear();
+            draw_item_menu(
+                &ctx,
+                app,
+                item,
+                pointer_click(play_next, egui::PointerButton::Primary),
+            );
+            assert!(
+                app.actions.is_empty(),
+                "disabled Play next emitted actions for {reason}: {:?}",
+                app.actions
+            );
+        };
+
+        assert_no_action(&mut app, &playable, "remote playback");
+
+        app.remote = None;
+        app.local.track = None;
+        assert_no_action(&mut app, &playable, "inactive local playback");
+
+        make_local_queue_reorderable(&mut app);
+        assert_no_action(&mut app, &unavailable, "unavailable track");
+        assert_no_action(&mut app, &local_file, "local file");
+        app.backend.shutdown();
+    }
+
+    /// The custom order is a setting like any other: it survives the trip
+    /// through the settings file, and older files without it stay in the
+    /// automatic order.
+    #[test]
+    fn play_later_menu_on_a_song_emits_one_local_insert_action() {
+        let (ctx, mut app) = accessible_app("play-later-single");
+        make_local_queue_reorderable(&mut app);
+        let item = PlayableItem::Track(track(3));
+
+        let menu = draw_item_menu(&ctx, &mut app, &item, vec![]);
+        let play_later = menu_item_center(&menu, "Play later");
+
+        app.actions.clear();
+        draw_item_menu(
+            &ctx,
+            &mut app,
+            &item,
+            pointer_click(play_later, egui::PointerButton::Primary),
+        );
+        assert!(
+            matches!(app.actions.as_slice(), [Action::PlayLater { items }]
+                if items.as_slice() == std::slice::from_ref(&item)),
+            "single-row Play later should emit exactly that row: {:?}",
+            app.actions
+        );
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn play_later_menu_preserves_multi_select_order_and_duplicates() {
+        let (ctx, mut app) = accessible_app("play-later-picked");
+        make_local_queue_reorderable(&mut app);
+        let songs = vec![
+            PlayableItem::Track(track(5)),
+            PlayableItem::Track(track(6)),
+            PlayableItem::Track(track(5)),
+        ];
+
+        let menu = draw_picked_menu(&ctx, &mut app, &songs, vec![]);
+        let play_later = menu_item_center(&menu, "Play later");
+
+        app.actions.clear();
+        draw_picked_menu(
+            &ctx,
+            &mut app,
+            &songs,
+            pointer_click(play_later, egui::PointerButton::Primary),
+        );
+        assert!(
+            matches!(app.actions.as_slice(), [Action::PlayLater { items }] if items == &songs),
+            "multi-select Play later should preserve the picked rows: {:?}",
+            app.actions
+        );
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn play_later_menu_is_inert_without_a_local_playable_target() {
+        let (ctx, mut app) = accessible_app("play-later-disabled");
+        let playable = PlayableItem::Track(track(7));
+        let mut unavailable_track = track(8);
+        unavailable_track.is_playable = Some(false);
+        let unavailable = PlayableItem::Track(unavailable_track);
+        let mut local_track = track(9);
+        local_track.is_local = true;
+        let local_file = PlayableItem::Track(local_track);
+
+        let assert_no_action = |app: &mut App, item: &PlayableItem, reason: &str| {
+            let menu = draw_item_menu(&ctx, app, item, vec![]);
+            let play_later = menu_item_center(&menu, "Play later");
+            app.actions.clear();
+            draw_item_menu(
+                &ctx,
+                app,
+                item,
+                pointer_click(play_later, egui::PointerButton::Primary),
+            );
+            assert!(
+                app.actions.is_empty(),
+                "disabled Play later emitted actions for {reason}: {:?}",
+                app.actions
+            );
+        };
+
+        assert_no_action(&mut app, &playable, "remote playback");
+
+        app.remote = None;
+        app.local.track = None;
+        assert_no_action(&mut app, &playable, "inactive local playback");
+
+        make_local_queue_reorderable(&mut app);
+        assert_no_action(&mut app, &unavailable, "unavailable track");
+        assert_no_action(&mut app, &local_file, "local file");
         app.backend.shutdown();
     }
 
@@ -9113,6 +10412,7 @@ mod tests {
         for theme in ["dark", "light"] {
             let (ctx, mut app) = accessible_app(&format!("full-height-panels-{theme}"));
             app.open(Page::Playlist("pl1".into()));
+            app.settings.sidebar_width = 250.0;
             app.settings.theme = if theme == "light" {
                 crate::settings::ThemeChoice::Light
             } else {
@@ -9142,7 +10442,23 @@ mod tests {
                             .outer_rect
                     };
                     let side = rect(&format!("{panel}-panel"));
-                    let library = rect("sidebar");
+                    let library = if width <= 1080.0 {
+                        let rail = rect("navigation-rail");
+                        assert_eq!(rail.width(), 64.0, "compact rail at {width} in {theme}");
+                        rail
+                    } else {
+                        let expanded = rect("sidebar");
+                        assert_eq!(
+                            expanded.width(),
+                            250.0,
+                            "expanded library restored in {theme}"
+                        );
+                        expanded
+                    };
+                    assert_eq!(
+                        app.settings.sidebar_width, 250.0,
+                        "temporary rail must retain the preferred width"
+                    );
                     let player = rect("player-bar");
                     assert_eq!(side.top(), library.top(), "{panel} at {width} in {theme}");
                     assert_eq!(side.top(), 0.0, "{panel} must start at the window top");

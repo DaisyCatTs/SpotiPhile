@@ -1,0 +1,53 @@
+[
+  {
+    "nodeId": "8:441",
+    "text": "Spotiphile selected by Daisy. Replacement direction authorized for Phase 1 implementation; native validation is in progress.",
+    "result": {
+      "id": "8:441",
+      "name": "Previous cream/gold shell rejected by Daisy. These findings guide",
+      "characters": "Spotiphile selected by Daisy. Replacement direction authorized for Phase 1 implementation; native validation is in progress.",
+      "fontName": {
+        "family": "Inter",
+        "style": "Regular",
+        "variationSettings": {
+          "slnt": 0,
+          "wght": 400
+        }
+      }
+    }
+  },
+  {
+    "nodeId": "11:460",
+    "text": "Spotiphile / Themes belong to the listener.",
+    "result": {
+      "id": "11:460",
+      "name": "Themes belong to the listener.",
+      "characters": "Spotiphile / Themes belong to the listener.",
+      "fontName": {
+        "family": "Inter",
+        "style": "Bold",
+        "variationSettings": {
+          "slnt": 0,
+          "wght": 700
+        }
+      }
+    }
+  },
+  {
+    "nodeId": "11:461",
+    "text": "Dark / Light / OLED. Accent is separate. Native implementation authorized; this study is not variable-bound.",
+    "result": {
+      "id": "11:461",
+      "name": "Dark / Light / OLED. Accent is a separate choice. Repla",
+      "characters": "Dark / Light / OLED. Accent is separate. Native implementation authorized; this study is not variable-bound.",
+      "fontName": {
+        "family": "Inter",
+        "style": "Regular",
+        "variationSettings": {
+          "slnt": 0,
+          "wght": 400
+        }
+      }
+    }
+  }
+]

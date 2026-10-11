@@ -1,0 +1,334 @@
+{
+  "date": "2026-10-09",
+  "status": "proposal, not visually approved",
+  "cases": [
+    {
+      "brokenImages": 0,
+      "height": 800,
+      "overflow": false,
+      "page": "home",
+      "seekBottom": 791.25,
+      "theme": "dark",
+      "width": 760
+    },
+    {
+      "brokenImages": 0,
+      "height": 800,
+      "overflow": false,
+      "page": "home",
+      "seekBottom": 791.25,
+      "theme": "light",
+      "width": 760
+    },
+    {
+      "brokenImages": 0,
+      "height": 800,
+      "overflow": false,
+      "page": "home",
+      "seekBottom": 791.25,
+      "theme": "oled",
+      "width": 760
+    },
+    {
+      "brokenImages": 0,
+      "height": 800,
+      "overflow": false,
+      "page": "library",
+      "seekBottom": 791.25,
+      "theme": "dark",
+      "width": 760
+    },
+    {
+      "brokenImages": 0,
+      "height": 800,
+      "overflow": false,
+      "page": "library",
+      "seekBottom": 791.25,
+      "theme": "light",
+      "width": 760
+    },
+    {
+      "brokenImages": 0,
+      "height": 800,
+      "overflow": false,
+      "page": "library",
+      "seekBottom": 791.25,
+      "theme": "oled",
+      "width": 760
+    },
+    {
+      "brokenImages": 0,
+      "height": 800,
+      "overflow": false,
+      "page": "playlist",
+      "seekBottom": 791.25,
+      "theme": "dark",
+      "width": 760
+    },
+    {
+      "brokenImages": 0,
+      "height": 800,
+      "overflow": false,
+      "page": "playlist",
+      "seekBottom": 791.25,
+      "theme": "light",
+      "width": 760
+    },
+    {
+      "brokenImages": 0,
+      "height": 800,
+      "overflow": false,
+      "page": "playlist",
+      "seekBottom": 791.25,
+      "theme": "oled",
+      "width": 760
+    },
+    {
+      "brokenImages": 0,
+      "height": 800,
+      "overflow": false,
+      "page": "home",
+      "seekBottom": 789.09375,
+      "theme": "dark",
+      "width": 1280
+    },
+    {
+      "brokenImages": 0,
+      "height": 800,
+      "overflow": false,
+      "page": "home",
+      "seekBottom": 789.09375,
+      "theme": "light",
+      "width": 1280
+    },
+    {
+      "brokenImages": 0,
+      "height": 800,
+      "overflow": false,
+      "page": "home",
+      "seekBottom": 789.09375,
+      "theme": "oled",
+      "width": 1280
+    },
+    {
+      "brokenImages": 0,
+      "height": 800,
+      "overflow": false,
+      "page": "library",
+      "seekBottom": 789.09375,
+      "theme": "dark",
+      "width": 1280
+    },
+    {
+      "brokenImages": 0,
+      "height": 800,
+      "overflow": false,
+      "page": "library",
+      "seekBottom": 789.09375,
+      "theme": "light",
+      "width": 1280
+    },
+    {
+      "brokenImages": 0,
+      "height": 800,
+      "overflow": false,
+      "page": "library",
+      "seekBottom": 789.09375,
+      "theme": "oled",
+      "width": 1280
+    },
+    {
+      "brokenImages": 0,
+      "height": 800,
+      "overflow": false,
+      "page": "playlist",
+      "seekBottom": 789.09375,
+      "theme": "dark",
+      "width": 1280
+    },
+    {
+      "brokenImages": 0,
+      "height": 800,
+      "overflow": false,
+      "page": "playlist",
+      "seekBottom": 789.09375,
+      "theme": "light",
+      "width": 1280
+    },
+    {
+      "brokenImages": 0,
+      "height": 800,
+      "overflow": false,
+      "page": "playlist",
+      "seekBottom": 789.09375,
+      "theme": "oled",
+      "width": 1280
+    },
+    {
+      "brokenImages": 0,
+      "height": 900,
+      "overflow": false,
+      "page": "home",
+      "seekBottom": 889.09375,
+      "theme": "dark",
+      "width": 1440
+    },
+    {
+      "brokenImages": 0,
+      "height": 900,
+      "overflow": false,
+      "page": "home",
+      "seekBottom": 889.09375,
+      "theme": "light",
+      "width": 1440
+    },
+    {
+      "brokenImages": 0,
+      "height": 900,
+      "overflow": false,
+      "page": "home",
+      "seekBottom": 889.09375,
+      "theme": "oled",
+      "width": 1440
+    },
+    {
+      "brokenImages": 0,
+      "height": 900,
+      "overflow": false,
+      "page": "library",
+      "seekBottom": 889.09375,
+      "theme": "dark",
+      "width": 1440
+    },
+    {
+      "brokenImages": 0,
+      "height": 900,
+      "overflow": false,
+      "page": "library",
+      "seekBottom": 889.09375,
+      "theme": "light",
+      "width": 1440
+    },
+    {
+      "brokenImages": 0,
+      "height": 900,
+      "overflow": false,
+      "page": "library",
+      "seekBottom": 889.09375,
+      "theme": "oled",
+      "width": 1440
+    },
+    {
+      "brokenImages": 0,
+      "height": 900,
+      "overflow": false,
+      "page": "playlist",
+      "seekBottom": 889.09375,
+      "theme": "dark",
+      "width": 1440
+    },
+    {
+      "brokenImages": 0,
+      "height": 900,
+      "overflow": false,
+      "page": "playlist",
+      "seekBottom": 889.09375,
+      "theme": "light",
+      "width": 1440
+    },
+    {
+      "brokenImages": 0,
+      "height": 900,
+      "overflow": false,
+      "page": "playlist",
+      "seekBottom": 889.09375,
+      "theme": "oled",
+      "width": 1440
+    }
+  ],
+  "captures": [
+    {
+      "page": "home",
+      "theme": "dark",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "file": "docs/design/professional-captures/home-dark-1280.png"
+    },
+    {
+      "page": "home",
+      "theme": "light",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "file": "docs/design/professional-captures/home-light-1280.png"
+    },
+    {
+      "page": "library",
+      "theme": "dark",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "file": "docs/design/professional-captures/library-dark-1280.png"
+    },
+    {
+      "page": "playlist",
+      "theme": "dark",
+      "viewport": {
+        "width": 1280,
+        "height": 800
+      },
+      "file": "docs/design/professional-captures/playlist-dark-1280.png"
+    },
+    {
+      "page": "playlist",
+      "theme": "light",
+      "viewport": {
+        "width": 760,
+        "height": 800
+      },
+      "file": "docs/design/professional-captures/playlist-light-760.png"
+    },
+    {
+      "page": "playlist",
+      "theme": "oled",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "file": "docs/design/professional-captures/playlist-oled-1440.png"
+    }
+  ],
+  "earlierKeyboardEvidence": {
+    "tabs": {
+      "focus": "lyrics-tab",
+      "lyricsHidden": false,
+      "selected": [
+        {
+          "id": "queue-tab",
+          "selected": "false",
+          "tabIndex": -1
+        },
+        {
+          "id": "lyrics-tab",
+          "selected": "true",
+          "tabIndex": 0
+        }
+      ],
+      "tab": "lyrics"
+    },
+    "escape": {
+      "expanded": "false",
+      "focusIsFooterOpener": true,
+      "inspector": "closed"
+    }
+  },
+  "limits": [
+    "Visual prototype with fictional data, not functional playback",
+    "Host screenshots may scale the requested DOM viewport",
+    "Geometry checks do not establish design approval or accessibility certification"
+  ]
+}

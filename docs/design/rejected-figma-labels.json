@@ -1,0 +1,56 @@
+[
+  {
+    "nodeId": "4:2",
+    "annotationResult": {
+      "success": true,
+      "nodeId": "4:2",
+      "name": "30 / Shell draft / Dark / Default / 1280",
+      "annotations": [
+        {
+          "label": "REJECTED by Daisy on 2026-10-08. Cream/gold palette and first shell draft are not approved. See new research board 8:438 and replacement review in docs/design/research-shell.html.",
+          "labelMarkdown": "REJECTED by Daisy on 2026-10-08. Cream/gold palette and first shell draft are not approved. See new research board 8:438 and replacement review in docs/design/research-shell.html."
+        }
+      ]
+    }
+  },
+  {
+    "nodeId": "11:456",
+    "name": "Rejected first draft notice 4:2"
+  },
+  {
+    "nodeId": "4:161",
+    "annotationResult": {
+      "success": true,
+      "nodeId": "4:161",
+      "name": "30 / Shell draft / light / Default / 1280",
+      "annotations": [
+        {
+          "label": "REJECTED by Daisy on 2026-10-08. Cream/gold palette and first shell draft are not approved. See new research board 8:438 and replacement review in docs/design/research-shell.html.",
+          "labelMarkdown": "REJECTED by Daisy on 2026-10-08. Cream/gold palette and first shell draft are not approved. See new research board 8:438 and replacement review in docs/design/research-shell.html."
+        }
+      ]
+    }
+  },
+  {
+    "nodeId": "11:457",
+    "name": "Rejected first draft notice 4:161"
+  },
+  {
+    "nodeId": "4:320",
+    "annotationResult": {
+      "success": true,
+      "nodeId": "4:320",
+      "name": "30 / Shell draft / oled / Default / 760",
+      "annotations": [
+        {
+          "label": "REJECTED by Daisy on 2026-10-08. Cream/gold palette and first shell draft are not approved. See new research board 8:438 and replacement review in docs/design/research-shell.html.",
+          "labelMarkdown": "REJECTED by Daisy on 2026-10-08. Cream/gold palette and first shell draft are not approved. See new research board 8:438 and replacement review in docs/design/research-shell.html."
+        }
+      ]
+    }
+  },
+  {
+    "nodeId": "11:458",
+    "name": "Rejected first draft notice 4:320"
+  }
+]

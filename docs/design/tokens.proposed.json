@@ -1,0 +1,86 @@
+{
+  "status": "REJECTED by Daisy on 2026-10-08; retained as first-draft history; do not apply to native runtime",
+  "themes": {
+    "dark": {
+      "window": "#111214",
+      "panel": "#18191c",
+      "surface": "#202226",
+      "hover": "#292c31",
+      "selected": "#33383f",
+      "text": "#f3f4f6",
+      "secondary": "#b6bac2",
+      "border": "#464b54",
+      "accent": "#ded2a8",
+      "on_accent": "#1a1710",
+      "focus": "#e7d9ab"
+    },
+    "light": {
+      "window": "#f6f5f2",
+      "panel": "#ffffff",
+      "surface": "#eeede9",
+      "hover": "#e4e3de",
+      "selected": "#d8d6ce",
+      "text": "#191b1f",
+      "secondary": "#575b63",
+      "border": "#8d929b",
+      "accent": "#66552b",
+      "on_accent": "#ffffff",
+      "focus": "#66552b"
+    },
+    "oled": {
+      "window": "#000000",
+      "panel": "#090909",
+      "surface": "#151515",
+      "hover": "#222222",
+      "selected": "#303030",
+      "text": "#f5f5f5",
+      "secondary": "#b8b8b8",
+      "border": "#505050",
+      "accent": "#ded2a8",
+      "on_accent": "#1a1710",
+      "focus": "#e7d9ab"
+    }
+  },
+  "spacing": {
+    "xs": 4,
+    "sm": 8,
+    "md": 16,
+    "lg": 24,
+    "xl": 32
+  },
+  "radius": {
+    "small": 6,
+    "default": 10,
+    "large": 14
+  },
+  "density": {
+    "compact": {
+      "row": 38
+    },
+    "default": {
+      "row": 46
+    },
+    "comfortable": {
+      "row": 54
+    }
+  },
+  "typography": {
+    "candidate": "Geist, requires native metrics/rendering validation",
+    "review": "Inter",
+    "fallback": "existing native fallback chain"
+  },
+  "motion_ms": {
+    "fast": 120,
+    "standard": 180,
+    "large": 280,
+    "reduced": 0
+  },
+  "layout": {
+    "sidebar": 200,
+    "rail": 64,
+    "inspector": 272,
+    "topbar": 52,
+    "player": 88,
+    "inspector_inline_min_width": 1100
+  }
+}

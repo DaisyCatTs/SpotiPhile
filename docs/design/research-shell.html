@@ -1,0 +1,1589 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DaisySpoti Phase 1 Research Shell</title>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("research-assets/InterVariable.ttf") format("truetype");
+      font-weight: 100 900;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    :root {
+      color-scheme: dark;
+      --review-bg: #090b0e;
+      --review-panel: #101318;
+      --review-text: #eef2f7;
+      --review-muted: #a0a9b5;
+      --window: #0d1014;
+      --panel: #14181f;
+      --panel-2: #191f27;
+      --surface: #202832;
+      --surface-2: #26313c;
+      --line: #303a46;
+      --soft-line: rgba(255, 255, 255, 0.08);
+      --text: #f3f6f8;
+      --muted: #aeb7c3;
+      --dim: #87919f;
+      --accent: #60a5fa;
+      --accent-2: #22d3ee;
+      --on-accent: #06101e;
+      --danger: #fb7185;
+      --warn: #fbbf24;
+      --ok: #5eead4;
+      --shadow: rgba(0, 0, 0, 0.44);
+      --radius-small: 6px;
+      --radius: 8px;
+      --radius-large: 14px;
+      --row: 46px;
+      --card-gap: 12px;
+      --sidebar: 230px;
+      --inspector: 308px;
+      --player: 88px;
+      --topbar: 54px;
+      --focus: 0 0 0 2px var(--window), 0 0 0 4px var(--accent);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    [data-theme="light"] {
+      color-scheme: light;
+      --review-bg: #eef1f5;
+      --review-panel: #ffffff;
+      --review-text: #12161b;
+      --review-muted: #5b6470;
+      --window: #f8fafc;
+      --panel: #ffffff;
+      --panel-2: #eef2f6;
+      --surface: #e7ecf2;
+      --surface-2: #dce4ed;
+      --line: #cdd6e1;
+      --soft-line: rgba(17, 24, 39, 0.1);
+      --text: #12171d;
+      --muted: #4e5865;
+      --dim: #5f6873;
+      --on-accent: #ffffff;
+      --shadow: rgba(31, 41, 55, 0.16);
+    }
+
+    [data-theme="oled"] {
+      --review-bg: #000000;
+      --review-panel: #050607;
+      --window: #000000;
+      --panel: #050607;
+      --panel-2: #080a0d;
+      --surface: #0d1117;
+      --surface-2: #131923;
+      --line: #202936;
+      --soft-line: rgba(255, 255, 255, 0.07);
+      --shadow: rgba(0, 0, 0, 0.82);
+    }
+
+    [data-accent="teal"] { --accent: #2dd4bf; --accent-2: #38bdf8; --on-accent: #031412; }
+    [data-accent="coral"] { --accent: #fb7185; --accent-2: #f97316; --on-accent: #22050a; }
+    [data-accent="neutral"] { --accent: #cbd5e1; --accent-2: #94a3b8; --on-accent: #111827; }
+    [data-theme="light"][data-accent="blue"] { --accent: #2563eb; --accent-2: #0891b2; --on-accent: #ffffff; }
+    [data-theme="light"][data-accent="teal"] { --accent: #0f766e; --accent-2: #0369a1; --on-accent: #ffffff; }
+    [data-theme="light"][data-accent="coral"] { --accent: #dc2626; --accent-2: #c2410c; --on-accent: #ffffff; }
+    [data-theme="light"][data-accent="neutral"] { --accent: #475569; --accent-2: #64748b; --on-accent: #ffffff; }
+    [data-density="compact"] { --row: 38px; --card-gap: 8px; --topbar: 50px; --player: 78px; }
+    [data-density="comfortable"] { --row: 54px; --card-gap: 16px; --topbar: 58px; --player: 96px; }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--window);
+      color: var(--review-text);
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    button, select, input {
+      font: inherit;
+    }
+
+    button, select {
+      color: inherit;
+    }
+
+    button:focus-visible,
+    select:focus-visible,
+    input:focus-visible,
+    [tabindex]:focus-visible {
+      outline: none;
+      box-shadow: var(--focus);
+    }
+
+    .review-shell {
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    .review-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 4px 8px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+      background: var(--review-panel);
+    }
+
+    .review-header h1 {
+      margin: 0;
+      font-size: 13px;
+      letter-spacing: 0;
+      max-width: 174px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .review-header p {
+      display: none;
+    }
+
+    .review-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: end;
+    }
+
+    .control-group {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      background: color-mix(in srgb, var(--review-panel) 88%, transparent);
+      border-radius: 10px;
+      box-shadow: none;
+    }
+
+    .review-controls button,
+    .review-controls select,
+    .icon-button,
+    .pill-button {
+      border: 1px solid transparent;
+      background: transparent;
+      border-radius: var(--radius-small);
+      min-height: 32px;
+      padding: 0 10px;
+      color: inherit;
+      cursor: pointer;
+    }
+
+    .review-controls button[aria-pressed="true"],
+    .review-controls button.is-on {
+      background: var(--accent);
+      color: var(--on-accent);
+    }
+
+    .review-controls select {
+      background: var(--surface);
+      border-color: var(--line);
+      color: var(--text);
+    }
+
+    .app-window {
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+      border: 0;
+      border-radius: 0;
+      background: var(--window);
+      color: var(--text);
+      box-shadow: none;
+      display: grid;
+      grid-template-rows: var(--topbar) 1fr var(--player);
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 14px;
+      padding: 0 14px;
+      background: color-mix(in srgb, var(--panel) 88%, var(--window));
+      border-bottom: 1px solid var(--line);
+    }
+
+    .window-buttons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: var(--surface-2);
+    }
+
+    .toolbar-left,
+    .toolbar-right,
+    .transport,
+    .mini-actions,
+    .tabs,
+    .view-switch {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: min(560px, 100%);
+      margin: 0 auto;
+      height: 34px;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      color: var(--muted);
+    }
+
+    .search input {
+      width: 100%;
+      min-width: 80px;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--text);
+    }
+
+    .shell-grid {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: var(--sidebar) minmax(0, 1fr) var(--inspector);
+      background: var(--window);
+    }
+
+    [data-inspector="closed"] .shell-grid {
+      grid-template-columns: var(--sidebar) minmax(0, 1fr) 0;
+    }
+
+    .sidebar {
+      min-width: 0;
+      overflow: hidden;
+      border-right: 1px solid var(--line);
+      background: var(--panel);
+      padding: 12px 10px;
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      gap: 14px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 6px 10px;
+      border-bottom: 1px solid var(--soft-line);
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background:
+        linear-gradient(140deg, var(--accent), transparent 58%),
+        linear-gradient(315deg, var(--accent-2), var(--surface-2));
+      display: grid;
+      place-items: center;
+      color: var(--on-accent);
+    }
+
+    .nav-list,
+    .pin-list,
+    .queue-list,
+    .source-list {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .nav-item,
+    .pin-item,
+    .queue-item,
+    .source-item {
+      min-width: 0;
+      display: grid;
+      align-items: center;
+      border-radius: var(--radius-small);
+      color: var(--muted);
+    }
+
+    .nav-item {
+      grid-template-columns: 24px 1fr auto;
+      gap: 10px;
+      padding: 8px 9px;
+      border: 1px solid transparent;
+      background: transparent;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .nav-item[aria-current="page"] {
+      background: color-mix(in srgb, var(--accent) 18%, var(--surface));
+      color: var(--text);
+      border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
+    }
+
+    .nav-item:hover,
+    .pin-item:hover,
+    .icon-button:hover,
+    .pill-button:hover,
+    .tab:hover,
+    .row:hover,
+    .album-card:hover {
+      background: var(--surface);
+    }
+
+    .section-label {
+      color: var(--dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-size: 11px;
+      padding: 2px 8px;
+      margin-top: 4px;
+    }
+
+    .pin-item {
+      grid-template-columns: 32px 1fr;
+      gap: 8px;
+      padding: 6px;
+    }
+
+    .pin-art,
+    .tiny-art {
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      overflow: hidden;
+      background: var(--surface-2);
+    }
+
+    .pin-title,
+    .truncate {
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .pin-copy,
+    .queue-copy {
+      min-width: 0;
+      display: grid;
+      gap: 1px;
+    }
+
+    .pin-sub,
+    .micro {
+      color: var(--dim);
+      font-size: 12px;
+    }
+
+    .sidebar-footer {
+      display: grid;
+      gap: 6px;
+      padding-top: 8px;
+      border-top: 1px solid var(--soft-line);
+    }
+
+    .source-item {
+      grid-template-columns: 22px 1fr auto;
+      gap: 8px;
+      padding: 6px 8px;
+      color: var(--muted);
+    }
+
+    .workspace {
+      min-width: 0;
+      overflow: auto;
+      padding: 18px 20px 26px;
+      background:
+        linear-gradient(180deg, color-mix(in srgb, var(--accent) 10%, transparent), transparent 220px),
+        var(--window);
+    }
+
+    .page {
+      display: none;
+      min-width: 0;
+    }
+
+    [data-page="home"] .page-home,
+    [data-page="library"] .page-library,
+    [data-page="playlist"] .page-playlist {
+      display: block;
+    }
+
+    .workspace-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow {
+      margin: 0 0 5px;
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    h2, h3, p {
+      margin-top: 0;
+    }
+
+    .workspace h2 {
+      margin-bottom: 5px;
+      font-size: clamp(24px, 3vw, 38px);
+      letter-spacing: 0;
+      line-height: 1.05;
+    }
+
+    .workspace h3 {
+      margin-bottom: 10px;
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+
+    .subtle {
+      color: var(--muted);
+    }
+
+    .home-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .album-grid {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: clamp(136px, 18vw, 160px);
+      overflow-x: auto;
+      padding-bottom: 4px;
+      gap: var(--card-gap);
+      margin-bottom: 22px;
+    }
+
+    .album-card {
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      padding: 8px;
+      background: color-mix(in srgb, var(--panel-2) 74%, transparent);
+      min-width: 0;
+      cursor: pointer;
+      color: var(--text);
+      text-align: left;
+    }
+
+    .cover {
+      aspect-ratio: 1;
+      width: 100%;
+      display: block;
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+    }
+
+    [data-theme="light"] .cover {
+      border-color: rgba(17, 24, 39, 0.12);
+    }
+
+    .album-title,
+    .row-title,
+    .queue-title {
+      font-weight: 650;
+      margin-top: 8px;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .queue-title {
+      margin-top: 0;
+    }
+
+    .album-artist,
+    .row-sub,
+    .queue-sub {
+      color: var(--muted);
+      font-size: 12px;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .list-panel,
+    .side-card,
+    .browser,
+    .playlist-hero,
+    .state-panel {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-large);
+      background: color-mix(in srgb, var(--panel) 88%, transparent);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .list-panel {
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .row {
+      min-height: var(--row);
+      display: grid;
+      grid-template-columns: 34px minmax(160px, 1.4fr) minmax(120px, 0.9fr) minmax(120px, 0.9fr) 74px 38px;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--soft-line);
+      color: var(--muted);
+    }
+
+    .row:last-child {
+      border-bottom: 0;
+    }
+
+    .row.is-current {
+      color: var(--text);
+      background: color-mix(in srgb, var(--accent) 14%, transparent);
+    }
+
+    .row.is-selected {
+      box-shadow: inset 3px 0 0 var(--accent);
+    }
+
+    .row-head {
+      min-height: 34px;
+      color: var(--dim);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: color-mix(in srgb, var(--surface) 64%, transparent);
+    }
+
+    .track-cell {
+      min-width: 0;
+      display: grid;
+      gap: 1px;
+    }
+
+    .metric-stack {
+      display: grid;
+      gap: 8px;
+      padding: 14px;
+    }
+
+    .metric {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--soft-line);
+    }
+
+    .metric:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .browser {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .browser-col {
+      min-width: 0;
+      border-right: 1px solid var(--line);
+    }
+
+    .browser-col:last-child {
+      border-right: 0;
+    }
+
+    .browser-title {
+      color: var(--dim);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 10px 12px 7px;
+      border-bottom: 1px solid var(--soft-line);
+    }
+
+    .browser-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 12px;
+      color: var(--muted);
+      border-left: 3px solid transparent;
+      min-height: 34px;
+    }
+
+    .browser-option.is-active {
+      color: var(--text);
+      background: color-mix(in srgb, var(--accent) 12%, transparent);
+      border-left-color: var(--accent);
+    }
+
+    .playlist-hero {
+      display: grid;
+      grid-template-columns: 184px minmax(0, 1fr);
+      gap: 20px;
+      padding: 16px;
+      margin-bottom: 16px;
+      align-items: end;
+      background:
+        radial-gradient(circle at 20% 0%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 18rem),
+        color-mix(in srgb, var(--panel) 90%, transparent);
+    }
+
+    .playlist-copy h2 {
+      font-size: clamp(30px, 4vw, 56px);
+      margin-bottom: 8px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .pill-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 34px;
+      border-color: var(--line);
+      background: var(--surface);
+    }
+
+    .pill-button.primary {
+      border-color: transparent;
+      background: var(--accent);
+      color: var(--on-accent);
+      font-weight: 700;
+    }
+
+    .icon-button {
+      width: 34px;
+      height: 34px;
+      display: inline-grid;
+      place-items: center;
+      padding: 0;
+      border-color: var(--line);
+      background: var(--surface);
+    }
+
+    .inspector {
+      min-width: 0;
+      overflow: hidden;
+      border-left: 1px solid var(--line);
+      background: var(--panel);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      transition: transform 140ms ease, opacity 140ms ease;
+    }
+
+    [data-inspector="closed"] .inspector {
+      opacity: 0;
+      pointer-events: none;
+      display: none;
+    }
+
+    .inspector-head {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .tabs {
+      min-width: 0;
+      padding: 3px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--surface);
+    }
+
+    .tab {
+      min-width: 0;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 6px 9px;
+      cursor: pointer;
+    }
+
+    .tab[aria-selected="true"] {
+      color: var(--text);
+      background: var(--panel);
+      box-shadow: inset 0 0 0 1px var(--line);
+    }
+
+    .inspector-body {
+      min-height: 0;
+      overflow: auto;
+      padding: 12px;
+    }
+
+    .queue-item {
+      grid-template-columns: 28px 38px minmax(0, 1fr) auto;
+      gap: 8px;
+      padding: 8px 4px;
+      border-bottom: 1px solid var(--soft-line);
+    }
+
+    .queue-index {
+      color: var(--dim);
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
+
+    .lyrics-block {
+      display: grid;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .lyrics-block .is-live {
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 700;
+      border-left: 3px solid var(--accent);
+      padding-left: 12px;
+    }
+
+    .info-grid {
+      display: grid;
+      gap: 10px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .info-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      color: var(--muted);
+      padding-bottom: 9px;
+      border-bottom: 1px solid var(--soft-line);
+    }
+
+    .info-row strong {
+      color: var(--text);
+      font-weight: 650;
+    }
+
+    .player {
+      display: grid;
+      grid-template-columns: minmax(220px, 0.9fr) minmax(320px, 1.2fr) minmax(220px, 0.9fr);
+      gap: 18px;
+      align-items: center;
+      padding: 0 16px;
+      border-top: 1px solid var(--line);
+      background:
+        linear-gradient(90deg, color-mix(in srgb, var(--accent) 16%, transparent), transparent 42%),
+        var(--panel);
+    }
+
+    .now {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: 56px minmax(0, 1fr) auto;
+      gap: 10px;
+      align-items: center;
+    }
+
+    [data-density="compact"] .now { grid-template-columns: 46px minmax(0, 1fr) auto; }
+    [data-density="comfortable"] .now { grid-template-columns: 64px minmax(0, 1fr) auto; }
+
+    .player-cover {
+      width: 56px;
+      height: 56px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    [data-density="compact"] .player-cover { width: 46px; height: 46px; }
+    [data-density="comfortable"] .player-cover { width: 64px; height: 64px; }
+
+    .transport-stack {
+      display: grid;
+      justify-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .play {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: var(--on-accent);
+      border-color: transparent;
+    }
+
+    .seek {
+      width: min(520px, 100%);
+      display: grid;
+      grid-template-columns: 42px 1fr 42px;
+      align-items: center;
+      gap: 8px;
+      color: var(--dim);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .bar {
+      height: 6px;
+      border-radius: 999px;
+      background: var(--surface-2);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bar::before {
+      content: "";
+      display: block;
+      height: 100%;
+      width: 36%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    }
+
+    .player-right {
+      display: flex;
+      align-items: center;
+      justify-content: end;
+      gap: 8px;
+      min-width: 0;
+      color: var(--muted);
+    }
+
+    .volume {
+      width: 86px;
+    }
+
+    .state-layer {
+      display: none;
+      position: absolute;
+      inset: 0;
+      padding: 42px;
+      background: color-mix(in srgb, var(--window) 88%, transparent);
+      backdrop-filter: blur(2px);
+      z-index: 10;
+    }
+
+    .workspace-wrap {
+      position: relative;
+      min-height: 100%;
+    }
+
+    [data-state="loading"] .state-loading,
+    [data-state="empty"] .state-empty,
+    [data-state="error"] .state-error {
+      display: grid;
+      place-items: center;
+    }
+
+    .state-panel {
+      width: min(420px, 100%);
+      padding: 22px;
+      text-align: center;
+    }
+
+    .state-panel h3 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .loading-lines {
+      display: grid;
+      gap: 8px;
+      margin: 16px 0 0;
+    }
+
+    .skeleton {
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--surface), var(--surface-2), var(--surface));
+      background-size: 220% 100%;
+      animation: shimmer 1.3s infinite linear;
+    }
+
+    @keyframes shimmer {
+      to { background-position: -220% 0; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+
+    .review-notes {
+      position: fixed;
+      left: 188px;
+      top: 4px;
+      z-index: 50;
+      max-width: min(820px, calc(100vw - 16px));
+      color: var(--review-muted);
+    }
+
+    .review-notes summary {
+      width: max-content;
+      max-width: 100%;
+      cursor: pointer;
+      padding: 4px 8px;
+      font-size: 12px;
+      line-height: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      border-radius: 9px;
+      background: var(--review-panel);
+      color: var(--review-text);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+    }
+
+    .notes-grid {
+      margin-top: 8px;
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      max-height: min(520px, calc(100vh - 74px));
+      overflow: auto;
+    }
+
+    .note-card {
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 12px;
+      padding: 14px;
+      background: color-mix(in srgb, var(--review-panel) 86%, transparent);
+      color: var(--review-muted);
+    }
+
+    .note-card h3 {
+      margin-bottom: 6px;
+      color: var(--review-text);
+      font-size: 14px;
+    }
+
+    .note-card a {
+      color: var(--accent);
+    }
+
+    .sources {
+      margin: 6px 0 0;
+      padding-left: 18px;
+    }
+
+    .sources li {
+      margin: 5px 0;
+    }
+
+    svg.icon {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+      flex: none;
+    }
+
+    .play svg.icon,
+    .pill-button.primary svg.icon {
+      fill: currentColor;
+      stroke-width: 0;
+    }
+
+    .play svg.icon {
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .cover svg,
+    .cover img,
+    .pin-art svg,
+    .pin-art img,
+    .tiny-art svg,
+    .tiny-art img,
+    .player-cover svg,
+    .player-cover img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    @media (max-width: 1080px) {
+      :root {
+        --sidebar: 68px;
+        --inspector: 300px;
+      }
+
+      .brand span,
+      .nav-item span,
+      .nav-item small,
+      .section-label,
+      .pin-copy,
+      .source-item span,
+      .source-item small {
+        display: none;
+      }
+
+      .brand {
+        justify-content: center;
+      }
+
+      .nav-item,
+      .source-item {
+        grid-template-columns: 1fr;
+        place-items: center;
+      }
+
+      .pin-item {
+        grid-template-columns: 1fr;
+        place-items: center;
+      }
+
+      .home-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .review-shell {
+        width: 100vw;
+        padding-top: 0;
+      }
+
+      .review-header {
+        grid-template-columns: 1fr;
+      }
+
+      .review-controls {
+        justify-content: start;
+      }
+
+      .app-window {
+        min-height: 0;
+        height: 100%;
+        border-radius: 0;
+      }
+
+      .shell-grid,
+      [data-inspector="closed"] .shell-grid {
+        grid-template-columns: 60px minmax(0, 1fr);
+      }
+
+      .inspector {
+        position: absolute;
+        z-index: 20;
+        right: 8px;
+        top: calc(var(--topbar) + 8px);
+        bottom: calc(var(--player) + 8px);
+        width: min(332px, calc(100vw - 86px));
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        box-shadow: 0 20px 60px var(--shadow);
+      }
+
+      [data-inspector="closed"] .inspector {
+        transform: translateX(20px);
+      }
+
+      .workspace {
+        padding: 14px;
+      }
+
+      .playlist-hero {
+        grid-template-columns: 112px minmax(0, 1fr);
+        gap: 14px;
+      }
+
+      .browser {
+        grid-template-columns: 1fr;
+      }
+
+      .browser-col {
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .browser-col:nth-child(3) {
+        display: none;
+      }
+
+      .row {
+        grid-template-columns: 26px minmax(150px, 1fr) 68px 34px;
+      }
+
+      .row > :nth-child(3),
+      .row > :nth-child(4) {
+        display: none;
+      }
+
+      .player {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+      }
+
+      .transport-stack {
+        grid-column: 1 / -1;
+        order: -1;
+      }
+
+      .player-right {
+        display: none;
+      }
+
+      .review-notes {
+        left: auto;
+        right: 8px;
+        max-width: calc(100vw - 16px);
+      }
+
+      .notes-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body data-theme="dark" data-accent="blue" data-density="default" data-page="home" data-inspector="open" data-tab="queue" data-state="ready">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M9 20v-6h6v6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+    <symbol id="i-library" viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M8 19V5"/><path d="M12 19V5"/><path d="m16 6 4 12"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M3 6h.01"/><path d="M3 12h.01"/><path d="M3 18h.01"/></symbol>
+    <symbol id="i-radio" viewBox="0 0 24 24"><path d="M4 11a8 8 0 0 1 16 0"/><path d="M7 12a5 5 0 0 1 10 0"/><circle cx="12" cy="13" r="2"/><path d="M12 15v6"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14"/><path d="M16 5v14"/></symbol>
+    <symbol id="i-skip" viewBox="0 0 24 24"><path d="m5 5 8 7-8 7z"/><path d="M19 5v14"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 5v14"/><path d="m5 12 8-7v14z"/></symbol>
+    <symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></symbol>
+    <symbol id="i-repeat" viewBox="0 0 24 24"><path d="m17 1 4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="m7 23-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.3 3-5.5A5.5 5.5 0 0 0 12 5a5.5 5.5 0 0 0-10 3.5c0 2.2 1.5 4 3 5.5l7 7z"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="M5 12h14"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+    <symbol id="i-cast" viewBox="0 0 24 24"><path d="M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12"/><path d="M2 12a9 9 0 0 1 9 9"/><path d="M2 16a5 5 0 0 1 5 5"/><path d="M2 20h.01"/></symbol>
+    <symbol id="i-audio" viewBox="0 0 24 24"><path d="M2 10v4"/><path d="M6 8v8"/><path d="M10 5v14"/><path d="M14 9v6"/><path d="M18 7v10"/><path d="M22 11v2"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M3 5h18"/><path d="M6 12h12"/><path d="M10 19h4"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V22a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H2a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3h.1a1.7 1.7 0 0 0 1-1.6V2a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6h.1a1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9v.1a1.7 1.7 0 0 0 1.6 1h.1a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.6 1z"/></symbol>
+  </svg>
+
+  <main class="review-shell">
+    <header class="review-header">
+      <div>
+        <h1>DaisySpoti UI</h1>
+            <p>Replacement review artifact after the rejected draft. Use the controls to test page composition, theme, accent, density, inspector behavior and states before native Rust work.</p>
+      </div>
+      <div class="review-controls" aria-label="Review controls">
+        <div class="control-group" aria-label="Page">
+          <button type="button" data-set-page="home" aria-pressed="true">Home</button>
+          <button type="button" data-set-page="library" aria-pressed="false">Library</button>
+          <button type="button" data-set-page="playlist" aria-pressed="false">Playlist</button>
+        </div>
+        <div class="control-group" aria-label="Theme">
+          <button type="button" data-set-theme="dark" aria-pressed="true">Dark</button>
+          <button type="button" data-set-theme="light" aria-pressed="false">Light</button>
+          <button type="button" data-set-theme="oled" aria-pressed="false">OLED</button>
+        </div>
+        <select id="accentSelect" aria-label="Accent">
+          <option value="blue">Blue accent</option>
+          <option value="teal">Teal accent</option>
+          <option value="coral">Coral accent</option>
+          <option value="neutral">Neutral accent</option>
+        </select>
+        <select id="densitySelect" aria-label="Density">
+          <option value="compact">Compact density</option>
+          <option value="default" selected>Default density</option>
+          <option value="comfortable">Comfortable density</option>
+        </select>
+        <select id="stateSelect" aria-label="State">
+          <option value="ready" selected>Ready</option>
+          <option value="loading">Loading</option>
+          <option value="empty">Empty</option>
+          <option value="error">Error</option>
+        </select>
+      </div>
+    </header>
+
+    <section class="app-window" aria-label="DaisySpoti proposed shell">
+      <header class="topbar">
+        <div class="toolbar-left">
+          <div class="window-buttons" aria-hidden="true"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+          <button class="icon-button" type="button" aria-label="Back"><svg class="icon"><use href="#i-back"></use></svg></button>
+          <button class="icon-button" type="button" aria-label="Forward"><svg class="icon" style="transform:scaleX(-1)"><use href="#i-back"></use></svg></button>
+        </div>
+        <label class="search">
+          <svg class="icon"><use href="#i-search"></use></svg>
+          <input value="paralyzed" aria-label="Search DaisySpoti">
+        </label>
+        <div class="toolbar-right">
+          <button class="icon-button" type="button" aria-label="Winamp"><svg class="icon"><use href="#i-audio"></use></svg></button>
+          <button class="icon-button" type="button" aria-label="MilkDrop visualizer"><svg class="icon"><use href="#i-radio"></use></svg></button>
+          <button class="icon-button" type="button" data-open-inspector aria-label="Open inspector"><svg class="icon"><use href="#i-list"></use></svg></button>
+          <button class="icon-button" type="button" aria-label="Settings"><svg class="icon"><use href="#i-settings"></use></svg></button>
+        </div>
+      </header>
+
+      <div class="shell-grid">
+        <aside class="sidebar" aria-label="Navigation">
+          <div class="brand"><span class="brand-mark"><svg class="icon"><use href="#i-audio"></use></svg></span><span>DaisySpoti</span></div>
+          <nav class="nav-list" aria-label="Main">
+            <button class="nav-item" type="button" data-set-page="home" aria-current="page"><svg class="icon"><use href="#i-home"></use></svg><span>Home</span><small>Now</small></button>
+            <button class="nav-item" type="button" data-set-page="library"><svg class="icon"><use href="#i-library"></use></svg><span>Library</span><small>42k</small></button>
+            <button class="nav-item" type="button" data-set-page="playlist"><svg class="icon"><use href="#i-list"></use></svg><span>Playlists</span><small>128</small></button>
+            <button class="nav-item" type="button"><svg class="icon"><use href="#i-clock"></use></svg><span>History</span><small>Today</small></button>
+          </nav>
+          <section>
+            <div class="section-label">Pins</div>
+            <div class="pin-list">
+              <div class="pin-item"><span class="pin-art" aria-hidden="true"><svg viewBox="0 0 80 80"><rect width="80" height="80" fill="#111827"/><path d="M9 50c17-29 43-34 62-20v41H9z" fill="#2563eb"/><path d="M16 18h45v8H16zM16 32h30v8H16z" fill="#93c5fd"/></svg></span><span class="pin-copy"><span class="pin-title">Fresh saves</span><span class="pin-sub">Playlist</span></span></div>
+              <div class="pin-item"><span class="pin-art" aria-hidden="true"><svg viewBox="0 0 80 80"><rect width="80" height="80" fill="#0f172a"/><circle cx="40" cy="40" r="28" fill="#14b8a6"/><path d="M22 47h36M28 35h24" stroke="#042f2e" stroke-width="7"/></svg></span><span class="pin-copy"><span class="pin-title">Late drive</span><span class="pin-sub">Folder</span></span></div>
+              <div class="pin-item"><span class="pin-art" aria-hidden="true"><svg viewBox="0 0 80 80"><rect width="80" height="80" fill="#18181b"/><path d="m13 62 16-44 14 25 10-17 15 36z" fill="#fb7185"/><path d="M18 62h44" stroke="#fecdd3" stroke-width="5"/></svg></span><span class="pin-copy"><span class="pin-title">MilkDrop nights</span><span class="pin-sub">Playlist</span></span></div>
+            </div>
+          </section>
+          <footer class="sidebar-footer">
+            <div class="source-item"><svg class="icon"><use href="#i-cast"></use></svg><span>This computer</span><small>Active</small></div>
+            <div class="source-item"><svg class="icon"><use href="#i-audio"></use></svg><span>Winamp skin</span><small>On</small></div>
+          </footer>
+        </aside>
+
+        <section class="workspace" aria-label="Workspace">
+          <div class="workspace-wrap">
+            <article class="page page-home">
+              <div class="workspace-head">
+                <div>
+                  <p class="eyebrow">Home</p>
+                  <h2>Good evening, Daisy</h2>
+                  <p class="subtle">Paralyzed is playing on this computer.</p>
+                </div>
+                <button class="pill-button" type="button" data-open-inspector><svg class="icon"><use href="#i-list"></use></svg>Queue</button>
+              </div>
+              <div class="home-layout">
+                <div>
+                  <h3>Recently heavy rotation</h3>
+                  <div class="album-grid">
+                    <button class="album-card" type="button" aria-label="Open Paralyzed"><span class="cover" aria-hidden="true"><img src="research-assets/shoreline-cover.png" alt="" loading="eager"></span><div class="album-title">Paralyzed</div><div class="album-artist">Release radar</div></button>
+                    <button class="album-card" type="button" aria-label="Open Glass Weather"><span class="cover" aria-hidden="true"><img src="research-assets/glass-cover.png" alt="" loading="lazy"></span><div class="album-title">Glass Weather</div><div class="album-artist">Mara Vale</div></button>
+                    <button class="album-card" type="button" aria-label="Open Signal Garden"><span class="cover" aria-hidden="true"><img src="research-assets/architecture-cover.png" alt="" loading="lazy"></span><div class="album-title">Signal Garden</div><div class="album-artist">North Index</div></button>
+                    <button class="album-card" type="button" aria-label="Open Static Bloom"><span class="cover" aria-hidden="true"><svg viewBox="0 0 160 160"><rect width="160" height="160" fill="#0b1120"/><circle cx="80" cy="80" r="54" fill="#cbd5e1"/><circle cx="80" cy="80" r="21" fill="#111827"/><path d="M80 26v108M26 80h108" stroke="#475569" stroke-width="5"/><path d="M40 118c29 12 54 12 80 0" stroke="#60a5fa" stroke-width="7" fill="none"/><text x="25" y="25" fill="#cbd5e1" font-size="10" font-weight="700">STATIC BLOOM</text></svg></span><div class="album-title">Static Bloom</div><div class="album-artist">Orchid Machine</div></button>
+                    <button class="album-card" type="button" aria-label="Open Low Orbit"><span class="cover" aria-hidden="true"><svg viewBox="0 0 160 160"><rect width="160" height="160" fill="#0c1425"/><path d="M0 100c21-42 47-60 77-54 23 5 41 26 83 36v78H0z" fill="#1d4ed8"/><path d="M0 118c39-17 79-18 160 14" stroke="#bfdbfe" stroke-width="8" fill="none"/><path d="M112 40c10 12 17 27 19 45" stroke="#60a5fa" stroke-width="4" fill="none"/><text x="18" y="34" fill="#bfdbfe" font-size="12" font-weight="700">LOW ORBIT</text></svg></span><div class="album-title">Low Orbit</div><div class="album-artist">Etta Sound</div></button>
+                  </div>
+                  <section class="list-panel" aria-label="Recent plays">
+                    <div class="panel-head"><h3>Recent plays</h3><button class="icon-button" type="button" aria-label="Filter recent plays"><svg class="icon"><use href="#i-filter"></use></svg></button></div>
+                    <div class="row row-head"><span>#</span><span>Title</span><span>Artist</span><span>Source</span><span>Time</span><span></span></div>
+                    <div class="row is-current is-selected" tabindex="0"><span>1</span><span class="track-cell"><span class="row-title">Paralyzed</span><span class="row-sub">Release radar</span></span><span>Riverline</span><span>Spotify</span><span>3:42</span><button class="icon-button" type="button" aria-label="More for Paralyzed"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                    <div class="row" tabindex="0"><span>2</span><span class="track-cell"><span class="row-title">Every Color in Blue</span><span class="row-sub">Saved songs</span></span><span>Brittany Howard</span><span>Spotify</span><span>3:39</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                    <div class="row" tabindex="0"><span>3</span><span class="track-cell"><span class="row-title">Room Under The Stairs</span><span class="row-sub">Album</span></span><span>ZAYN</span><span>Spotify</span><span>4:08</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                  </section>
+                </div>
+              </div>
+            </article>
+
+            <article class="page page-library">
+              <div class="workspace-head">
+                <div>
+                  <p class="eyebrow">Library</p>
+                  <h2>Songs</h2>
+                  <p class="subtle">42,318 songs, 1,204 in Alternative.</p>
+                </div>
+                <div class="view-switch">
+                  <button class="icon-button" type="button" aria-label="Grid view"><svg class="icon"><use href="#i-library"></use></svg></button>
+                  <button class="icon-button" type="button" aria-label="List view"><svg class="icon"><use href="#i-list"></use></svg></button>
+                </div>
+              </div>
+              <section class="browser" aria-label="Column browser">
+                <div class="browser-col"><div class="browser-title">Genres</div><div class="browser-option is-active"><span>Alternative</span><strong>1,204</strong></div><div class="browser-option"><span>Electronic</span><strong>986</strong></div><div class="browser-option"><span>Jazz</span><strong>544</strong></div></div>
+                <div class="browser-col"><div class="browser-title">Artists</div><div class="browser-option is-active"><span>Riverline</span><strong>18</strong></div><div class="browser-option"><span>Future Islands</span><strong>31</strong></div><div class="browser-option"><span>Madi Diaz</span><strong>22</strong></div></div>
+                <div class="browser-col"><div class="browser-title">Albums</div><div class="browser-option is-active"><span>Paralyzed</span><strong>1</strong></div><div class="browser-option"><span>People Who Aren't There Anymore</span><strong>12</strong></div><div class="browser-option"><span>Weird Faith</span><strong>13</strong></div></div>
+              </section>
+              <section class="list-panel" aria-label="Song table">
+                <div class="row row-head"><span>#</span><span>Title</span><span>Artist</span><span>Album</span><span>Time</span><span></span></div>
+                <div class="row is-current is-selected" tabindex="0"><span>1</span><span class="track-cell"><span class="row-title">Paralyzed</span><span class="row-sub">Riverline, added 2 days ago</span></span><span>Riverline</span><span>Paralyzed</span><span>3:42</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>2</span><span class="track-cell"><span class="row-title">Deep In The Night</span><span class="row-sub">Future Islands, saved</span></span><span>Future Islands</span><span>People Who Aren't There Anymore</span><span>3:27</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>3</span><span class="track-cell"><span class="row-title">Don't Do Me Good</span><span class="row-sub">Madi Diaz, saved</span></span><span>Madi Diaz</span><span>Weird Faith</span><span>4:14</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>4</span><span class="track-cell"><span class="row-title">Dreamin</span><span class="row-sub">ZAYN, saved</span></span><span>ZAYN</span><span>Room Under The Stairs</span><span>3:32</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>5</span><span class="track-cell"><span class="row-title">A Very Long Track Name That Still Needs A Clean Ellipsis In Compact Density</span><span class="row-sub">North Index, long content check</span></span><span>North Index</span><span>Signal Garden</span><span>5:18</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>6</span><span class="track-cell"><span class="row-title">Glass Weather</span><span class="row-sub">Mara Vale, saved</span></span><span>Mara Vale</span><span>Glass Weather</span><span>4:11</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>7</span><span class="track-cell"><span class="row-title">Static Bloom</span><span class="row-sub">Orchid Machine, saved</span></span><span>Orchid Machine</span><span>Static Bloom</span><span>4:19</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>8</span><span class="track-cell"><span class="row-title">Low Orbit</span><span class="row-sub">Etta Sound, saved</span></span><span>Etta Sound</span><span>Low Orbit</span><span>3:58</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>9</span><span class="track-cell"><span class="row-title">Earth Sign</span><span class="row-sub">Brittany Howard, saved</span></span><span>Brittany Howard</span><span>What Now</span><span>3:39</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>10</span><span class="track-cell"><span class="row-title">Corner Of My Eye</span><span class="row-sub">Future Islands, saved</span></span><span>Future Islands</span><span>People Who Aren't There Anymore</span><span>3:53</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>11</span><span class="track-cell"><span class="row-title">Room Under The Stairs</span><span class="row-sub">ZAYN, saved</span></span><span>ZAYN</span><span>Room Under The Stairs</span><span>4:08</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>12</span><span class="track-cell"><span class="row-title">Tides</span><span class="row-sub">Little Simz, saved</span></span><span>Little Simz</span><span>Sometimes I Might Be Introvert</span><span>4:51</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>13</span><span class="track-cell"><span class="row-title">Elysian</span><span class="row-sub">Floating Points, saved</span></span><span>Floating Points</span><span>Promises</span><span>5:28</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>14</span><span class="track-cell"><span class="row-title">Closer</span><span class="row-sub">Jon Hopkins, saved</span></span><span>Jon Hopkins</span><span>Immunity</span><span>6:05</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>15</span><span class="track-cell"><span class="row-title">Age Of Phase</span><span class="row-sub">Nils Frahm, saved</span></span><span>Nils Frahm</span><span>All Melody</span><span>5:10</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>16</span><span class="track-cell"><span class="row-title">Day By Day</span><span class="row-sub">Khruangbin, saved</span></span><span>Khruangbin</span><span>Mordechai</span><span>4:33</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>17</span><span class="track-cell"><span class="row-title">From You</span><span class="row-sub">Bonobo, saved</span></span><span>Bonobo</span><span>Fragments</span><span>3:56</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>18</span><span class="track-cell"><span class="row-title">Sapien</span><span class="row-sub">Four Tet, saved</span></span><span>Four Tet</span><span>Three</span><span>3:19</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+              </section>
+            </article>
+
+            <article class="page page-playlist">
+              <section class="playlist-hero" aria-label="Playlist header">
+                <span class="cover" aria-hidden="true"><svg viewBox="0 0 180 180"><rect width="180" height="180" fill="#0f172a"/><path d="M25 135c22-75 58-103 105-83 23 10 31 31 25 55-7 28-40 42-72 39-22-2-40-7-58-11z" fill="#60a5fa"/><path d="M28 136c38-12 74-14 128 6" stroke="#e0f2fe" stroke-width="10" fill="none"/><circle cx="116" cy="60" r="20" fill="#fb7185"/><path d="M47 44h47" stroke="#cbd5e1" stroke-width="8"/></svg></span>
+                <div class="playlist-copy">
+                  <p class="eyebrow">Playlist</p>
+                  <h2>Fresh saves</h2>
+                  <p class="subtle">128 tracks, updated today. Public playlist owned by Daisy.</p>
+                  <div class="hero-actions">
+                    <button class="pill-button primary" type="button"><svg class="icon"><use href="#i-play"></use></svg>Play</button>
+                    <button class="pill-button" type="button"><svg class="icon"><use href="#i-shuffle"></use></svg>Shuffle</button>
+                    <button class="icon-button" type="button" aria-label="Save"><svg class="icon"><use href="#i-heart"></use></svg></button>
+                    <button class="icon-button" type="button" aria-label="Add to queue"><svg class="icon"><use href="#i-plus"></use></svg></button>
+                    <button class="icon-button" type="button" aria-label="More playlist actions"><svg class="icon"><use href="#i-more"></use></svg></button>
+                  </div>
+                </div>
+              </section>
+              <section class="list-panel" aria-label="Playlist tracks">
+                <div class="panel-head"><h3>Tracks</h3><label class="search" style="width:260px"><svg class="icon"><use href="#i-search"></use></svg><input value="" placeholder="Filter tracks" aria-label="Filter playlist tracks"></label></div>
+                <div class="row row-head"><span>#</span><span>Title</span><span>Artist</span><span>Album</span><span>Time</span><span></span></div>
+                <div class="row is-current is-selected" tabindex="0"><span>1</span><span class="track-cell"><span class="row-title">Paralyzed</span><span class="row-sub">Playing from this computer</span></span><span>Riverline</span><span>Paralyzed</span><span>3:42</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>2</span><span class="track-cell"><span class="row-title">Static Bloom</span><span class="row-sub">Added by Daisy</span></span><span>Orchid Machine</span><span>Static Bloom</span><span>4:19</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>3</span><span class="track-cell"><span class="row-title">Low Orbit</span><span class="row-sub">Added by Daisy</span></span><span>Etta Sound</span><span>Low Orbit</span><span>3:58</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+                <div class="row" tabindex="0"><span>4</span><span class="track-cell"><span class="row-title">Signal Garden</span><span class="row-sub">Added by Daisy</span></span><span>North Index</span><span>Signal Garden</span><span>5:01</span><button class="icon-button" type="button" aria-label="More"><svg class="icon"><use href="#i-more"></use></svg></button></div>
+              </section>
+            </article>
+
+            <div class="state-layer state-loading" aria-live="polite"><div class="state-panel"><h3>Loading library</h3><p class="subtle">Cached rows stay in place while the request refreshes.</p><div class="loading-lines"><span class="skeleton"></span><span class="skeleton" style="width:86%"></span><span class="skeleton" style="width:72%"></span></div></div></div>
+            <div class="state-layer state-empty"><div class="state-panel"><h3>No matches</h3><p class="subtle">Adjust the current filter or clear the search field.</p><button class="pill-button primary" type="button">Clear filter</button></div></div>
+            <div class="state-layer state-error"><div class="state-panel"><h3>Could not refresh</h3><p class="subtle">The last usable content remains visible behind this message.</p><button class="pill-button primary" type="button">Retry</button></div></div>
+          </div>
+        </section>
+
+        <aside class="inspector" aria-label="Inspector">
+          <div class="inspector-head">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px">
+              <strong>Inspector</strong>
+              <button class="icon-button" type="button" data-close-inspector aria-label="Close inspector"><svg class="icon"><use href="#i-x"></use></svg></button>
+            </div>
+            <div class="tabs" role="tablist" aria-label="Inspector tabs">
+              <button class="tab" type="button" role="tab" data-tab="queue" aria-selected="true">Queue</button>
+              <button class="tab" type="button" role="tab" data-tab="lyrics" aria-selected="false">Lyrics</button>
+              <button class="tab" type="button" role="tab" data-tab="info" aria-selected="false">Info</button>
+            </div>
+          </div>
+          <div class="inspector-body">
+            <div class="tab-panel tab-queue">
+              <div class="queue-list">
+                <div class="queue-item is-current"><span class="queue-index">1</span><span class="tiny-art" aria-hidden="true"><img src="research-assets/shoreline-cover.png" alt="" loading="eager"></span><span class="queue-copy"><span class="queue-title">Paralyzed</span><span class="queue-sub">Riverline</span></span><span class="micro">3:42</span></div>
+                <div class="queue-item"><span class="queue-index">2</span><span class="tiny-art" aria-hidden="true"><img src="research-assets/glass-cover.png" alt="" loading="lazy"></span><span class="queue-copy"><span class="queue-title">Glass Weather</span><span class="queue-sub">Mara Vale</span></span><span class="micro">4:11</span></div>
+                <div class="queue-item"><span class="queue-index">3</span><span class="tiny-art" aria-hidden="true"><img src="research-assets/architecture-cover.png" alt="" loading="lazy"></span><span class="queue-copy"><span class="queue-title">Signal Garden</span><span class="queue-sub">North Index</span></span><span class="micro">5:01</span></div>
+              </div>
+            </div>
+            <div class="tab-panel tab-lyrics" hidden>
+              <div class="lyrics-block">
+                <p>Low light on the dashboard</p>
+                <p class="is-live">I keep the signal clean enough to find you</p>
+                <p>Every street repeats the chorus</p>
+                <p>And the room starts moving in time</p>
+              </div>
+            </div>
+            <div class="tab-panel tab-info" hidden>
+              <div class="info-grid">
+                <div class="info-row"><span>Source</span><strong>Spotify</strong></div>
+                <div class="info-row"><span>Playback</span><strong>This computer</strong></div>
+                <div class="info-row"><span>Visualizer</span><strong>MilkDrop</strong></div>
+                <div class="info-row"><span>Queue</span><strong>3 upcoming</strong></div>
+                <div class="info-row"><span>Saved</span><strong>Yes</strong></div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <footer class="player" aria-label="Player">
+        <div class="now">
+          <span class="player-cover" aria-hidden="true"><img src="research-assets/shoreline-cover.png" alt="" loading="eager"></span>
+          <span class="track-cell"><span class="row-title">Paralyzed</span><span class="row-sub">Riverline</span></span>
+          <button class="icon-button" type="button" aria-label="Save Paralyzed"><svg class="icon"><use href="#i-heart"></use></svg></button>
+        </div>
+        <div class="transport-stack">
+          <div class="transport">
+            <button class="icon-button" type="button" aria-label="Shuffle"><svg class="icon"><use href="#i-shuffle"></use></svg></button>
+            <button class="icon-button" type="button" aria-label="Previous"><svg class="icon"><use href="#i-back"></use></svg></button>
+            <button class="icon-button play" type="button" aria-label="Pause"><svg class="icon"><use href="#i-pause"></use></svg></button>
+            <button class="icon-button" type="button" aria-label="Next"><svg class="icon"><use href="#i-skip"></use></svg></button>
+            <button class="icon-button" type="button" aria-label="Repeat"><svg class="icon"><use href="#i-repeat"></use></svg></button>
+          </div>
+          <div class="seek"><span>1:21</span><span class="bar" aria-hidden="true"></span><span>3:42</span></div>
+        </div>
+        <div class="player-right">
+          <button class="icon-button" type="button" data-open-inspector aria-label="Open queue"><svg class="icon"><use href="#i-list"></use></svg></button>
+          <button class="icon-button" type="button" aria-label="Devices"><svg class="icon"><use href="#i-cast"></use></svg></button>
+          <span class="bar volume" aria-label="Volume" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="72"></span>
+        </div>
+      </footer>
+    </section>
+
+    <details class="review-notes">
+      <summary>Research, tokens and boundaries</summary>
+      <div class="notes-grid" aria-label="Review notes">
+      <article class="note-card">
+        <h3>Research basis</h3>
+        <p>This direction combines album identity, dense tables, optional side panels and theme ownership from the audited desktop music references.</p>
+        <ul class="sources">
+          <li><a href="https://help.roonlabs.com/portal/en/kb/articles/albums">Roon Albums</a> and <a href="https://help.roonlabs.com/portal/en/kb/articles/signal-path">Signal Path</a></li>
+          <li><a href="https://support.apple.com/en-mide/guide/music-windows/musd4821f613/windows">Apple Music column browser</a></li>
+          <li><a href="https://audirvana.com/audirvana-studio/">Audirvana Studio 3.0</a></li>
+          <li><a href="https://newsroom.spotify.com/2023-06-20/spotify-desktop-experience-redesign-your-library-now-playing-views-customize/">Spotify desktop redesign notes</a></li>
+          <li><a href="https://www.foobar2000.org/screenshots-windows">foobar2000 screenshots</a> and <a href="https://getmusicbee.com/addons/s/?type=1">MusicBee skins</a></li>
+        </ul>
+      </article>
+      <article class="note-card">
+        <h3>Boundaries</h3>
+        <p>The data is fictional review content. It does not rename the app to Spotiphile, add new audio formats, implement Pure Shuffle, or change Spotify playback capabilities.</p>
+      </article>
+      <article class="note-card">
+        <h3>Native fit</h3>
+        <p>The shell maps to existing Rust boundaries: UI emits Actions, the player bar stays persistent, Queue and Lyrics remain optional, and Winamp/MilkDrop entry points stay visible.</p>
+      </article>
+      </div>
+    </details>
+  </main>
+
+  <script>
+    const root = document.body;
+    document.querySelectorAll('.nav-item[data-set-page]').forEach(button => {
+      const label = button.querySelector('span')?.textContent;
+      if (label) button.setAttribute('aria-label', label);
+    });
+    const setAttr = (name, value) => {
+      root.dataset[name] = value;
+      document.querySelectorAll(`[data-set-${name}]`).forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset[`set${name[0].toUpperCase() + name.slice(1)}`] === value));
+      });
+    };
+
+    document.querySelectorAll("[data-set-page]").forEach((button) => {
+      button.addEventListener("click", () => {
+        setAttr("page", button.dataset.setPage);
+        document.querySelectorAll(".nav-item[data-set-page]").forEach((item) => {
+          if (item.dataset.setPage === button.dataset.setPage) item.setAttribute("aria-current", "page");
+          else item.removeAttribute("aria-current");
+        });
+      });
+    });
+
+    document.querySelectorAll("[data-set-theme]").forEach((button) => {
+      button.addEventListener("click", () => setAttr("theme", button.dataset.setTheme));
+    });
+
+    document.getElementById("accentSelect").addEventListener("change", (event) => {
+      root.dataset.accent = event.target.value;
+    });
+
+    document.getElementById("densitySelect").addEventListener("change", (event) => {
+      root.dataset.density = event.target.value;
+    });
+
+    document.getElementById("stateSelect").addEventListener("change", (event) => {
+      root.dataset.state = event.target.value;
+    });
+
+    document.querySelectorAll("[data-close-inspector]").forEach((button) => {
+      button.addEventListener("click", () => {
+        root.dataset.inspector = "closed";
+        document.querySelector("[data-open-inspector]").focus();
+      });
+    });
+
+    document.querySelectorAll("[data-open-inspector]").forEach((button) => {
+      button.addEventListener("click", () => {
+        root.dataset.inspector = "open";
+      });
+    });
+
+    const tabs = [...document.querySelectorAll(".tab")];
+    tabs.forEach((tab, index) => {
+      const panel = document.querySelector(`.tab-${tab.dataset.tab}`);
+      tab.id = `inspector-tab-${tab.dataset.tab}`;
+      panel.id = `inspector-panel-${tab.dataset.tab}`;
+      tab.setAttribute("aria-controls", panel.id);
+      panel.setAttribute("role", "tabpanel");
+      panel.setAttribute("aria-labelledby", tab.id);
+      tab.tabIndex = tab.getAttribute("aria-selected") === "true" ? 0 : -1;
+      const activate = () => {
+        root.dataset.tab = tab.dataset.tab;
+        tabs.forEach((item) => {
+          item.setAttribute("aria-selected", String(item === tab));
+          item.tabIndex = item === tab ? 0 : -1;
+        });
+        document.querySelectorAll(".tab-panel").forEach((panel) => {
+          panel.hidden = !panel.classList.contains(`tab-${tab.dataset.tab}`);
+        });
+      };
+      tab.addEventListener("click", activate);
+      tab.addEventListener("keydown", event => {
+        const offset = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
+        const next = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : offset ? (index + offset + tabs.length) % tabs.length : null;
+        if (next === null) return;
+        event.preventDefault();
+        tabs[next].click();
+        tabs[next].focus();
+      });
+    });
+
+    // Static row specimens have no mock playback action. Keep their real menu
+    // buttons reachable without creating inert keyboard stops.
+    document.querySelectorAll('.row[tabindex]').forEach(row => row.removeAttribute('tabindex'));
+    document.querySelectorAll('.cover-card[tabindex], .pin-item[tabindex]').forEach(item => item.removeAttribute('tabindex'));
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && root.dataset.inspector === "open") {
+        root.dataset.inspector = "closed";
+        document.querySelector("[data-open-inspector]").focus();
+      }
+    });
+  </script>
+</body>
+</html>

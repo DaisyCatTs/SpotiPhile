@@ -60,6 +60,8 @@ pub fn side_panel(app: &mut App, ui: &mut egui::Ui) {
             ui.available_width(),
         );
         ui.add_space(window_controls.lyrics_top);
+        super::queue::inspector_tabs(app, ui, false);
+        ui.add_space(8.0);
         ui.horizontal(|ui| {
             ui.add_space(4.0);
             theme::text(

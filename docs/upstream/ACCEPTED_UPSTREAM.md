@@ -126,3 +126,13 @@ The [power unregister API](https://learn.microsoft.com/en-us/windows/win32/api/p
 reports success or failure; its public documentation does not explicitly describe
 callback quiescence. Successful unregister is the upstream lifetime assumption;
 real registration/drop is checked separately, not proof of all shutdown races.
+
+Windows x64 validation completed for the source and teardown adaptation:
+966 default and 990 all-feature library tests passed (two ignored in the full
+runs), all binary/integration suites passed, both Clippy configurations passed
+with warnings denied, formatting passed, and doctests/Rustdoc passed. The ignored
+Windows desktop registration/drop test was explicitly run and passed separately.
+All 21 tests in the pinned fastframe-shell dependency passed, including wake-before-
+wait and cross-thread waking. Four launcher tests passed on the unchanged
+LF-normalized WSL copy; Jekyll passed in 7.484 seconds. Release validation and
+combined SpotiPhile queue validation are still pending at this checkpoint.

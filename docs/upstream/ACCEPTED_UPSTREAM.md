@@ -165,3 +165,30 @@ module. Protected CI must validate this fresh stable candidate. Prior checks
 above describe the original focused and combined branches, not this new SHA.
 The owner authorized zero required approving reviews; all seven strict required
 CI contexts, administrator enforcement and linear history remain enabled.
+
+## Remaining functional ports, 2026-10-11
+
+This candidate is based on main `d6be3e8`, after power/tray #7 and ordered queue
+playlist saving #9 merged through protected checks. It deliberately ports six
+remaining changes. Together with main's ten upstream ports, the candidate
+contains sixteen of the seventeen commits after the immutable baseline.
+
+| Original upstream SHA | Candidate commit | Author | Behavior |
+| --- | --- | --- | --- |
+| `17f3a0db3547aee20b24c432a7b8fb5fe1709592` | `6ca455b` | Dennis | Closing a minimized window follows the existing tray setting from the logic pass. |
+| `12deee472ee87e2c9ed0e0f13730cbdd9a6cfa45` | `e456a7f` | Dennis | Automatic Mac GPU switching and MilkDrop surface update after monitor moves. |
+| `eff77cd340dc5312a2f76b59c7a2ee73d0011867` | `d841503` | Ali Kaan | All 25 upstream Turkish wording corrections. |
+| `88d5831f0d63e797579b4cdccfdc94d19efd85cb` | `449869b` | Volodymyr Bunchuk | Ukrainian locale, catalogue and diagnostics. |
+| `d692a2276e11a597b579ef033e09f0c14dfbe018` | `898c4dc` | Göktuğ Ekinci | Active collection shuffle retains the current theme's hover accent. |
+| `cbe817610546c8d1b023ab3977dd89ede65d372e` | `0cc79e3` | Luís Fernando | Contributor attribution for an existing Spotify-owned Blend. |
+
+Original author/co-author metadata is retained. The close port uses our previously
+validated adaptation, retaining both the power handler and tray timing regression.
+Blend recognition uses the loaded adders: the listener plus another person.
+This is an inference from metadata, not a new Spotify Blend API or creation flow.
+No collaboration/editing claim is added. Editorial mixes remain unchanged.
+
+Additional tests and the offline Blend review fixture are in `66b4ae2`. Hover is
+tested with dark, light and custom blue palettes, not a hardcoded green. Blend
+rendering checks narrow/wide responsive columns, the byline and read-only label.
+See [validation](../features/upstream-final-functional-validation.md).

@@ -1,10 +1,11 @@
 # Rejected or deferred upstream changes
 
 No individual commit has been rejected. Of the 17 commits after the baseline,
-ten fixes are ported on this stable candidate; seven are not yet included here.
-Four of those seven are validated on the development branch (minimized close,
-Mac GPU handling, Turkish wording and Ukrainian). Three still need individual
-review (shuffle hover, Blend attribution and Linux custom chrome).
+sixteen fixes are ported on this focused candidate. The remaining upstream change,
+`14db97c82263400d180100135d631c9885245ce2` (Linux custom title bar), is deferred.
+It changes window chrome and needs the separate visual review while UI redesign
+is paused. This is a deferred port, not rejection of Linux support or upstream
+functionality. Main promotion of this candidate still requires protected CI.
 
 Wholesale merges are rejected as the integration strategy. Review reliability,
 security, performance and platform fixes first. Preserve product functionality

@@ -32,6 +32,7 @@ pub fn page(app: &mut App, ui: &mut egui::Ui) {
         });
     });
     ui.add_space(12.0);
+    search_field(app, ui);
     contents(app, ui, false);
 }
 
@@ -112,6 +113,9 @@ pub fn side_panel(app: &mut App, ui: &mut egui::Ui) {
             ui.horizontal(|ui| history_buttons(app, ui));
         }
         ui.add_space(8.0);
+        if app.queue_tab == QueueTab::Queue {
+            search_field(app, ui);
+        }
         // Lazy load recents when tab becomes visible.
         if app.queue_tab == QueueTab::Recents
             && !app.recents.loading
@@ -220,6 +224,23 @@ fn queue_drop(ui: &egui::Ui, rect: egui::Rect) -> Option<Arc<DragTrack>> {
 /// section's heading.
 const SECTION_GAP: f32 = 14.0;
 
+fn search_field(app: &mut App, ui: &mut egui::Ui) {
+    let mut query = app.queue_search.query().to_string();
+    widgets::search_field(
+        ui,
+        &app.palette,
+        app.locale,
+        ui.id().with("queue-search"),
+        &mut query,
+        &gettext(app.locale, "Search"),
+        ui.available_width(),
+    );
+    if query != app.queue_search.query() {
+        app.actions.push(Action::SetQueueSearch(query));
+    }
+    ui.add_space(8.0);
+}
+
 fn contents(app: &mut App, ui: &mut egui::Ui, compact: bool) {
     let palette = app.palette;
     app.sync_queue_selection();
@@ -228,8 +249,10 @@ fn contents(app: &mut App, ui: &mut egui::Ui, compact: bool) {
     // Neither the Web API nor librespot can reorder or insert into a live
     // remote queue, so without local playback active every drop just
     // appends, same as the "Add to queue" menu item.
-    let reorderable = app.queue_locally_reorderable();
-    if !reorderable
+    let filtering = !app.queue_search.query().trim().is_empty();
+    let reorderable = !filtering && app.queue_locally_reorderable();
+    if !filtering
+        && !reorderable
         && let Some(track) = queue_drop(ui, ui.clip_rect())
         && track.queue_rows.is_none()
         && !track
@@ -367,7 +390,22 @@ fn contents(app: &mut App, ui: &mut egui::Ui, compact: bool) {
     // context's rows follow under the usual heading. One numbering runs
     // through both, because that is the order things play.
     let queued_len = app.queued_rows_len().min(queue_len);
-    if queued_len > 0 {
+    let visible = app.queue_search.visible(
+        app.queue
+            .get()
+            .map(|queue| queue.queue.as_slice())
+            .unwrap_or_default(),
+    );
+    let manual_visible = visible.partition_point(|index| *index < queued_len);
+    if visible.is_empty() && filtering {
+        theme::text(
+            ui,
+            gettext(app.locale, "No matches."),
+            theme::regular(14.0),
+            palette.secondary,
+        );
+    }
+    if manual_visible > 0 {
         // The trash sits with the songs it removes: only this section is
         // the user's to clear, the context below plays itself.
         ui.horizontal(|ui| {
@@ -382,7 +420,9 @@ fn contents(app: &mut App, ui: &mut egui::Ui, compact: bool) {
                 palette.text,
             );
             ui.with_layout(Layout::right_to_left(Align::Center), |ui| {
-                clear_button(app, ui);
+                if !filtering {
+                    clear_button(app, ui);
+                }
             });
         });
         ui.add_space(4.0);
@@ -417,7 +457,8 @@ fn contents(app: &mut App, ui: &mut egui::Ui, compact: bool) {
                 (row >= 0.0).then(|| (row.round() as usize).min(queued_len))
             })
             .flatten();
-        widgets::virtual_rows(ui, queued_len, row_height + gap, |ui, index| {
+        widgets::virtual_rows(ui, manual_visible, row_height + gap, |ui, displayed| {
+            let index = visible[displayed];
             let width = ui.available_width();
             let shift = ui.ctx().animate_value_with_time(
                 ui.id().with(("queue-move-shift", index)),
@@ -489,7 +530,7 @@ fn contents(app: &mut App, ui: &mut egui::Ui, compact: bool) {
     // With Playing next empty, the panel holds no drop target at all: every
     // row on it belongs to Next up, which plays from the context and is never
     // rewritten. The player bar's Queue button still takes the drop.
-    if queue_len > queued_len {
+    if visible.len() > manual_visible {
         theme::text(
             ui,
             gettext(
@@ -501,9 +542,14 @@ fn contents(app: &mut App, ui: &mut egui::Ui, compact: bool) {
             palette.text,
         );
         ui.add_space(4.0);
-        widgets::virtual_rows(ui, queue_len - queued_len, row_height, |ui, index| {
-            queue_row(app, ui, queued_len + index, compact, 0.0);
-        });
+        widgets::virtual_rows(
+            ui,
+            visible.len() - manual_visible,
+            row_height,
+            |ui, index| {
+                queue_row(app, ui, visible[manual_visible + index], compact, 0.0);
+            },
+        );
     }
     queue_shortcuts(app, ui);
 }
@@ -613,8 +659,12 @@ fn queue_shortcuts(app: &mut App, ui: &egui::Ui) {
                 && (input.consume_key(egui::Modifiers::NONE, egui::Key::Delete)
                     || (cfg!(target_os = "macos")
                         && input.consume_key(egui::Modifiers::NONE, egui::Key::Backspace))),
-            editable && input.consume_key(egui::Modifiers::COMMAND, egui::Key::ArrowUp),
-            editable && input.consume_key(egui::Modifiers::COMMAND, egui::Key::ArrowDown),
+            editable
+                && app.queue_search.query().trim().is_empty()
+                && input.consume_key(egui::Modifiers::COMMAND, egui::Key::ArrowUp),
+            editable
+                && app.queue_search.query().trim().is_empty()
+                && input.consume_key(egui::Modifiers::COMMAND, egui::Key::ArrowDown),
         )
     });
     if copy || cut {

@@ -619,7 +619,7 @@ Actions:
 - [ ] save queue as Session Capsule.
 - [ ] shuffle selected subsection.
 - [ ] “Start Here” without destroying everything after it.
-- [ ] search huge queue.
+- [x] search huge queue. Loaded-row filtering, original-occurrence selection, 12,000-row regression, full Windows checks and native dark/light visual validation passed. See docs/features/queue-search-validation.md.
 
 Desktop behavior:
 

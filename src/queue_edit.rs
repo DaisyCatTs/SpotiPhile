@@ -1,5 +1,68 @@
 //! Occurrence-based index mappings for edits to the manual queue.
 
+/// Cached search view. Indices always refer to the original playback queue.
+#[derive(Default)]
+pub struct QueueSearch {
+    query: String,
+    source: Vec<crate::api::models::PlayableItem>,
+    cached_query: String,
+    visible: std::sync::Arc<[usize]>,
+}
+
+impl QueueSearch {
+    pub fn query(&self) -> &str {
+        &self.query
+    }
+
+    pub fn set_query(&mut self, query: String) -> bool {
+        if self.query == query {
+            return false;
+        }
+        self.query = query;
+        true
+    }
+
+    pub fn visible(
+        &mut self,
+        items: &[crate::api::models::PlayableItem],
+    ) -> std::sync::Arc<[usize]> {
+        if self.query.trim().is_empty() {
+            if self.cached_query != self.query || self.visible.len() != items.len() {
+                self.visible = (0..items.len()).collect();
+                self.cached_query.clone_from(&self.query);
+            }
+            // Ordinary queue viewing needs indices only. Release search metadata.
+            self.source = Vec::new();
+            return self.visible.clone();
+        }
+        if self.source != items || self.cached_query != self.query {
+            let needle = self.query.trim().to_lowercase();
+            self.visible = items
+                .iter()
+                .enumerate()
+                .filter_map(|(index, item)| {
+                    let album = match item {
+                        crate::api::models::PlayableItem::Track(track) => track
+                            .album
+                            .as_ref()
+                            .map(|album| album.name.as_str())
+                            .unwrap_or_default(),
+                        crate::api::models::PlayableItem::Episode(_) => "",
+                    };
+                    (needle.is_empty()
+                        || format!("{} {} {}", item.name(), item.subtitle(), album)
+                            .to_lowercase()
+                            .contains(&needle))
+                    .then_some(index)
+                })
+                .collect();
+            self.source = items.to_vec();
+            self.cached_query.clone_from(&self.query);
+        }
+        self.visible.clone()
+    }
+}
+
 fn selected_rows(len: usize, rows: &[usize]) -> Option<Vec<usize>> {
     if rows.is_empty() || rows.iter().any(|&row| row >= len) {
         return None;
@@ -50,6 +113,92 @@ pub fn removed_order(len: usize, rows: &[usize]) -> Option<Vec<usize>> {
 #[cfg(test)]
 mod tests {
     use super::{moved_order, removed_order};
+
+    #[test]
+    fn large_queue_search_keeps_original_indices_and_reuses_the_view() {
+        use crate::api::models::{PlayableItem, Track};
+        let items: Vec<_> = (0..12_000)
+            .map(|index| {
+                PlayableItem::Track(Track {
+                    uri: format!("spotify:track:{}", index % 7),
+                    name: if index % 3 == 0 { "Match" } else { "Other" }.into(),
+                    ..Default::default()
+                })
+            })
+            .collect();
+        let mut search = super::QueueSearch::default();
+        search.set_query("match".into());
+        let matches = search.visible(&items);
+        assert_eq!(matches.len(), 4_000);
+        assert_eq!(matches.last(), Some(&11_997));
+        assert!(std::sync::Arc::ptr_eq(&matches, &search.visible(&items)));
+        let advanced = search.visible(&items[1..]);
+        assert_eq!(advanced.first(), Some(&2));
+        assert_eq!(advanced.last(), Some(&11_996));
+        search.set_query(String::new());
+        let all = search.visible(&items);
+        assert_eq!(all.len(), 12_000);
+        assert!(
+            search.source.is_empty(),
+            "clearing search releases metadata"
+        );
+        assert_eq!(search.source.capacity(), 0);
+        assert!(std::sync::Arc::ptr_eq(&all, &search.visible(&items)));
+    }
+
+    #[test]
+    fn queue_search_retains_occurrences_and_invalidates_metadata() {
+        use crate::api::models::{Album, ArtistRef, Episode, PlayableItem, Show, Track};
+        let song = PlayableItem::Track(Track {
+            uri: "spotify:track:repeat".into(),
+            name: "Écho".into(),
+            artists: vec![ArtistRef {
+                name: "Artist".into(),
+                ..Default::default()
+            }],
+            album: Some(Album {
+                name: "Night".into(),
+                ..Default::default()
+            }),
+            ..Default::default()
+        });
+        let mut items = vec![
+            song.clone(),
+            PlayableItem::Episode(Episode {
+                name: "Interview".into(),
+                show: Some(Show {
+                    name: "Science".into(),
+                    ..Default::default()
+                }),
+                ..Default::default()
+            }),
+            song,
+        ];
+        let mut search = super::QueueSearch::default();
+        search.set_query("  ÉCHO ".into());
+        let result = search.visible(&items);
+        assert_eq!(&*result, &[0, 2]);
+        assert!(
+            std::sync::Arc::ptr_eq(&result, &search.visible(&items)),
+            "unchanged frames reuse the view"
+        );
+        for query in ["artist", "NIGHT"] {
+            search.set_query(query.into());
+            assert_eq!(&*search.visible(&items), &[0, 2]);
+        }
+        search.set_query("science".into());
+        assert_eq!(&*search.visible(&items), &[1]);
+        if let PlayableItem::Episode(episode) = &mut items[1] {
+            episode.show.as_mut().unwrap().name = "History".into();
+        }
+        assert!(
+            search.visible(&items).is_empty(),
+            "metadata updates invalidate the cached match"
+        );
+        search.set_query("  ".into());
+        assert_eq!(&*search.visible(&items), &[0, 1, 2]);
+        assert!(search.visible(&[]).is_empty());
+    }
 
     #[test]
     fn moves_normalized_occurrences_in_original_order() {

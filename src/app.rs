@@ -536,6 +536,7 @@ pub struct App {
     /// Queue selection is independent of any collection behind its side panel.
     pub queue_selection: RowSelection,
     pub queue_selection_view: Vec<String>,
+    pub queue_search: crate::queue_edit::QueueSearch,
     pub table_sorts: HashMap<Page, TableSort>,
     /// User ids resolved to display names; `None` while unknown, so an id
     /// is asked about only once per run.
@@ -953,6 +954,7 @@ impl App {
             selection: None,
             queue_selection: RowSelection::default(),
             queue_selection_view: Vec::new(),
+            queue_search: crate::queue_edit::QueueSearch::default(),
             table_sorts: session
                 .sorts
                 .iter()
@@ -2162,6 +2164,7 @@ impl App {
         self.clear_queue_history();
         self.queue_selection = RowSelection::default();
         self.queue_selection_view.clear();
+        self.queue_search = crate::queue_edit::QueueSearch::default();
         self.local_transfer_sequence = None;
         self.queue_start_pending = None;
         self.pending_album_queues.clear();
@@ -4425,6 +4428,19 @@ impl App {
     }
 
     pub fn sync_queue_selection(&mut self) {
+        let visible = self.queue_search.visible(
+            self.queue
+                .get()
+                .map(|queue| queue.queue.as_slice())
+                .unwrap_or_default(),
+        );
+        self.queue_selection
+            .rows
+            .retain(|index| visible.binary_search(index).is_ok());
+        self.queue_selection.anchor = self
+            .queue_selection
+            .anchor
+            .filter(|index| visible.binary_search(index).is_ok());
         let unchanged = self.queue.get().map_or_else(
             || self.queue_selection_view.is_empty(),
             |queue| {
@@ -4480,7 +4496,17 @@ impl App {
                     .anchor
                     .unwrap_or(row)
                     .min(self.queue_selection_view.len() - 1);
-                selected.rows = (anchor.min(row)..=anchor.max(row)).collect();
+                let visible = self.queue_search.visible(
+                    self.queue
+                        .get()
+                        .map(|queue| queue.queue.as_slice())
+                        .unwrap_or_default(),
+                );
+                selected.rows = visible
+                    .iter()
+                    .copied()
+                    .filter(|index| (anchor.min(row)..=anchor.max(row)).contains(index))
+                    .collect();
                 selected.anchor = Some(anchor);
             }
         }
@@ -4488,7 +4514,17 @@ impl App {
 
     pub fn select_all_queue_rows(&mut self) {
         self.sync_queue_selection();
-        self.queue_selection.rows = (0..self.queue_selection_view.len()).collect();
+        self.queue_selection.rows = self
+            .queue_search
+            .visible(
+                self.queue
+                    .get()
+                    .map(|queue| queue.queue.as_slice())
+                    .unwrap_or_default(),
+            )
+            .iter()
+            .copied()
+            .collect();
         self.queue_selection.anchor = self.queue_selection.rows.first().copied();
     }
 
@@ -9347,6 +9383,11 @@ impl App {
             }
             Action::ClearQueue => self.clear_queue(),
             Action::SaveQueueAsPlaylist => self.save_queue_as_playlist(),
+            Action::SetQueueSearch(query) => {
+                if self.queue_search.set_query(query) {
+                    self.queue_selection = RowSelection::default();
+                }
+            }
             Action::SaveRadio(seed) => self.save_radio(&seed),
             Action::RefreshQueue => self.refresh_queue(true),
             Action::CopyLink(uri) => {
@@ -15526,6 +15567,66 @@ mod tests {
         });
         assert_eq!(queue_uris(&app), before);
         assert_eq!(app.manual_queue, ["spotify:track:b"]);
+    }
+
+    #[test]
+    fn queue_search_selection_edits_original_occurrences_only() {
+        let mut app = app_with_local_manual_queue();
+        for (index, item) in app.queue.get_mut().unwrap().queue.iter_mut().enumerate() {
+            if let PlayableItem::Track(track) = item {
+                track.name = if index == 0 || index == 2 {
+                    "Match"
+                } else {
+                    "Hidden"
+                }
+                .into();
+            }
+        }
+        let ctx = egui::Context::default();
+        let before = queue_uris(&app);
+        app.pick_queue_row(1, RowPick::Only);
+        app.apply(Action::SetQueueSearch("match".into()), &ctx);
+        assert!(app.queue_selection.rows.is_empty());
+        assert_eq!(
+            queue_uris(&app),
+            before,
+            "search cannot change playback order"
+        );
+        app.pick_queue_row(0, RowPick::Only);
+        app.pick_queue_row(2, RowPick::Range);
+        assert_eq!(
+            app.queue_selection.rows.iter().copied().collect::<Vec<_>>(),
+            [0, 2]
+        );
+        app.select_all_queue_rows();
+        assert_eq!(
+            app.queue_selection.rows.iter().copied().collect::<Vec<_>>(),
+            [0, 2]
+        );
+        app.apply(
+            Action::RemoveQueueRows {
+                rows: vec![0, 2],
+                expected_queue: app.manual_queue.clone(),
+            },
+            &ctx,
+        );
+        assert_eq!(app.manual_queue, ["spotify:track:b"]);
+        assert_eq!(queue_uris(&app).1.last().unwrap(), "spotify:track:ctx");
+        app.apply(Action::SetQueueSearch(String::new()), &ctx);
+        app.select_all_queue_rows();
+        assert_eq!(app.queue_selection.rows.len(), 2);
+        app.apply(Action::SetQueueSearch("hidden".into()), &ctx);
+        app.select_all_queue_rows();
+        assert_eq!(app.queue_selection.rows.len(), 2);
+        if let PlayableItem::Track(track) = &mut app.queue.get_mut().unwrap().queue[0] {
+            track.name = "Renamed".into();
+        }
+        app.sync_queue_selection();
+        assert_eq!(
+            app.queue_selection.rows.iter().copied().collect::<Vec<_>>(),
+            [1],
+            "hidden metadata-renamed rows cannot remain selected"
+        );
     }
 
     #[test]

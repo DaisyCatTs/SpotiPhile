@@ -9304,6 +9304,30 @@ mod tests {
     }
 
     #[test]
+    fn queue_search_renders_original_positions_and_limits_selection() {
+        let (ctx, mut app) = accessible_app("queue-search-selection");
+        app.backend.set_offline(true);
+        seed_queued_songs(&mut app);
+        app.history = vec![Page::Queue];
+        app.history_index = 0;
+        app.apply(Action::SetQueueSearch("Queued 2".into()), &ctx);
+        let text = queue_edit_frame(&ctx, &mut app, vec![], egui::Modifiers::NONE);
+        assert!(text.iter().any(|(label, _)| label == "Queued 2"));
+        assert!(!text.iter().any(|(label, _)| label == "Queued 0"));
+        assert!(!text.iter().any(|(label, _)| label == "Queued 1"));
+        app.select_all_queue_rows();
+        assert_eq!(
+            app.queue_selection.rows.iter().copied().collect::<Vec<_>>(),
+            [2]
+        );
+        app.apply(Action::SetQueueSearch("nothing matches this".into()), &ctx);
+        let text = queue_edit_frame(&ctx, &mut app, vec![], egui::Modifiers::NONE);
+        assert!(text.iter().any(|(label, _)| label == "No matches."));
+        assert!(app.queue_selection.rows.is_empty());
+        app.backend.shutdown();
+    }
+
+    #[test]
     fn queue_batch_native_click_range_toggle_copy_cut_and_delete() {
         let (ctx, mut app) = accessible_app("queue-batch-native-selection");
         app.backend.set_offline(true);

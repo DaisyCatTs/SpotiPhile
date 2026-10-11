@@ -224,3 +224,22 @@ batch stops the remaining additions and shows the existing playlist-change error
 Earlier accepted batches remain in the playlist; Spotify provides no atomic
 multi-request write. Inspect that playlist before retrying to avoid duplicate
 additions. See [validation](../features/queue-playlist-validation.md).
+
+## Search the queue (development)
+
+The queue page and queue inspector have a Search field for loaded upcoming rows.
+It matches song/episode titles, artists, albums and podcast shows without case
+sensitivity. The current item remains visible. Row numbers retain their original
+playback positions, and matching duplicates remain separate occurrences.
+
+Changing the search clears selection. Select All and Shift-selection include
+only matching rows; copy and removal still use original occurrence indexes.
+Metadata changes remove newly hidden rows from selection. Clearing the field
+restores the full view without changing playback or queue order. Search is local
+and temporary, and resets on sign-out. It does not fetch unseen context pages.
+
+While filtering, positional drag targets, keyboard moves and Clear queue are
+unavailable because hidden rows make those operations ambiguous. Explicit
+Move to top/bottom commands still refer to the whole manual queue, not the search
+result. Save as playlist also saves the whole loaded queue, not just matches.
+See [search validation](../features/queue-search-validation.md).

@@ -1076,6 +1076,8 @@ pub enum Action {
     ClearQueue,
     /// Save the current and upcoming queue as a playlist.
     SaveQueueAsPlaylist,
+    /// Filter loaded upcoming queue occurrences without changing playback.
+    SetQueueSearch(String),
     /// Save a radio page's songs to a new playlist, by the seed's URI.
     SaveRadio(String),
     RefreshQueue,

@@ -56,3 +56,32 @@ playback reliability receive priority; UI logic must preserve Daisy visual scope
   docs/features/upstream-audio-validation.md. Cross-platform CI remains pending.
 - No new benchmark, authenticated playback, Bluetooth switch or sleep/wake
   hardware validation is claimed. Upstream's measurements are upstream evidence.
+
+### Resampler, name-cache and ordering ports, Spotifast #681/#744/#717/#701
+
+| Upstream SHA | Queue-feature commit | Promotion commit | Author |
+| --- | --- | --- | --- |
+| `031e8c565c29bd72763bf29f0cfbe17c3446bc58` | `2229f97` | `577d24a` | Dennis |
+| `9dd23c9b27a0ad6d43d4569a36547f9806945451` | `6cad104` | `e985796` | Luís Fernando |
+| `9d74afe8ad5196eb67942f449d6ed57988d58697` | `f420bb7` | `4be253a` | Лев Федорец |
+| `5b7a5dfe8c15542ee82fd7560c1e36496306b6c9` | `8ea6ffa` | `8240528` | Samet Karaş |
+
+Applied without source adaptations, retaining original author/co-author metadata.
+Stereo resampling uses portable split sums with numerical regression coverage.
+Overlapping failed lookups do not replace known adder names, while successful
+renames still invalidate name-dependent views. Sidebar rank lookups preserve
+first duplicate ranks, stable missing entries, pins and folders. Album sorting
+keeps each album in disc/track order and distinguishes same-named albums by ID
+or URI. Descending album-name order does not reverse tracks inside an album.
+Views still carry original source indices into playback and row actions.
+
+No new request, credential/persistence schema, dependency, layout, typography or
+navigation change. Existing queue protections and native themes are retained.
+The independent promotion branch passed 950/974 library tests, binary/integration
+suites, both Clippy configurations, documentation tests/Rustdoc, launcher tests,
+Jekyll (4.362 seconds), and a 2m 24s release build/version smoke on Windows x64.
+One existing native credential-store test remains ignored in ordinary suites.
+Combined queue-branch verification is recorded in
+[upstream-library-validation.md](../features/upstream-library-validation.md).
+Protected cross-platform CI remains pending. No new CPU/RAM benchmark or manual
+authenticated playback result is claimed. Upstream timing claims are upstream's.

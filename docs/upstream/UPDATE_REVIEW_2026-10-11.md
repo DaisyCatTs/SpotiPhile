@@ -15,16 +15,16 @@ Origin main: 0 ahead / 17 behind. At the initial fetch, local HEAD: 8 ahead / 17
 | --- | --- | --- |
 | [12deee4](https://github.com/crmne/spotifast/commit/12deee472ee87e2c9ed0e0f13730cbdd9a6cfa45) | Let dual-GPU Macs keep the integrated GPU for Spotifast (#736) | Pending |
 | [eff77cd](https://github.com/crmne/spotifast/commit/eff77cd340dc5312a2f76b59c7a2ee73d0011867) | fix(i18n): refine Turkish translations for consistency and natural phrasing (#668) | Pending |
-| [031e8c5](https://github.com/crmne/spotifast/commit/031e8c565c29bd72763bf29f0cfbe17c3446bc58) | Let the stereo resampler use vector registers on every target (#681) | Pending |
-| [9d74afe](https://github.com/crmne/spotifast/commit/9d74afe8ad5196eb67942f449d6ed57988d58697) | Reduce library sorting work during scrolling (#717) | Pending |
+| [031e8c5](https://github.com/crmne/spotifast/commit/031e8c565c29bd72763bf29f0cfbe17c3446bc58) | Let the stereo resampler use vector registers on every target (#681) | Accepted: `2229f97` |
+| [9d74afe](https://github.com/crmne/spotifast/commit/9d74afe8ad5196eb67942f449d6ed57988d58697) | Reduce library sorting work during scrolling (#717) | Accepted: `f420bb7` |
 | [88d5831](https://github.com/crmne/spotifast/commit/88d5831f0d63e797579b4cdccfdc94d19efd85cb) | feat(i18n): add Ukrainian language support (#718) | Pending |
 | [277a4fa](https://github.com/crmne/spotifast/commit/277a4fabcd2ca11ced4adb45b274f29084fde7eb) | Wait for room in the audio queue instead of polling it (#726) | Accepted: `52f29af` |
 | [17f3a0d](https://github.com/crmne/spotifast/commit/17f3a0db3547aee20b24c432a7b8fb5fe1709592) | Hide a minimised window to the tray when it is closed (#725) | Pending |
 | [f5a946c](https://github.com/crmne/spotifast/commit/f5a946c6bb1b332a1147153821172cf08eb84d30) | Keep the resume point and history safe when a session ends abruptly (#727) | Accepted: `4c62229` |
-| [9dd23c9](https://github.com/crmne/spotifast/commit/9dd23c9b27a0ad6d43d4569a36547f9806945451) | Keep an adder's name once it is found (#744) | Pending |
+| [9dd23c9](https://github.com/crmne/spotifast/commit/9dd23c9b27a0ad6d43d4569a36547f9806945451) | Keep an adder's name once it is found (#744) | Accepted: `6cad104` |
 | [d692a22](https://github.com/crmne/spotifast/commit/d692a2276e11a597b579ef033e09f0c14dfbe018) | Keep the playlist shuffle button green while hovered (#722) | Pending |
 | [cbe8176](https://github.com/crmne/spotifast/commit/cbe817610546c8d1b023ab3977dd89ede65d372e) | Show Added By in Blends (#745) | Pending |
-| [5b7a5df](https://github.com/crmne/spotifast/commit/5b7a5dfe8c15542ee82fd7560c1e36496306b6c9) | Keep each album's songs in track order when sorting by album (#701) | Pending |
+| [5b7a5df](https://github.com/crmne/spotifast/commit/5b7a5dfe8c15542ee82fd7560c1e36496306b6c9) | Keep each album's songs in track order when sorting by album (#701) | Accepted: `8ea6ffa` |
 | [14db97c](https://github.com/crmne/spotifast/commit/14db97c82263400d180100135d631c9885245ce2) | Add Linux custom title bar (#648) | Pending |
 | [595ddc4](https://github.com/crmne/spotifast/commit/595ddc4e6ff4241f9c46e3b994ff48bd1cdd3c8a) | Follow the system's power and session state (#728) | Pending |
 | [fea496e](https://github.com/crmne/spotifast/commit/fea496e4a2c51fa89899e3e07a39e6f9fd02114f) | Sleep in the tray until something is due (#730) | Pending |
@@ -51,7 +51,7 @@ accepted, rejected and pending original SHAs from the ledgers.
 A GitHub behind badge measures ancestry, not whether a fix was ported. Focused
 ports retain our linear development history and can still leave that badge at
 17 behind. The accepted ledger is the evidence of functional integration. The
-remaining 14 commits still need individual review and validation.
+remaining 10 commits still need individual review and validation.
 
 
 The owner subsequently authorized validated promotion to main. Protected PR #1
@@ -82,3 +82,10 @@ Windows power/thread policy should be checked against Microsoft's
 [Quality of Service](https://learn.microsoft.com/en-us/windows/win32/procthread/quality-of-service)
 and [MMCSS](https://learn.microsoft.com/en-us/windows/win32/procthread/multimedia-class-scheduler-service)
 documentation. These are review inputs, not evidence of a completed power port.
+
+
+PR #3 adds the reviewed resampler, name-cache, sidebar-ordering and album-ordering
+ports, stacked on #2. These four are now ported and separately validated on the
+promotion branch; combined queue-feature verification is a separate record.
+Power/tray/polling and the remaining platform, language and visual changes remain
+pending. Listing a dependency review boundary does not mark it implemented.

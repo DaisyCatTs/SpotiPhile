@@ -92,3 +92,10 @@ The queue-feature branch now carries upstream's decoder wakeups and device
 recovery, independently of the focused protected promotion branches. No Daisy
 queue code or visual scope was replaced. See ACCEPTED_UPSTREAM.md for source SHAs
 and docs/features/upstream-audio-validation.md for combined verification.
+
+On 2026-10-11, exact upstream resampler, name-cache and ordering ports were
+integrated without replacing Daisy's queue edits or appearance work. The sidebar
+and collection remain coupled to upstream, with Daisy's view/selection mapping
+retained. Original source indices still drive playback and row actions. Native
+layout, custom themes, fonts and controls are not redesigned by these ports.
+See ACCEPTED_UPSTREAM.md and docs/features/upstream-library-validation.md.

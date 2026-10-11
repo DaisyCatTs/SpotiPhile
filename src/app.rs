@@ -19884,6 +19884,22 @@ mod tests {
         assert_eq!(app.connected_repaint_interval(), REMOTE_POLL_ACTIVE);
     }
 
+    #[test]
+    fn hidden_playback_on_another_device_keeps_active_polling() {
+        let mut app = headless_app();
+        store_track(&mut app, "remote-playing");
+        let mut now = app
+            .cached_track_preview("spotify:track:remote-playing", 0)
+            .unwrap();
+        now.local = false;
+        now.playing = true;
+        app.frame_now = Some(now);
+        app.budget = crate::power::Budget::Background;
+        assert_eq!(app.connected_repaint_interval(), REMOTE_POLL_ACTIVE);
+        app.frame_now.as_mut().unwrap().playing = false;
+        assert_eq!(app.connected_repaint_interval(), REMOTE_POLL_UNSEEN);
+    }
+
     /// A poll asked for soon, after a transfer or a remote command, stays
     /// soon while nobody can see the window.
     #[test]

@@ -249,24 +249,40 @@ impl Reader {
 
 impl Drop for Reader {
     fn drop(&mut self) {
+        let mut cancelled = true;
         // SAFETY: each handle came from its registration and is undone once.
         unsafe {
             for handle in self.settings.drain(..) {
-                PowerSettingUnregisterNotification(handle);
+                cancelled &= cancellation_succeeded(PowerSettingUnregisterNotification(handle));
             }
             if let Some(handle) = self.suspend.take() {
-                PowerUnregisterSuspendResumeNotification(handle);
+                cancelled &=
+                    cancellation_succeeded(PowerUnregisterSuspendResumeNotification(handle));
             }
             if let Some(handle) = self.network.take() {
-                CancelMibChangeNotify2(handle);
+                cancelled &= cancellation_succeeded(CancelMibChangeNotify2(handle));
             }
         }
         self.session.take();
+        if !cancelled {
+            // A registration may still call back. Retain its small allocation
+            // until process exit rather than free a live callback context.
+            return;
+        }
         // SAFETY: no registration uses them any more.
         unsafe {
             drop(Box::from_raw(self.params));
             drop(Box::from_raw(self.context));
         }
+    }
+}
+
+fn cancellation_succeeded(error: u32) -> bool {
+    if error == 0 {
+        true
+    } else {
+        log::warn!("power notification cancellation failed ({error}); retaining callback context");
+        false
     }
 }
 
@@ -616,6 +632,13 @@ unsafe extern "system" fn session_procedure(
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn callback_context_is_released_only_after_successful_cancellation() {
+        assert!(cancellation_succeeded(0));
+        assert!(!cancellation_succeeded(87));
+        assert!(!cancellation_succeeded(5));
+    }
 
     #[test]
     fn each_power_setting_reads_as_documented() {

@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: Spotifast\n"
 "Report-Msgid-Bugs-To: https://github.com/crmne/spotifast/issues/new?"
 "template=translation.yml\n"
-"POT-Creation-Date: 2026-10-11 04:51+0100\n"
+"POT-Creation-Date: 2026-10-11 04:55+0100\n"
 "PO-Revision-Date: 2026-09-09 13:30+0000\n"
 "Last-Translator: Spotifast contributors\n"
 "Language-Team: Japanese\n"
@@ -345,28 +345,28 @@ msgstr "次に再生"
 msgid "Next up"
 msgstr "このあと再生"
 
-#: src/ui/queue.rs:524
+#: src/ui/queue.rs:528
 msgid "Undo"
 msgstr "元に戻す"
 
-#: src/ui/queue.rs:529
+#: src/ui/queue.rs:534
 msgid "Redo"
 msgstr "やり直す"
 
-#: src/ui/queue.rs:670 src/ui/queue.rs:703 src/ui/widgets.rs:2693
+#: src/ui/queue.rs:682 src/ui/queue.rs:715 src/ui/widgets.rs:2693
 #: src/ui/collection.rs:1081
 msgid "Retry"
 msgstr "再試行"
 
-#: src/ui/queue.rs:685
+#: src/ui/queue.rs:697
 msgid "No recent plays"
 msgstr "再生履歴はありません"
 
-#: src/ui/queue.rs:686
+#: src/ui/queue.rs:698
 msgid "Played songs appear here."
 msgstr "再生した曲がここに表示されます。"
 
-#: src/ui/queue.rs:766 src/ui/artist.rs:185
+#: src/ui/queue.rs:778 src/ui/artist.rs:185
 msgid "Load more"
 msgstr "さらに読み込む"
 

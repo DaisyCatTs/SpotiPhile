@@ -514,24 +514,40 @@ pub(crate) fn owns_keyboard_focus(ctx: &egui::Context) -> bool {
     let ids = ctx
         .data(|data| data.get_temp::<Vec<egui::Id>>(egui::Id::new("queue-row-ids")))
         .unwrap_or_default();
+    let history_ids = ctx
+        .data(|data| data.get_temp::<Vec<egui::Id>>(egui::Id::new("queue-history-ids")))
+        .unwrap_or_default();
     ctx.memory(|memory| memory.focused())
-        .is_some_and(|id| ids.contains(&id))
+        .is_some_and(|id| ids.contains(&id) || history_ids.contains(&id))
 }
 
 fn history_buttons(app: &mut App, ui: &mut egui::Ui) {
-    for (label, enabled, action) in [
+    for (key, label, enabled, action) in [
         (
+            "queue-undo",
             gettext(app.locale, "Undo"),
             app.can_undo_queue(),
             Action::UndoQueue,
         ),
         (
+            "queue-redo",
             gettext(app.locale, "Redo"),
             app.can_redo_queue(),
             Action::RedoQueue,
         ),
     ] {
-        if ui.add_enabled(enabled, egui::Button::new(label)).clicked() {
+        let response = ui
+            .push_id(key, |ui| ui.add_enabled(enabled, egui::Button::new(label)))
+            .inner;
+        ui.ctx().data_mut(|data| {
+            let key = egui::Id::new("queue-history-ids");
+            let mut ids = data.get_temp::<Vec<egui::Id>>(key).unwrap_or_default();
+            if !ids.contains(&response.id) {
+                ids.push(response.id);
+            }
+            data.insert_temp(key, ids);
+        });
+        if response.clicked() {
             app.actions.push(action);
         }
     }
@@ -541,12 +557,8 @@ fn queue_shortcuts(app: &mut App, ui: &egui::Ui) {
     if ui.ctx().text_edit_focused() || app.dialog.is_some() || egui::Popup::is_any_open(ui.ctx()) {
         return;
     }
-    let ids = ui
-        .ctx()
-        .data(|data| data.get_temp::<Vec<egui::Id>>(egui::Id::new("queue-row-ids")))
-        .unwrap_or_default();
     let focus = ui.memory(|memory| memory.focused());
-    let owns_focus = focus.is_some_and(|id| ids.contains(&id));
+    let owns_focus = owns_keyboard_focus(ui.ctx());
     if !owns_focus && !(matches!(app.page(), crate::model::Page::Queue) && focus.is_none()) {
         return;
     }

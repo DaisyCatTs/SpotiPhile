@@ -9286,7 +9286,6 @@ mod tests {
             app.apply(action, &ctx);
         }
         assert_eq!(app.manual_queue.len(), 3);
-        ctx.memory_mut(|memory| memory.surrender_focus(memory.focused().unwrap_or(egui::Id::NULL)));
         queue_edit_frame(
             &ctx,
             &mut app,

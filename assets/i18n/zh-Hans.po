@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: Spotifast\n"
 "Report-Msgid-Bugs-To: https://github.com/crmne/spotifast/issues/new?"
 "template=translation.yml\n"
-"POT-Creation-Date: 2026-10-11 04:51+0100\n"
+"POT-Creation-Date: 2026-10-11 04:55+0100\n"
 "PO-Revision-Date: 2026-09-09 13:30+0000\n"
 "Last-Translator: Spotifast contributors\n"
 "Language-Team: Simplified Chinese\n"
@@ -345,28 +345,28 @@ msgstr "接下来播放"
 msgid "Next up"
 msgstr "后续曲目"
 
-#: src/ui/queue.rs:524
+#: src/ui/queue.rs:528
 msgid "Undo"
 msgstr "撤销"
 
-#: src/ui/queue.rs:529
+#: src/ui/queue.rs:534
 msgid "Redo"
 msgstr "重做"
 
-#: src/ui/queue.rs:670 src/ui/queue.rs:703 src/ui/widgets.rs:2693
+#: src/ui/queue.rs:682 src/ui/queue.rs:715 src/ui/widgets.rs:2693
 #: src/ui/collection.rs:1081
 msgid "Retry"
 msgstr "重试"
 
-#: src/ui/queue.rs:685
+#: src/ui/queue.rs:697
 msgid "No recent plays"
 msgstr "没有最近播放记录"
 
-#: src/ui/queue.rs:686
+#: src/ui/queue.rs:698
 msgid "Played songs appear here."
 msgstr "播放过的歌曲会显示在这里。"
 
-#: src/ui/queue.rs:766 src/ui/artist.rs:185
+#: src/ui/queue.rs:778 src/ui/artist.rs:185
 msgid "Load more"
 msgstr "加载更多"
 

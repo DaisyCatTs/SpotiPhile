@@ -18,3 +18,14 @@ a Windows run does not validate Unix filesystem behavior.
 
 Future entries must record source SHA, author, purpose, adaptations, port commit,
 verification and any platform or performance limitations.
+
+## Branch validation, 2026-10-11
+
+On Windows x64, formatting, both Clippy configurations with warnings denied,
+default/all-feature full suites and documentation tests passed. Library totals
+were 942 and 965 passed, each with one existing credential-store test ignored.
+Integration suites passed after the exact neutral executable-name renames.
+The optimized build passed in 2m 27s. The upstream inventory smoke reported
+one accepted commit and 16 pending commits; GitHub's report job also passed.
+Other platform and protected checks remain pending on PR #1. No live playback
+or new performance measurement is claimed for this port.

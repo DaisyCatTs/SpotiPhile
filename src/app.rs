@@ -35,6 +35,8 @@ const REMOTE_POLL_IDLE: Duration = Duration::from_secs(20);
 const REMOTE_FRESH: Duration = Duration::from_secs(45);
 const DEVICES_FRESH: Duration = Duration::from_secs(12);
 const SEARCH_DEBOUNCE: Duration = Duration::from_millis(280);
+/// How old the saved resume point may grow while music plays.
+const SESSION_REFRESH: Duration = Duration::from_secs(30);
 /// How far into a song Previous restarts it rather than stepping back,
 /// matching what librespot does during playback.
 const RESTART_BEFORE_PREVIOUS: u32 = 3_000;
@@ -2644,6 +2646,8 @@ impl App {
         if same_uri && !new_occurrence {
             return;
         }
+        // A new track is a new resume point (upstream #727).
+        self.session_dirty = true;
         let queue_already_updated =
             self.queue_start_pending.take().as_ref() == Some(&self.target());
         let repeating = same_uri && new_occurrence && now.repeat == RepeatMode::Track;
@@ -2877,6 +2881,12 @@ impl App {
         self.sync_skin(ctx);
         if self.settings_dirty && self.last_settings_save.elapsed() > Duration::from_secs(2) {
             self.save_settings();
+        }
+        // Refresh a moving resume point even if no other state changes.
+        if self.now_playing().is_some_and(|now| now.playing)
+            && self.last_session_save.elapsed() > SESSION_REFRESH
+        {
+            self.session_dirty = true;
         }
         if self.session_dirty && self.last_session_save.elapsed() > Duration::from_secs(2) {
             self.save_session();
@@ -15028,6 +15038,39 @@ mod tests {
         assert_eq!(queue_uris(&app), after);
         assert!(app.can_undo_queue());
         app.backend.shutdown();
+    }
+
+    /// Playing music keeps the saved resume point fresh on its own, so a
+    /// session that ends without a goodbye resumes close to where it was.
+    #[test]
+    fn playing_music_saves_the_resume_point_now_and_again() {
+        let mut app = headless_app();
+        app.local.track = Some(crate::player::LocalTrack {
+            uri: "spotify:track:a".into(),
+            ..Default::default()
+        });
+        app.local.playback = Playback::Playing;
+        let ctx = egui::Context::default();
+        let pass = |app: &mut App| {
+            let mut output = ctx.run_ui(egui::RawInput::default(), |ui| {
+                app.background_frame(ui.ctx());
+            });
+            output.textures_delta.clear();
+        };
+        pass(&mut app);
+        let saved = app.last_session_save;
+
+        pass(&mut app);
+        assert_eq!(app.last_session_save, saved, "no save while it is fresh");
+
+        app.last_session_save = Instant::now() - SESSION_REFRESH - Duration::from_secs(1);
+        app.session_dirty = false;
+        pass(&mut app);
+        assert!(!app.session_dirty);
+        assert!(
+            app.last_session_save.elapsed() < SESSION_REFRESH,
+            "saved again"
+        );
     }
 
     #[test]

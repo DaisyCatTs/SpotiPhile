@@ -16,3 +16,15 @@ published history. UI redesign remains paused and requires separate review.
 The daily read-only workflow reports pending commits at 08:17 UTC once present
 on the default branch. It cannot integrate code, publish or modify the repository.
 GitHub may delay scheduled runs. The report is an inventory, not automatic approval.
+
+## Solo-maintainer promotion policy
+
+On 2026-10-11 the owner requested merging completed work without a separate
+write-access reviewer. Main now requires zero approving reviews; all seven
+required status checks, strict up-to-date checks, enforced admin protection,
+linear history, and disabled force pushes/deletion remain intact.
+PR #1 merged as c27e5c25c0c1f2d7e6bc6022ff87b34047fc7328.
+Squashed stack ancestry conflicted on retargeting #2. Its two source ports were
+replayed on current main without rewriting published branches. Source, tests,
+Cargo files, workflows and README are identical to the previously CI-validated
+981a653 snapshot. Fresh protected CI remains required on this new ancestry.

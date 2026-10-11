@@ -90,3 +90,39 @@ documentation tests and Rustdoc passed. Four launcher tests passed in WSL using
 the established LF-normalized packaging copy. Jekyll passed in 4.362 seconds.
 The optimized build passed in 2m 24s and its version smoke passed. Cross-platform
 CI and performance measurements remain separate; no manual hardware claim.
+
+## Power, session and tray scheduling
+
+- `595ddc4e6ff4241f9c46e3b994ff48bd1cdd3c8a`, Dennis, Spotifast #728,
+  port `82761fb`: platform readers and bounded pre-suspend/session-end saves.
+- `fea496e4a2c51fa89899e3e07a39e6f9fd02114f`, Dennis, Spotifast #730,
+  port `135a0df`: event-driven tray wait and Windows MMCSS audio task.
+- `dd2d5e34e66d4e01e31e595a3022a1de808b449a`, Dennis, Spotifast #733,
+  port `18a42e0`: hidden idle remote polling, with prompt command follow-up.
+
+Cherry-pick conflicts contained context from the separately pending #732
+minimized-close fix. That unrelated helper/test was excluded; the power and
+scheduling changes were retained. No wholesale upstream merge was performed.
+All fastframe crates, including the build dependency, now share maintainer fork
+revision `f7dc6fbe938e8a953509d110cdba036f537e5b7e`. Its difference from the old
+revision consists of documentation, MMCSS audio registration and condition-variable
+headless waking. The MIT license and original copyright remain unchanged.
+The upstream lockfile and Nix vendor hash travel with the dependency change.
+
+Validation is in progress. Windows power GUIDs were checked against SDK
+10.0.26100.0. Callback cancellation, saver policy, save acknowledgement, wake
+races and playback polling are review boundaries. No energy/CPU improvement is
+claimed without a new measurement. macOS reads Low Power Mode but this port does
+not provide macOS sleep notifications. Linux watcher failure exits its watcher;
+there is no reconnection promise. Flatpak portal/logind availability can differ.
+
+SpotiPhile adaptation: Windows teardown checks every unregister result. If any
+registration cannot be cancelled, its callback context and subscription parameters
+are retained until process exit and a warning is logged, avoiding a potential
+use-after-free. A hidden remote-playback regression preserves active polling.
+Cancellation is performed outside callbacks and without holding their locks,
+following [Microsoft's cancellation guidance](https://learn.microsoft.com/en-us/windows/win32/api/netioapi/nf-netioapi-cancelmibchangenotify2).
+The [power unregister API](https://learn.microsoft.com/en-us/windows/win32/api/powersetting/nf-powersetting-powersettingunregisternotification)
+reports success or failure; its public documentation does not explicitly describe
+callback quiescence. Successful unregister is the upstream lifetime assumption;
+real registration/drop is checked separately, not proof of all shutdown races.

@@ -32,11 +32,15 @@ use fastframe_now_playing::{
 
 const REMOTE_POLL_ACTIVE: Duration = Duration::from_secs(4);
 const REMOTE_POLL_IDLE: Duration = Duration::from_secs(20);
+/// With nobody able to see the window and nothing playing anywhere.
+const REMOTE_POLL_UNSEEN: Duration = Duration::from_secs(30);
 const REMOTE_FRESH: Duration = Duration::from_secs(45);
 const DEVICES_FRESH: Duration = Duration::from_secs(12);
 const SEARCH_DEBOUNCE: Duration = Duration::from_millis(280);
 /// How old the saved resume point may grow while music plays.
 const SESSION_REFRESH: Duration = Duration::from_secs(30);
+/// The longest the app sleeps in the tray with nothing due.
+const HEADLESS_SLEEP: Duration = Duration::from_secs(2);
 /// How far into a song Previous restarts it rather than stepping back,
 /// matching what librespot does during playback.
 const RESTART_BEFORE_PREVIOUS: u32 = 3_000;
@@ -195,8 +199,8 @@ impl PendingPaste {
 pub struct AppOptions {
     /// Demo and isolated tests must not read or migrate real Spotify grants.
     pub restore_sign_in: bool,
-    /// Register the MPRIS media-control service and follow the desktop's
-    /// light or dark preference (Linux).
+    /// Register the MPRIS media-control service, follow the desktop's light
+    /// or dark preference (Linux) and the system's power and session state.
     pub media_controls: bool,
     /// Register the system-tray item (Linux).
     pub tray: bool,
@@ -249,6 +253,11 @@ pub struct App {
     tray: Option<fastframe_tray::Tray>,
     /// Whether the tray menu last offered Pause rather than Play.
     tray_playing: bool,
+    /// The system's power and session state.
+    power: crate::power::Power,
+    /// What the app may spend on drawing and polling, from the power state
+    /// and the window's; worked out in each logic pass.
+    pub budget: crate::power::Budget,
     pub window_hidden: bool,
     /// The window should close but the process should stay in the tray.
     pub hide_intent: bool,
@@ -622,7 +631,7 @@ impl fastframe_shell::Resident for App {
         } else if self.wants_show {
             Headless::Show
         } else {
-            Headless::Wait
+            self.headless_wait()
         }
     }
 
@@ -727,6 +736,12 @@ impl App {
             .tray
             .then(|| fastframe_tray::Tray::spawn(tray_config(), move || wake.wake()))
             .flatten();
+        let power = if options.media_controls {
+            let wake = waker.clone();
+            crate::power::Power::spawn(move || wake.wake())
+        } else {
+            crate::power::Power::fixed(crate::power::Conditions::default())
+        };
 
         let first_page = session
             .last_page
@@ -755,6 +770,8 @@ impl App {
             media_art: None,
             tray,
             tray_playing: false,
+            power,
+            budget: crate::power::Budget::default(),
             window_hidden: false,
             hide_intent: false,
             wants_show: false,
@@ -781,7 +798,7 @@ impl App {
             local_playback: LocalPlayback::Unavailable,
             local: LocalState::default(),
             remote: None,
-            remote_polled_at: Instant::now() - REMOTE_POLL_IDLE,
+            remote_polled_at: Instant::now() - REMOTE_POLL_UNSEEN,
             remote_poll_pending: false,
             remote_poll_seq: 0,
             session_dirty: false,
@@ -2779,10 +2796,7 @@ impl App {
         }
 
         if self.is_connected() && !self.offline {
-            let interval = match self.target() {
-                Target::Local if self.local.is_active() => REMOTE_POLL_IDLE,
-                _ => REMOTE_POLL_ACTIVE,
-            };
+            let interval = self.connected_repaint_interval();
             if !self.remote_poll_pending && self.remote_polled_at.elapsed() >= interval {
                 self.poll_remote(false);
             }
@@ -6257,8 +6271,11 @@ impl App {
         }
     }
 
+    /// Makes the next poll due within 700 ms, whatever the interval: it
+    /// counts back from the longest one, so a window hidden meanwhile does
+    /// not put a follow-up poll off.
     fn poll_remote_soon(&mut self) {
-        self.remote_polled_at = Instant::now() - REMOTE_POLL_IDLE + Duration::from_millis(700);
+        self.remote_polled_at = Instant::now() - REMOTE_POLL_UNSEEN + Duration::from_millis(700);
     }
 
     // ---- navigation ------------------------------------------------------------
@@ -9699,6 +9716,7 @@ impl App {
         self.handle_events();
         self.open_pending_link();
         self.handle_media_commands();
+        self.sync_power(ctx);
         self.handle_tray();
         #[cfg(target_os = "macos")]
         self.handle_dock_menu();
@@ -9718,21 +9736,75 @@ impl App {
         self.schedule_next_pass(ctx);
     }
 
+    fn sync_power(&mut self, ctx: &egui::Context) {
+        self.power.refresh();
+        let shown =
+            !self.window_hidden && !ctx.input(|input| input.viewport().minimized.unwrap_or(false));
+        let focused = ctx.input(|input| input.viewport().focused.unwrap_or(true));
+        let budget = crate::power::budget(self.power.conditions(), shown, focused);
+        if budget != self.budget {
+            log::debug!("budget: {budget:?}");
+            self.budget = budget;
+            self.power
+                .set_background(budget == crate::power::Budget::Background);
+        }
+        for event in self.power.take_events() {
+            use crate::power::Event;
+            match event {
+                Event::Suspending(ack) | Event::EndingSession(ack) => {
+                    self.save_state();
+                    self.plays.save(&self.dirs.history_file());
+                    ack.done();
+                }
+                Event::Resumed => {}
+            }
+        }
+    }
+
     /// Asks for the next pass that playback, pending plays and polling need.
     ///
     /// This runs with the logic, not the drawing: eframe skips drawing a
     /// hidden, minimised or occluded window but still runs its logic, so
     /// a hidden window keeps polling and keeps media controls current.
     fn schedule_next_pass(&self, ctx: &egui::Context) {
-        let playing = self.now_playing().is_some_and(|now| now.playing);
-        if playing {
-            ctx.request_repaint_after(Duration::from_millis(250));
+        if let Some(due) = self.next_pass() {
+            ctx.request_repaint_after(due);
         }
-        if self.any_play_pending() {
-            ctx.request_repaint_after(Duration::from_millis(120));
+    }
+
+    /// The soonest that playback, a pending play or polling needs the logic
+    /// to run again, if any of them does.
+    fn next_pass(&self) -> Option<Duration> {
+        let playing = self
+            .now_playing()
+            .is_some_and(|now| now.playing)
+            .then_some(Duration::from_millis(250));
+        let pending = self
+            .any_play_pending()
+            .then_some(Duration::from_millis(120));
+        let polling = self
+            .is_connected()
+            .then(|| self.connected_repaint_interval());
+        [playing, pending, polling].into_iter().flatten().min()
+    }
+
+    /// How long the headless loop may sleep after this tick: until the next
+    /// pass is due, and never longer than `HEADLESS_SLEEP`, which keeps the
+    /// timers in `tick` (saving, eviction, update checks) running. MilkDrop's
+    /// window outlives the main one and is polled every tick. Tray clicks,
+    /// media keys and backend events wake the loop at once.
+    fn headless_wait(&self) -> fastframe_shell::Headless {
+        use fastframe_shell::{HEADLESS_TICK, Headless};
+        if self.settings.milkdrop_open {
+            return Headless::Wait;
         }
-        if self.is_connected() {
-            ctx.request_repaint_after(self.connected_repaint_interval());
+        let wait = self
+            .next_pass()
+            .map_or(HEADLESS_SLEEP, |due| due.min(HEADLESS_SLEEP));
+        if wait <= HEADLESS_TICK {
+            Headless::Wait
+        } else {
+            Headless::WaitFor(wait)
         }
     }
 
@@ -9944,9 +10016,15 @@ impl App {
     /// the UI deadline. While a track is playing, the 250ms progress refresh
     /// still wins, so the saving is idle-local frames: 4s -> 20s, 80% fewer
     /// wakeups when paused on this device.
+    ///
+    /// With nobody able to see the window and nothing playing anywhere, the
+    /// poll only keeps a hidden device list fresh, so it runs every 30s.
     fn connected_repaint_interval(&self) -> Duration {
+        let unseen = self.budget == crate::power::Budget::Background
+            && !self.now_playing().is_some_and(|now| now.playing);
         match self.target() {
             Target::Local if self.local.is_active() => REMOTE_POLL_IDLE,
+            _ if unseen => REMOTE_POLL_UNSEEN,
             _ => REMOTE_POLL_ACTIVE,
         }
     }
@@ -15412,6 +15490,29 @@ mod tests {
         app.adopt_custom_themes(ctx);
     }
 
+    /// In the tray the app sleeps as long as nothing is due: until the next
+    /// progress update while music plays, and a short tick while a play is
+    /// pending or MilkDrop's window is open.
+    #[test]
+    fn the_tray_sleeps_until_something_is_due() {
+        use fastframe_shell::Headless;
+        let mut app = headless_app();
+        assert_eq!(app.headless_wait(), Headless::WaitFor(HEADLESS_SLEEP));
+
+        app.local.track = Some(crate::player::LocalTrack {
+            uri: "spotify:track:a".into(),
+            ..Default::default()
+        });
+        app.local.playback = Playback::Playing;
+        assert_eq!(
+            app.headless_wait(),
+            Headless::WaitFor(Duration::from_millis(250))
+        );
+
+        app.settings.milkdrop_open = true;
+        assert_eq!(app.headless_wait(), Headless::Wait);
+    }
+
     /// Quit wins over everything, a switch between the main window and the
     /// mini player reopens at once, and closing to the tray runs headless
     /// until Show or Quit.
@@ -15430,7 +15531,11 @@ mod tests {
         app.quit_requested = false;
         Resident::window_gone(&mut app);
         assert!(app.window_hidden && !app.hide_intent);
-        assert_eq!(app.headless_frame(&ctx), Headless::Wait);
+        assert_eq!(
+            app.headless_frame(&ctx),
+            Headless::WaitFor(HEADLESS_SLEEP),
+            "nothing due: a long sleep that a wake cuts short"
+        );
         app.wants_show = true;
         assert_eq!(app.headless_frame(&ctx), Headless::Show);
         app.quit_requested = true;
@@ -18002,6 +18107,47 @@ mod tests {
             REMOTE_POLL_IDLE,
             "paused local UI wait is 20s (already the API interval); 4s was only a tighter wake-up"
         );
+    }
+
+    /// Nobody can see the window and nothing plays: the poll slows to 30s.
+    /// Music playing anywhere keeps it at its usual pace, for the media
+    /// controls.
+    #[test]
+    fn an_unseen_idle_window_polls_less_often() {
+        let mut app = headless_app();
+        app.budget = crate::power::Budget::Background;
+        assert_eq!(app.connected_repaint_interval(), REMOTE_POLL_UNSEEN);
+        app.budget = crate::power::Budget::Saver;
+        assert_eq!(app.connected_repaint_interval(), REMOTE_POLL_ACTIVE);
+    }
+
+    #[test]
+    fn hidden_playback_on_another_device_keeps_active_polling() {
+        let mut app = headless_app();
+        store_track(&mut app, "remote-playing");
+        let mut now = app
+            .cached_track_preview("spotify:track:remote-playing", 0)
+            .unwrap();
+        now.local = false;
+        now.playing = true;
+        app.frame_now = Some(now);
+        app.budget = crate::power::Budget::Background;
+        assert_eq!(app.connected_repaint_interval(), REMOTE_POLL_ACTIVE);
+        app.frame_now.as_mut().unwrap().playing = false;
+        assert_eq!(app.connected_repaint_interval(), REMOTE_POLL_UNSEEN);
+    }
+
+    /// A poll asked for soon, after a transfer or a remote command, stays
+    /// soon while nobody can see the window.
+    #[test]
+    fn a_poll_asked_for_soon_is_not_put_off_while_unseen() {
+        let mut app = headless_app();
+        app.budget = crate::power::Budget::Background;
+        app.poll_remote_soon();
+        let due_in = app
+            .connected_repaint_interval()
+            .saturating_sub(app.remote_polled_at.elapsed());
+        assert!(due_in <= Duration::from_millis(700), "due in {due_in:?}");
     }
 
     #[test]

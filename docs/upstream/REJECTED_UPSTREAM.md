@@ -1,7 +1,8 @@
 # Rejected or deferred upstream changes
 
 No individual commit has been rejected. Of the 17 commits after the baseline,
-seven fixes are ported on this branch; the other 10 remain pending review.
+ten fixes are ported on this branch; the other seven remain pending review.
+The power/tray bundle is not promotion-ready until its validation finishes.
 
 Wholesale merges are rejected as the integration strategy. Review reliability,
 security, performance and platform fixes first. Preserve product functionality

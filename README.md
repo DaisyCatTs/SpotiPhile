@@ -42,6 +42,11 @@ Local playback attempts to recover a failed or stalled output, including when
 headphones or the default device change. If the output cannot reopen, playback
 stops with an error. Decoder queue waits remain bounded.
 
+While paused and hidden, remote playback polling slows down. Tray clicks,
+media keys and backend events wake the app; MilkDrop keeps its short update
+interval. Windows and supported Linux sessions request a bounded save before
+sleep, and Windows also saves at session end. macOS reads Low Power Mode.
+
 ## Your music, on your desktop
 
 | Feature | What you can do |

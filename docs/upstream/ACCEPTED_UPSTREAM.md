@@ -82,3 +82,11 @@ Protected cross-platform CI and actual device-switch testing remain pending.
 All four ports applied without source adaptations and preserve original author
 and co-author metadata. Branch-specific checks are in progress. Platform CI,
 new performance measurements and live authenticated behavior are not yet claimed.
+
+Windows x64 branch validation completed: 950/974 library tests passed with one
+existing credential-store test ignored, all binary/integration suites passed,
+both Clippy configurations passed with warnings denied, and formatting,
+documentation tests and Rustdoc passed. Four launcher tests passed in WSL using
+the established LF-normalized packaging copy. Jekyll passed in 4.362 seconds.
+The optimized build passed in 2m 24s and its version smoke passed. Cross-platform
+CI and performance measurements remain separate; no manual hardware claim.

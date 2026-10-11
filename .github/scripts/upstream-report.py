@@ -8,7 +8,10 @@ BASELINE = "995c768dcba4da7f93302bf2107af6b7ec3df02b"
 
 
 def git(*args):
-    return subprocess.check_output(["git", *args], text=True).strip()
+    try:
+        return subprocess.check_output(["git", *args], text=True, timeout=60).strip()
+    except subprocess.TimeoutExpired as error:
+        raise SystemExit("Upstream inventory Git command timed out after 60 seconds.") from error
 
 
 def main():

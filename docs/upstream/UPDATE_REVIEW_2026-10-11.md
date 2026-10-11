@@ -26,10 +26,10 @@ Origin main: 0 ahead / 17 behind. At the initial fetch, local HEAD: 8 ahead / 17
 | [cbe8176](https://github.com/crmne/spotifast/commit/cbe817610546c8d1b023ab3977dd89ede65d372e) | Show Added By in Blends (#745) | Pending |
 | [5b7a5df](https://github.com/crmne/spotifast/commit/5b7a5dfe8c15542ee82fd7560c1e36496306b6c9) | Keep each album's songs in track order when sorting by album (#701) | Accepted: `8ea6ffa` |
 | [14db97c](https://github.com/crmne/spotifast/commit/14db97c82263400d180100135d631c9885245ce2) | Add Linux custom title bar (#648) | Pending |
-| [595ddc4](https://github.com/crmne/spotifast/commit/595ddc4e6ff4241f9c46e3b994ff48bd1cdd3c8a) | Follow the system's power and session state (#728) | Pending |
-| [fea496e](https://github.com/crmne/spotifast/commit/fea496e4a2c51fa89899e3e07a39e6f9fd02114f) | Sleep in the tray until something is due (#730) | Pending |
+| [595ddc4](https://github.com/crmne/spotifast/commit/595ddc4e6ff4241f9c46e3b994ff48bd1cdd3c8a) | Follow the system's power and session state (#728) | Accepted: `86a2d6e` |
+| [fea496e](https://github.com/crmne/spotifast/commit/fea496e4a2c51fa89899e3e07a39e6f9fd02114f) | Sleep in the tray until something is due (#730) | Accepted: `451cf50` |
 | [13876a8](https://github.com/crmne/spotifast/commit/13876a8e81c7abd90266a2c20d030c3e5958213b) | Keep playing when the audio output changes (#731) | Accepted: `ed30344` |
-| [dd2d5e3](https://github.com/crmne/spotifast/commit/dd2d5e34e66d4e01e31e595a3022a1de808b449a) | Poll other devices less often when nobody can see the app (#733) | Pending |
+| [dd2d5e3](https://github.com/crmne/spotifast/commit/dd2d5e34e66d4e01e31e595a3022a1de808b449a) | Poll other devices less often when nobody can see the app (#733) | Accepted: `65ab8fb` |
 
 Prioritize abrupt-session history/resume safety (`f5a946c`), audio-output
 recovery (`13876a8`), sink backpressure (`277a4fa`), then polling/tray/power
@@ -51,7 +51,7 @@ accepted, rejected and pending original SHAs from the ledgers.
 A GitHub behind badge measures ancestry, not whether a fix was ported. Focused
 ports retain our linear development history and can still leave that badge at
 17 behind. The accepted ledger is the evidence of functional integration. The
-remaining 10 commits still need individual review and validation.
+remaining seven commits still need individual review and validation.
 
 
 The owner subsequently authorized validated promotion to main. Protected PR #1
@@ -87,5 +87,12 @@ documentation. These are review inputs, not evidence of a completed power port.
 PR #3 adds the reviewed resampler, name-cache, sidebar-ordering and album-ordering
 ports, stacked on #2. These four are now ported and separately validated on the
 promotion branch; combined queue-feature verification is a separate record.
-Power/tray/polling and the remaining platform, language and visual changes remain
-pending. Listing a dependency review boundary does not mark it implemented.
+The power/tray/polling bundle was subsequently ported as recorded below.
+The remaining platform, language and visual changes are pending.
+
+
+PR #4 stacks the power/tray/polling bundle on #3. Windows focused-branch
+checks passed, including the release build and pinned shell wakeup tests.
+Combined queue validation passed, including both full suites, Clippy, docs
+and the optimized build. GitHub approval and protected
+platform checks remain required before stable promotion.

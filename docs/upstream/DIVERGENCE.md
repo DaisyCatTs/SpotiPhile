@@ -99,3 +99,10 @@ and collection remain coupled to upstream, with Daisy's view/selection mapping
 retained. Original source indices still drive playback and row actions. Native
 layout, custom themes, fonts and controls are not redesigned by these ports.
 See ACCEPTED_UPSTREAM.md and docs/features/upstream-library-validation.md.
+
+The power/tray bundle adds platform readers and event-driven hidden waits while
+preserving queue ownership, Winamp and MilkDrop's short tick. All fastframe crates
+move together to f7dc6fbe938e8a953509d110cdba036f537e5b7e. Windows teardown errors
+retain live callback allocations; hidden remote playback retains active polling.
+No profile/credential migration or UI redesign is included. Validation is recorded
+in docs/features/upstream-power-validation.md when complete.

@@ -1,5 +1,22 @@
 # Spotifast agent guide
 
+## SpotiPhile fork policy override
+
+This repository is SpotiPhile, owned at DaisyCatTs/SpotiPhile. Spotifast remains
+our upstream at crmne/spotifast. The owner authorized tested upstream fixes and
+protected promotion to main on 2026-10-11. Work on focused branches or dev, never
+directly on stable main. Promote through protected pull requests after required
+checks and reviews. Do not bypass protection, rewrite published history or merge
+upstream wholesale. Preserve SpotiPhile work and record original SHAs, authors,
+adaptations and validation in docs/upstream/. BASELINE.md records the immutable
+upstream baseline and integration policy.
+
+UI redesign is paused and requires separate visual review. Preserve MilkDrop,
+Winamp, native Rust rendering and useful upstream functionality. No browser
+engine, telemetry, alternate Spotify audio source, DRM circumvention or fake
+lossless support. Inherited branch/contribution policies below apply only where
+they do not conflict with this fork policy or explicit owner instructions.
+
 Follow `CONTRIBUTING.md`; it is the canonical product and contribution policy.
 These instructions add implementation constraints for coding agents.
 

@@ -1,0 +1,29 @@
+name: Spotiphile upstream watch
+
+on:
+  push:
+    branches: [dev, 'feature/**']
+    paths:
+      - '.github/workflows/upstream-watch.yml'
+      - '.github/scripts/upstream-report.py'
+      - 'docs/upstream/**'
+  workflow_dispatch:
+  schedule:
+    - cron: '17 8 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Fetch upstream metadata without integration
+        run: git fetch --no-tags https://github.com/crmne/spotifast.git main:refs/remotes/upstream/main
+      - name: Report pending commits
+        run: python3 .github/scripts/upstream-report.py >> "$GITHUB_STEP_SUMMARY"

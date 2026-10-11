@@ -57,6 +57,12 @@ Spotify request, stored schema or player engine command.
 
 ## Future ownership boundaries (recommendation, not implemented)
 
+The original persistence safety fix `f5a946c` is now deliberately ported as
+`4c62229`; see the accepted ledger. Its source retains upstream author credit.
+The renamed origin is `DaisyCatTs/SpotiPhile`. The immutable intake baseline
+remains unchanged; the later fetched head and remaining review inventory are in
+`UPDATE_REVIEW_2026-10-11.md`.
+
 Queue selection, occurrence mapping (`src/queue_edit.rs`), batch edit actions,
 clipboard/keyboard ownership and local Play Later are also Daisy-owned. They
 reuse inherited optimistic queue reconciliation and local engine clear/re-add.

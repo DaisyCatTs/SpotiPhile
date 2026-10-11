@@ -92,3 +92,9 @@ Daisy commits ahead and zero behind; no upstream commit has been merged/ported.
 
 Closeout evidence is maintained on audit/phase0-closeout, based on dev, to avoid
 cancelling the dev validation run when only audit documents are published.
+
+## Later rename and upstream fetch
+
+On 2026-10-11 GitHub confirmed the fork was renamed to `DaisyCatTs/SpotiPhile`;
+local origin now follows that URL. Historical URLs and baseline SHAs above
+are preserved. See [the pending 17-commit review](UPDATE_REVIEW_2026-10-11.md).

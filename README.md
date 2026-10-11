@@ -51,7 +51,8 @@ without starting playback or removing playlist continuation. Manual queue rows
 also offer **Move to top** and **Move to bottom**, preserving the current song
 and context queue. **Play later** appends before playlist continuation. Queue
 selection supports block drag/movement, Copy/Cut/Paste and selected removal with
-Ctrl/Cmd and Shift shortcuts. Manual edits require active local playback; context
+Ctrl/Cmd and Shift shortcuts. Bounded local Undo/Redo reverses manual edits
+until playback or context/device changes. Manual edits require active local playback; context
 rows remain protected. Remote queueing keeps append semantics. See
 [the queue contract](docs/_reference/queue.md).
 

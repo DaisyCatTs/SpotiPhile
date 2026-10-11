@@ -614,7 +614,7 @@ Actions:
 - [x] remove selected.
 - [x] clear manual queue.
 - [x] preserve context queue.
-- [~] undo/redo.
+- [x] undo/redo.
 - [ ] save queue as playlist.
 - [ ] save queue as Session Capsule.
 - [ ] shuffle selected subsection.
@@ -638,6 +638,8 @@ Remote capability UX:
 - [ ] no fake queue operations that the provider cannot guarantee.
 
 ---
+
+Undo/redo validation: [bounded local journal, playback invalidation and native shortcuts](docs/features/queue-history-validation.md).
 
 Validation scope: [queue selection, Play Later and inherited queue controls](docs/features/queue-batch-validation.md). These checks cover existing native local controls, not the proposed five-layer queue redesign or authenticated remote playlist creation.
 

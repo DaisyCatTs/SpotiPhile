@@ -29,6 +29,16 @@ actual button/shortcut events. The first broad run caught header wrapping and
 an obscured translated Recent control; history buttons were moved out of the
 inspector tab row, and the original assertions passed unchanged.
 
-Both Clippy configurations and complete suites passed before final safety/limit
-refinements; final combined checks and production build are recorded below when
-finished. No live authenticated playback or Linux/macOS runtime test is claimed.
+The combined source with upstream's resume/history safety port passed both Clippy
+configurations, default/all-features suites, doc tests/build, localization checks,
+launcher tests and Jekyll. Windows library totals: 1,004 and 1,027 passed, with
+one existing credential-store test ignored in each. The port's initial release
+build/version smoke passed. A final keyboard-focus refinement keeps Ctrl/Cmd
+Redo available after clicking Undo; its strengthened native test no longer
+surrenders button focus artificially. Final checks passed after that refinement; the latest Windows release build
+passed in 2m 19s. No live authenticated playback or Linux/macOS runtime test is claimed.
+
+The validated source checkpoint is `c14cd92`; the keyboard-focus follow-up is
+`d154658`. Upstream persistence safety is separately recorded in the accepted
+ledger as `4c62229`. Work is pushed on the focused branch, with stable main
+unchanged. GitHub platform CI remains a separate gate.

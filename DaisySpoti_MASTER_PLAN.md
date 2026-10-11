@@ -615,7 +615,7 @@ Actions:
 - [x] clear manual queue.
 - [x] preserve context queue.
 - [x] undo/redo.
-- [ ] save queue as playlist.
+- [~] save queue as playlist. Ordered occurrences and 100-item write batches implemented; authenticated end-to-end validation pending.
 - [ ] save queue as Session Capsule.
 - [ ] shuffle selected subsection.
 - [ ] “Start Here” without destroying everything after it.

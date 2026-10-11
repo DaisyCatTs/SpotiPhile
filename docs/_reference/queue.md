@@ -210,3 +210,17 @@ the in-memory history, so it cannot resurrect consumed songs. Pausing and seekin
 retain valid history. History is bounded to 20 edits, with snapshot row limits;
 queues over 4,096 upcoming rows remain editable without undo recording. See
 [history validation](../features/queue-history-validation.md) for exact scope.
+
+## Save queue as playlist (development)
+
+Saving creates a private playlist containing the current item followed by the
+loaded upcoming queue, in playback order. Every repeated song or episode remains
+a separate occurrence, including a queued copy of the currently playing item.
+This is a snapshot at the click, not a subscription to later queue edits or a
+copy of unseen pages of the playback context.
+
+Playlist additions run sequentially in batches of at most 100 items. A failed
+batch stops the remaining additions and shows the existing playlist-change error.
+Earlier accepted batches remain in the playlist; Spotify provides no atomic
+multi-request write. Inspect that playlist before retrying to avoid duplicate
+additions. See [validation](../features/queue-playlist-validation.md).

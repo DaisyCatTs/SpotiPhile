@@ -1,7 +1,7 @@
 # Rejected or deferred upstream changes
 
 No individual commit has been rejected. Of the 17 commits after the baseline,
-three persistence/audio fixes are ported on this branch; the other 14 remain pending review.
+seven fixes are ported on this branch; the other 10 remain pending review.
 
 Wholesale merges are rejected as the integration strategy. Review reliability,
 security, performance and platform fixes first. Preserve product functionality

@@ -58,3 +58,35 @@ passed (946/969 library tests, one existing credential-store test ignored),
 integration suites passed, both Clippy configurations passed with warnings
  denied, and the optimized build passed in 2m 23s with a version smoke.
 Protected cross-platform CI and actual device-switch testing remain pending.
+
+## Resampler, name-cache and ordering fixes
+
+- Upstream `031e8c565c29bd72763bf29f0cfbe17c3446bc58`, Spotifast #681;
+  port `577d24a`, Dennis. Portable eight-lane stereo reduction; other channel
+  counts keep the scalar path. Existing phase/chunk logic is unchanged. Numerical
+  comparison coverage is retained. No local throughput benchmark is claimed.
+- Upstream `9dd23c9b27a0ad6d43d4569a36547f9806945451`, Spotifast #744;
+  port `e985796`, Luís Fernando. Failed overlapping name lookups cannot overwrite
+  a known name. Successful account renames still advance the name revision.
+  No new API request, credential behavior or persistence schema.
+- Upstream `9d74afe8ad5196eb67942f449d6ed57988d58697`, Spotifast #717;
+  port `4be253a`, Лев Федорец. Cached rank lookups replace repeated sidebar order
+  scans. First duplicate ranks, stable missing entries, pins and folders are
+  retained. No spacing, typography, shell or navigation redesign.
+- Upstream `5b7a5dfe8c15542ee82fd7560c1e36496306b6c9`, Spotifast #701;
+  port `8240528`, Samet Karaş. Album sorting groups by identity and disc/track
+  order, including URI fallback when IDs are empty. Descending reverses album
+  names while keeping songs inside each album in track order. Original item
+  indices remain attached to rows, preserving playback/action mapping.
+
+All four ports applied without source adaptations and preserve original author
+and co-author metadata. Branch-specific checks are in progress. Platform CI,
+new performance measurements and live authenticated behavior are not yet claimed.
+
+Windows x64 branch validation completed: 950/974 library tests passed with one
+existing credential-store test ignored, all binary/integration suites passed,
+both Clippy configurations passed with warnings denied, and formatting,
+documentation tests and Rustdoc passed. Four launcher tests passed in WSL using
+the established LF-normalized packaging copy. Jekyll passed in 4.362 seconds.
+The optimized build passed in 2m 24s and its version smoke passed. Cross-platform
+CI and performance measurements remain separate; no manual hardware claim.

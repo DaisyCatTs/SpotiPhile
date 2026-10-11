@@ -38,6 +38,10 @@ https://github.com/user-attachments/assets/a5f669ce-b3b7-4f8e-9933-976a78876c7e
 
 [Features](#your-music-on-your-desktop) · [Install](#install) · [First playback](#start-listening) · [Mini player](#the-winamp-mini-player) · [MilkDrop](#music-in-motion) · [Help](#guides-and-help)
 
+Local playback attempts to recover a failed or stalled output, including when
+headphones or the default device change. If the output cannot reopen, playback
+stops with an error. Decoder queue waits remain bounded.
+
 ## Your music, on your desktop
 
 | Feature | What you can do |

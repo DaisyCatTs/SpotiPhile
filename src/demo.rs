@@ -748,6 +748,51 @@ fn demo_sound() -> Vec<f64> {
         .collect()
 }
 
+/// Existing Spotify-owned Blend, with known contributor metadata, for review.
+fn populate_blend(app: &mut App) {
+    let Some(page) = app.playlist_pages.get_mut("pl1") else {
+        return;
+    };
+    if let Some(playlist) = page.playlist.get_mut() {
+        playlist.name = "Your Blend".into();
+        playlist.owner = Owner {
+            id: Some("spotify".into()),
+            display_name: Some("Spotify".into()),
+            uri: Some("spotify:user:spotify".into()),
+        };
+        playlist.collaborative = false;
+        playlist.images.clear();
+    }
+    page.contributors = ["demo".to_string(), "kasia".to_string()]
+        .into_iter()
+        .collect();
+    for item in &mut page.items.items {
+        if let Some(adder) = &mut item.added_by
+            && adder.id.as_deref() == Some("sam")
+        {
+            adder.id = Some("demo".into());
+        }
+    }
+    app.user_names.insert("demo".into(), Some("Carmine".into()));
+    if let Some(playlists) = app.library.playlists.get_mut() {
+        for playlist in playlists {
+            playlist.images.clear();
+        }
+    }
+    for item in &mut page.items.items {
+        if let Some(PlayableItem::Track(track)) = &mut item.item
+            && let Some(album) = &mut track.album
+        {
+            album.images.clear();
+        }
+    }
+    for track in app.track_cache.values_mut() {
+        if let Some(album) = &mut track.album {
+            album.images.clear();
+        }
+    }
+}
+
 #[cfg(feature = "demo")]
 pub fn apply_flags(app: &mut App, page: Option<&str>, show: Option<&str>) {
     // Default screenshots to the main window regardless of saved settings.
@@ -773,6 +818,7 @@ pub fn apply_flags(app: &mut App, page: Option<&str>, show: Option<&str>) {
                     380.0
                 };
             }
+            "blend" => populate_blend(app),
             "queue" => app.show_queue_panel = true,
             "playing-next" => {
                 app.show_queue_panel = true;
@@ -1257,6 +1303,70 @@ mod tests {
         // These frames never advance the clock or take pictures.
         app.reveal_theme_changes = false;
         (ctx, app)
+    }
+
+    #[test]
+    fn existing_blend_shows_adders_without_claiming_collaboration() {
+        fn collect(shape: &egui::Shape, texts: &mut Vec<String>) {
+            match shape {
+                egui::Shape::Text(text) => texts.push(text.galley.job.text.clone()),
+                egui::Shape::Vec(shapes) => shapes.iter().for_each(|shape| collect(shape, texts)),
+                _ => {}
+            }
+        }
+        for width in [1100.0, 1600.0] {
+            for theme in [
+                crate::settings::ThemeChoice::Dark,
+                crate::settings::ThemeChoice::Light,
+            ] {
+                for blend in [false, true] {
+                    let (ctx, mut app) = accessible_app("blend-attribution");
+                    populate_blend(&mut app);
+                    if !blend {
+                        app.playlist_pages
+                            .get_mut("pl1")
+                            .unwrap()
+                            .contributors
+                            .remove("demo");
+                    }
+                    app.history = vec![Page::Playlist("pl1".into())];
+                    app.history_index = 0;
+                    app.apply(Action::SetTheme(theme), &ctx);
+                    let mut texts = Vec::new();
+                    for _ in 0..2 {
+                        texts.clear();
+                        let mut output = ctx.run_ui(
+                            egui::RawInput {
+                                screen_rect: Some(egui::Rect::from_min_size(
+                                    egui::Pos2::ZERO,
+                                    egui::vec2(width, 800.0),
+                                )),
+                                ..Default::default()
+                            },
+                            |ui| app.frame_ui(ui),
+                        );
+                        output.textures_delta.clear();
+                        for shape in &output.shapes {
+                            collect(&shape.shape, &mut texts);
+                        }
+                    }
+                    assert_eq!(
+                        texts.iter().any(|text| text == "ADDED BY"),
+                        blend && width == 1600.0,
+                        "{width}/{theme:?}: {texts:?}"
+                    );
+                    assert_eq!(
+                        texts.iter().any(|text| text == "with Carmine and Kasia"),
+                        blend
+                    );
+                    assert!(
+                        !texts.iter().any(|text| text == "Collaborative Playlist"),
+                        "a Spotify-owned Blend is read-only"
+                    );
+                    app.backend.shutdown();
+                }
+            }
+        }
     }
 
     /// #576: the Library heading never runs under the header's buttons. It

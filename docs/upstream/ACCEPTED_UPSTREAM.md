@@ -142,3 +142,27 @@ Combined validation passed: 1,028/1,052 library tests, binary/integration suites
 both Clippy configurations, formatting, doctests and warnings-denied Rustdoc.
 Jekyll passed in 8.724 seconds. Release build passed in 2m 38s with version smoke.
 See ../features/upstream-power-validation.md for explicit coverage limits.
+
+## Minimized-window close behavior
+
+Upstream `17f3a0db3547aee20b24c432a7b8fb5fe1709592`, Dennis, Spotifast #725.
+Port `3c2f103`. The keep-playing-in-background decision now runs in the logic
+pass, so closing a minimized window hides into the available tray instead of
+exiting. No-tray, explicit Quit and window-switch behavior remain unchanged.
+Conflict resolution retained the existing power handler and headless timing test.
+No layout or appearance change, new dependency, credential or persistence format.
+Combined Windows x64 validation passed: 1,029/1,053 library tests, all
+binary/integration suites, both Clippy configurations, formatting, all-feature
+doctests and warnings-denied Rustdoc. Launcher tests and Jekyll passed.
+Optimized build passed in 2m 38s with version smoke. Manual tray interaction
+and cross-platform CI remain separate. See ../features/upstream-close-validation.md.
+
+## Stable promotion status
+
+Main includes persistence safety (#1, c27e5c2) and audio reliability
+(#5, fe0aa73). The owner authorized solo-maintainer promotion without a separate
+approving review. All seven strict required CI checks, enforced administrator
+protection, linear history and disabled force pushes/deletion remain enabled.
+GitHub auto-merge is enabled so ready promotion PRs merge after their checks.
+PR #6 promotes the already-tested library/resampler bundle from current main.
+PRs #3 and #4 merged into their feature bases, which does not promote them to main.

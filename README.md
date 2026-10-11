@@ -62,7 +62,8 @@ stops with an error. Decoder queue waits remain bounded.
 
 While paused and hidden, remote playback polling slows down. Tray clicks,
 media keys and backend events wake the app; MilkDrop keeps its short update
-interval. Windows and supported Linux sessions request a bounded save before
+interval. Closing a minimized window also respects Keep playing in the
+background when a tray is available. Windows and supported Linux sessions request a bounded save before
 sleep, and Windows also saves at session end. macOS reads Low Power Mode.
 
 ## Your music, on your desktop

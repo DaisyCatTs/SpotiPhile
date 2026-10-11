@@ -1,8 +1,8 @@
 # Rejected or deferred upstream changes
 
 No individual upstream commit has been rejected after the baseline. The fetched
-upstream tip has 17 commits after the baseline. Ten are deliberately ported;
-seven remain pending individual review and validation.
+upstream tip has 17 commits after the baseline. Eleven are deliberately ported;
+six remain pending individual review and validation.
 
 Wholesale upstream merges are intentionally rejected as an integration strategy.
 Upstream branding and future visual redesigns must not overwrite Daisy ownership.

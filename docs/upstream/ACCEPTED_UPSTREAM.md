@@ -166,3 +166,36 @@ protection, linear history and disabled force pushes/deletion remain enabled.
 GitHub auto-merge is enabled so ready promotion PRs merge after their checks.
 PR #6 promotes the already-tested library/resampler bundle from current main.
 PRs #3 and #4 merged into their feature bases, which does not promote them to main.
+
+## Mac GPU and translation ports
+
+- `12deee472ee87e2c9ed0e0f13730cbdd9a6cfa45`, Dennis, #736, port `6d25541`.
+  The macOS bundle opts into automatic graphics switching. MilkDrop updates its
+  glutin surface when moving to another monitor; zero-sized surfaces are guarded.
+  The installed glutin 0.32.3 source confirms CGL resize calls context.update(),
+  and its config includes offline-renderer support. Reviewed against Apple's
+  [QA1734](https://developer.apple.com/library/archive/qa/qa1734/_index.html) and
+  [TN2229](https://developer.apple.com/library/archive/technotes/tn2229/_index.html).
+  Windows plist parsing passed. No dual-GPU hardware or energy measurement claim.
+- `eff77cd340dc5312a2f76b59c7a2ee73d0011867`, Ali Kaan, #668, port `bfacfc2`.
+  All 25 upstream Turkish wording corrections were verified against upstream
+  before/after catalogues. Conflict resolution preserved SpotiPhile strings,
+  current references and metadata; it took the incoming notch-widget correction.
+- `88d5831f0d63e797579b4cdccfdc94d19efd85cb`, Volodymyr Bunchuk, #718,
+  port `6020ff5`. Registers Ukrainian locale, system-tag mapping, plural/date
+  tests and Windows ARM diagnostic translations. Adds 25 SpotiPhile-specific
+  translations for queue controls, appearance foundations and branded sign-in.
+  These additions have structural checks, not an independent fluent-speaker review.
+
+Catalogues were regenerated using the existing pinned gettext tooling. Ukrainian
+retired branding entries caused an initial unchanged localization test failure
+(template count 677, parsed catalogue 678). Removing obsolete Ukrainian entries
+resolved it; no test assertion was weakened. Active catalogue key sets match the
+current template, all Turkish wording changes remain, and gettext --check passed.
+Final Windows combined validation passed: 1,029/1,053 library tests, all
+binary/integration suites, both Clippy configurations, formatter, doctests,
+Rustdoc and gettext --check. Jekyll and launcher tests passed. Release build
+passed in 2m 40s with version smoke; Ukrainian native demo captures at 1280x800
+dark and 900x650 light were inspected. Adaptation commit: 0126d08. See
+../features/upstream-languages-validation.md. macOS compile/bundle checks remain CI
+coverage and do not substitute for real dual-GPU monitor-switch testing.

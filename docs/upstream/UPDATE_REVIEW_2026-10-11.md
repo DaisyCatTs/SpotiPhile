@@ -13,11 +13,11 @@ Origin main: 0 ahead / 17 behind. At the initial fetch, local HEAD: 8 ahead / 17
 
 | Commit | Change | Status |
 | --- | --- | --- |
-| [12deee4](https://github.com/crmne/spotifast/commit/12deee472ee87e2c9ed0e0f13730cbdd9a6cfa45) | Let dual-GPU Macs keep the integrated GPU for Spotifast (#736) | Pending |
-| [eff77cd](https://github.com/crmne/spotifast/commit/eff77cd340dc5312a2f76b59c7a2ee73d0011867) | fix(i18n): refine Turkish translations for consistency and natural phrasing (#668) | Pending |
+| [12deee4](https://github.com/crmne/spotifast/commit/12deee472ee87e2c9ed0e0f13730cbdd9a6cfa45) | Let dual-GPU Macs keep the integrated GPU for Spotifast (#736) | Accepted: `6d25541` |
+| [eff77cd](https://github.com/crmne/spotifast/commit/eff77cd340dc5312a2f76b59c7a2ee73d0011867) | fix(i18n): refine Turkish translations for consistency and natural phrasing (#668) | Accepted: `bfacfc2` |
 | [031e8c5](https://github.com/crmne/spotifast/commit/031e8c565c29bd72763bf29f0cfbe17c3446bc58) | Let the stereo resampler use vector registers on every target (#681) | Accepted: `2229f97` |
 | [9d74afe](https://github.com/crmne/spotifast/commit/9d74afe8ad5196eb67942f449d6ed57988d58697) | Reduce library sorting work during scrolling (#717) | Accepted: `f420bb7` |
-| [88d5831](https://github.com/crmne/spotifast/commit/88d5831f0d63e797579b4cdccfdc94d19efd85cb) | feat(i18n): add Ukrainian language support (#718) | Pending |
+| [88d5831](https://github.com/crmne/spotifast/commit/88d5831f0d63e797579b4cdccfdc94d19efd85cb) | feat(i18n): add Ukrainian language support (#718) | Accepted: `6020ff5` |
 | [277a4fa](https://github.com/crmne/spotifast/commit/277a4fabcd2ca11ced4adb45b274f29084fde7eb) | Wait for room in the audio queue instead of polling it (#726) | Accepted: `52f29af` |
 | [17f3a0d](https://github.com/crmne/spotifast/commit/17f3a0db3547aee20b24c432a7b8fb5fe1709592) | Hide a minimised window to the tray when it is closed (#725) | Accepted: `3c2f103` |
 | [f5a946c](https://github.com/crmne/spotifast/commit/f5a946c6bb1b332a1147153821172cf08eb84d30) | Keep the resume point and history safe when a session ends abruptly (#727) | Accepted: `4c62229` |
@@ -51,7 +51,7 @@ accepted, rejected and pending original SHAs from the ledgers.
 A GitHub behind badge measures ancestry, not whether a fix was ported. Focused
 ports retain our linear development history and can still leave that badge at
 17 behind. The accepted ledger is the evidence of functional integration. The
-remaining six commits still need individual review and validation.
+remaining three commits still need individual review and validation.
 
 
 The owner subsequently authorized validated promotion to main. Protected PR #1
@@ -102,3 +102,8 @@ ports against main with auto-merge. #3/#4 feature-base merges are not main
 promotion. Solo-maintainer review count is zero; strict required CI and
 linear-history protections remain. Minimized-close Windows combined checks and optimized build passed, as
 recorded in docs/features/upstream-close-validation.md.
+
+Mac GPU and language ports passed Windows combined checks and release build.
+Ukrainian coverage includes 25 fork strings; Turkish retains all 25 upstream
+wording corrections. Hardware GPU switching and fluent review remain separate.
+Three original commits remain pending, as listed in the table.

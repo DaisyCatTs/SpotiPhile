@@ -86,3 +86,9 @@ Before each port, compare behavior, persistence, network policy, queue invariant
 platform cfgs and dependency revisions. Port logic separately from upstream
 appearance. Update docs, tests and ledgers together. Keep SHA-pinned patch groups
 coherent; a compiling partial dependency update can still break native integration.
+
+Audio reliability ports on 2026-10-11 preserve the inherited sink architecture.
+The queue-feature branch now carries upstream's decoder wakeups and device
+recovery, independently of the focused protected promotion branches. No Daisy
+queue code or visual scope was replaced. See ACCEPTED_UPSTREAM.md for source SHAs
+and docs/features/upstream-audio-validation.md for combined verification.

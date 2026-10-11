@@ -2,7 +2,7 @@
 
 Renamed fork: `DaisyCatTs/SpotiPhile`. Local origin now uses its new URL.
 Upstream remains `crmne/spotifast` with the inert push guard. Safe fetches used
-`--no-tags`. No upstream commit was merged, cherry-picked or rebased.
+`--no-tags`. At the initial fetch, no upstream commit was integrated. Deliberate ports followed as recorded below.
 
 Immutable baseline: `995c768dcba4da7f93302bf2107af6b7ec3df02b`.
 Fetched upstream: `dd2d5e34e66d4e01e31e595a3022a1de808b449a`.
@@ -18,7 +18,7 @@ Origin main: 0 ahead / 17 behind. At the initial fetch, local HEAD: 8 ahead / 17
 | [031e8c5](https://github.com/crmne/spotifast/commit/031e8c565c29bd72763bf29f0cfbe17c3446bc58) | Let the stereo resampler use vector registers on every target (#681) | Pending |
 | [9d74afe](https://github.com/crmne/spotifast/commit/9d74afe8ad5196eb67942f449d6ed57988d58697) | Reduce library sorting work during scrolling (#717) | Pending |
 | [88d5831](https://github.com/crmne/spotifast/commit/88d5831f0d63e797579b4cdccfdc94d19efd85cb) | feat(i18n): add Ukrainian language support (#718) | Pending |
-| [277a4fa](https://github.com/crmne/spotifast/commit/277a4fabcd2ca11ced4adb45b274f29084fde7eb) | Wait for room in the audio queue instead of polling it (#726) | Pending |
+| [277a4fa](https://github.com/crmne/spotifast/commit/277a4fabcd2ca11ced4adb45b274f29084fde7eb) | Wait for room in the audio queue instead of polling it (#726) | Accepted: `52f29af` |
 | [17f3a0d](https://github.com/crmne/spotifast/commit/17f3a0db3547aee20b24c432a7b8fb5fe1709592) | Hide a minimised window to the tray when it is closed (#725) | Pending |
 | [f5a946c](https://github.com/crmne/spotifast/commit/f5a946c6bb1b332a1147153821172cf08eb84d30) | Keep the resume point and history safe when a session ends abruptly (#727) | Accepted: `4c62229` |
 | [9dd23c9](https://github.com/crmne/spotifast/commit/9dd23c9b27a0ad6d43d4569a36547f9806945451) | Keep an adder's name once it is found (#744) | Pending |
@@ -28,7 +28,7 @@ Origin main: 0 ahead / 17 behind. At the initial fetch, local HEAD: 8 ahead / 17
 | [14db97c](https://github.com/crmne/spotifast/commit/14db97c82263400d180100135d631c9885245ce2) | Add Linux custom title bar (#648) | Pending |
 | [595ddc4](https://github.com/crmne/spotifast/commit/595ddc4e6ff4241f9c46e3b994ff48bd1cdd3c8a) | Follow the system's power and session state (#728) | Pending |
 | [fea496e](https://github.com/crmne/spotifast/commit/fea496e4a2c51fa89899e3e07a39e6f9fd02114f) | Sleep in the tray until something is due (#730) | Pending |
-| [13876a8](https://github.com/crmne/spotifast/commit/13876a8e81c7abd90266a2c20d030c3e5958213b) | Keep playing when the audio output changes (#731) | Pending |
+| [13876a8](https://github.com/crmne/spotifast/commit/13876a8e81c7abd90266a2c20d030c3e5958213b) | Keep playing when the audio output changes (#731) | Accepted: `ed30344` |
 | [dd2d5e3](https://github.com/crmne/spotifast/commit/dd2d5e34e66d4e01e31e595a3022a1de808b449a) | Poll other devices less often when nobody can see the app (#733) | Pending |
 
 Prioritize abrupt-session history/resume safety (`f5a946c`), audio-output
@@ -51,4 +51,34 @@ accepted, rejected and pending original SHAs from the ledgers.
 A GitHub behind badge measures ancestry, not whether a fix was ported. Focused
 ports retain our linear development history and can still leave that badge at
 17 behind. The accepted ledger is the evidence of functional integration. The
-remaining 16 commits still need individual review and validation.
+remaining 14 commits still need individual review and validation.
+
+
+The owner subsequently authorized validated promotion to main. Protected PR #1
+contains persistence safety and the read-only watcher. PR #2 contains the two
+audio ports and is stacked on #1. Required CI and GitHub approval remain gates.
+The paused appearance redesign is excluded from both promotion PRs.
+
+## Next port boundaries
+
+- Resampler #681: single-module portable stereo reduction and a numerical
+  regression. Review rounding and whole/chunk equivalence; do not describe
+  upstream's Arm benchmark as a measurement of our build.
+- Name-cache #744: failed overlapping lookups must not replace a known name.
+  Preserve revision invalidation and successful rename behavior.
+- Sidebar ordering #717 and album ordering #701: functional ordering fixes,
+  separately tested against Daisy queue selections and row identity. These do
+  not authorize shell, spacing, typography or appearance redesign.
+- Power #728, tray scheduling #730 and hidden polling #733 form a dependency
+  bundle. #730 moves every fastframe crate together to pinned maintainer fork
+  revision f7dc6fbe938e8a953509d110cdba036f537e5b7e and refreshes the Nix hash.
+  Review callback teardown, bounded save acknowledgments, Windows thread QoS,
+  platform availability and real tray/media-key wakeups before accepting it.
+  MilkDrop must retain the short headless tick. macOS keeps its AppKit tray loop;
+  its power reader does not implement sleep/wake notifications. Linux's optional
+  logind delay inhibitor can be unavailable in a sandbox and must remain optional.
+
+Windows power/thread policy should be checked against Microsoft's
+[Quality of Service](https://learn.microsoft.com/en-us/windows/win32/procthread/quality-of-service)
+and [MMCSS](https://learn.microsoft.com/en-us/windows/win32/procthread/multimedia-class-scheduler-service)
+documentation. These are review inputs, not evidence of a completed power port.

@@ -1,5 +1,5 @@
 > **Spotiphile development fork:** the product name is now Spotiphile. Phase 1
-> native UI work is in progress on a focused branch. This is not a new stable
+> UI redesign is paused while queue features and upstream reliability fixes are reviewed. This is not a new stable
 > release. See [the design workspace](docs/design/README.md) and
 > [the canonical plan](DaisySpoti_MASTER_PLAN.md). The inherited downloads and
 > guides below belong to Spotifast, whose attribution is retained. Package,
@@ -55,6 +55,10 @@ Ctrl/Cmd and Shift shortcuts. Bounded local Undo/Redo reverses manual edits
 until playback or context/device changes. Manual edits require active local playback; context
 rows remain protected. Remote queueing keeps append semantics. See
 [the queue contract](docs/_reference/queue.md).
+
+Local playback attempts to recover a failed or stalled output, including when
+headphones or the default device change. If the output cannot reopen, playback
+stops with an error. Decoder queue waits remain bounded.
 
 ## Your music, on your desktop
 

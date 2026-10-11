@@ -6,7 +6,7 @@ msgstr ""
 "Project-Id-Version: Spotifast\n"
 "Report-Msgid-Bugs-To: https://github.com/crmne/spotifast/issues/new?"
 "template=translation.yml\n"
-"POT-Creation-Date: 2026-10-11 04:55+0100\n"
+"POT-Creation-Date: 2026-10-11 06:49+0100\n"
 "PO-Revision-Date: 2026-10-02 20:30+0300\n"
 "Last-Translator: Barış Berke Çetin <brsberkectn@gmail.com>\n"
 "Language-Team: Turkish\n"
@@ -28,13 +28,13 @@ msgstr "{name} duraklat"
 msgid "Play {name}"
 msgstr "{name} çal"
 
-#: src/ui/sidebar.rs:314 src/app.rs:2443 src/app.rs:18130
-#: src/ui/collection.rs:1711 src/ui/collection.rs:1888
+#: src/ui/sidebar.rs:314 src/app.rs:2467 src/app.rs:18295
+#: src/ui/collection.rs:1753 src/ui/collection.rs:1930
 msgid "Playlist"
 msgstr "Çalma listesi"
 
-#: src/ui/sidebar.rs:324 src/app.rs:2417 src/app.rs:18135
-#: src/ui/collection.rs:1881 src/ui/home.rs:49 src/ui/keys.rs:258
+#: src/ui/sidebar.rs:324 src/app.rs:2441 src/app.rs:18300
+#: src/ui/collection.rs:1923 src/ui/home.rs:49 src/ui/keys.rs:258
 #: src/ui/winamp/playlist.rs:653
 msgid "Liked Songs"
 msgstr "Beğenilenler"
@@ -64,124 +64,121 @@ msgstr "Yerel özel sıralama"
 msgid "Spotify custom order"
 msgstr "Spotify özel sıralaması"
 
-#: src/ui/sidebar.rs:570 src/ui/sidebar.rs:994 src/i18n.rs:255 src/i18n.rs:258
+#: src/ui/sidebar.rs:596 src/ui/sidebar.rs:1020 src/i18n.rs:262 src/i18n.rs:265
 #: src/ui/keys.rs:254 src/ui/topbar.rs:243
 msgid "Home"
 msgstr "Ana Sayfa"
 
-#: src/ui/sidebar.rs:576 src/ui/sidebar.rs:1005 src/app.rs:6201
+#: src/ui/sidebar.rs:602 src/ui/sidebar.rs:1031 src/app.rs:6222
 #: src/ui/keys.rs:245
 msgid "Search"
 msgstr "Ara"
 
-#: src/ui/sidebar.rs:592
+#: src/ui/sidebar.rs:618
 msgid "Your Library"
 msgstr "Kitaplığınız"
 
-#: src/ui/sidebar.rs:830
+#: src/ui/sidebar.rs:856
 msgid "Folder"
 msgstr "Klasör"
 
 #. Translators: {owner} is the name of the playlist's owner.
-#. Translators: {owner} is the name of the playlist's owner.
-#: src/ui/sidebar.rs:938 src/ui/search.rs:214
+#: src/ui/sidebar.rs:964 src/ui/search.rs:214
 #, rust-format
 msgid "Playlist • {owner}"
 msgstr "Çalma Listesi • {owner}"
 
-#: src/ui/sidebar.rs:1044
+#: src/ui/sidebar.rs:1070
 msgid "Hide sidebar (Ctrl+B)"
 msgstr "Kenar çubuğunu gizle (Ctrl+B)"
 
-#: src/ui/sidebar.rs:1045
+#: src/ui/sidebar.rs:1071
 msgid "Hide sidebar (Cmd+B)"
 msgstr "Kenar çubuğunu gizle (Cmd+B)"
 
-#: src/ui/sidebar.rs:1054
+#: src/ui/sidebar.rs:1080
 msgid "Show as list"
 msgstr "Liste olarak göster"
 
-#: src/ui/sidebar.rs:1056
+#: src/ui/sidebar.rs:1082
 msgid "Show as grid"
 msgstr "Izgara olarak göster"
 
-#: src/ui/sidebar.rs:1069
+#: src/ui/sidebar.rs:1095
 msgid "Create a playlist"
 msgstr "Çalma listesi oluştur"
 
-#: src/ui/sidebar.rs:1085
+#: src/ui/sidebar.rs:1111
 msgid "Search Your Library"
 msgstr "Kitaplığında ara"
 
-#: src/ui/sidebar.rs:1101
+#: src/ui/sidebar.rs:1127
 msgid "Library"
 msgstr "Kitaplık"
 
-#: src/ui/sidebar.rs:1121 src/app.rs:6174 src/model.rs:636 src/ui/search.rs:647
+#: src/ui/sidebar.rs:1147 src/app.rs:6195 src/model.rs:636 src/ui/search.rs:647
 msgid "Playlists"
 msgstr "Çalma listeleri"
 
-#: src/ui/sidebar.rs:1122 src/model.rs:635 src/model.rs:749
+#: src/ui/sidebar.rs:1148 src/model.rs:635 src/model.rs:749
 #: src/ui/library.rs:17 src/ui/search.rs:575
 msgid "Albums"
 msgstr "Albümler"
 
-#: src/ui/sidebar.rs:1123 src/model.rs:634 src/ui/library.rs:22
+#: src/ui/sidebar.rs:1149 src/model.rs:634 src/ui/library.rs:22
 #: src/ui/search.rs:508
 msgid "Artists"
 msgstr "Sanatçılar"
 
-#: src/ui/sidebar.rs:1124 src/model.rs:637 src/ui/library.rs:27
+#: src/ui/sidebar.rs:1150 src/model.rs:637 src/ui/library.rs:27
 #: src/ui/search.rs:697
 msgid "Podcasts"
 msgstr "Podcast'ler"
 
-#: src/ui/sidebar.rs:1145
+#: src/ui/sidebar.rs:1171
 msgid "Search in Your Library"
 msgstr "Kitaplığında ara"
 
-#: src/ui/sidebar.rs:1273 src/app.rs:2478 src/ui/artist.rs:203
+#: src/ui/sidebar.rs:1299 src/app.rs:2502 src/ui/artist.rs:203
 #: src/ui/artist.rs:311 src/ui/home.rs:567 src/ui/library.rs:118
 #: src/ui/search.rs:145 src/ui/search.rs:472 src/ui/winamp/playlist.rs:729
 msgid "Artist"
 msgstr "Sanatçı"
 
 #. Translators: {publisher} is the podcast's publisher.
-#. Translators: {publisher} is the podcast's publisher.
-#: src/ui/sidebar.rs:1309 src/ui/search.rs:239
+#: src/ui/sidebar.rs:1335 src/ui/search.rs:239
 #, rust-format
 msgid "Podcast • {publisher}"
 msgstr "Podcast • {publisher}"
 
-#: src/ui/sidebar.rs:1367
+#: src/ui/sidebar.rs:1393
 msgid "Nothing here yet."
 msgstr "Burada henüz bir şey yok."
 
-#: src/ui/sidebar.rs:1369
+#: src/ui/sidebar.rs:1395
 msgid "No matches."
 msgstr "Eşleşme bulunamadı."
 
-#: src/ui/sidebar.rs:2002
+#: src/ui/sidebar.rs:2028
 msgid "Sort by recently played"
 msgstr "Son çalınanlara göre sırala"
 
-#: src/ui/sidebar.rs:2023 src/ui/player_bar.rs:683 src/ui/widgets.rs:1137
+#: src/ui/sidebar.rs:2049 src/ui/player_bar.rs:683 src/ui/widgets.rs:1137
 #: src/ui/artist.rs:341 src/ui/collection.rs:214 src/ui/search.rs:390
 #: src/ui/show.rs:311
 msgid "Play"
 msgstr "Çal"
 
-#: src/ui/sidebar.rs:2041
+#: src/ui/sidebar.rs:2067
 msgid "Unpin"
 msgstr "Sabitlemeyi kaldır"
 
-#: src/ui/sidebar.rs:2043
+#: src/ui/sidebar.rs:2069
 msgid "Pin to top"
 msgstr "Başa sabitle"
 
-#. Translators: Keep {count} exactly as written. It becomes the number of
-#. liked songs.
-#: src/i18n.rs:178
+#. Translators: Keep {count} exactly as written. It becomes the number of liked songs.
+#: src/i18n.rs:184
 #, rust-format
 msgid "Playlist • {count} song"
 msgid_plural "Playlist • {count} songs"
@@ -189,40 +186,37 @@ msgstr[0] "Çalma listesi • {count} şarkı"
 msgstr[1] "Çalma listesi • {count} şarkı"
 
 #. Translators: Keep {count} exactly as written. It becomes a number of songs.
-#. Translators: Keep {count} exactly as written. It becomes the number of
-#. selected songs.
+#. Translators: Keep {count} exactly as written. It becomes the number of selected songs.
 #. Translators: {count} is a number of songs.
-#: src/i18n.rs:189 src/ui/widgets.rs:566 src/ui/collection.rs:1975
+#: src/i18n.rs:195 src/ui/widgets.rs:566 src/ui/collection.rs:2017
 #, rust-format
 msgid "{count} song"
 msgid_plural "{count} songs"
 msgstr[0] "{count} şarkı"
 msgstr[1] "{count} şarkı"
 
-#. Translators: Keep {count} exactly as written. It becomes a number of
-#. playlists.
-#: src/i18n.rs:200
+#. Translators: Keep {count} exactly as written. It becomes a number of playlists.
+#: src/i18n.rs:206
 #, rust-format
 msgid "{count} playlist"
 msgid_plural "{count} playlists"
 msgstr[0] "{count} çalma listesi"
 msgstr[1] "{count} çalma listesi"
 
-#. Translators: Keep {count} exactly as written. It becomes the number of
-#. playlists a folder holds.
-#: src/i18n.rs:211
+#. Translators: Keep {count} exactly as written. It becomes the number of playlists a folder holds.
+#: src/i18n.rs:217
 #, rust-format
 msgid "Folder • {count} playlist"
 msgid_plural "Folder • {count} playlists"
 msgstr[0] "Klasör • {count} çalma listesi"
 msgstr[1] "Klasör • {count} çalma listesi"
 
-#: src/i18n.rs:221
+#: src/i18n.rs:227
 #, rust-format
 msgid "{name}, folder, collapsed"
 msgstr "{name}, klasör, daraltılmış"
 
-#: src/i18n.rs:223
+#: src/i18n.rs:229
 #, rust-format
 msgid "{name}, folder, expanded"
 msgstr "{name}, klasör, genişletilmiş"
@@ -235,7 +229,7 @@ msgstr "Görselleştiriciyi değiştirmek için tıklayın"
 msgid "Nothing playing"
 msgstr "Hiçbir şey çalmıyor"
 
-#: src/ui/player_bar.rs:406 src/app.rs:7484
+#: src/ui/player_bar.rs:406 src/app.rs:7508
 msgid "Pick a song, album, or playlist"
 msgstr "Bir şarkı, albüm veya çalma listesi seçin"
 
@@ -418,7 +412,7 @@ msgstr "Enstrümantal"
 msgid "No timed lyrics for this track."
 msgstr "Bu parça için senkronize şarkı sözü yok."
 
-#: src/ui/lyrics.rs:387 src/ui/widgets.rs:2678 src/app.rs:10691
+#: src/ui/lyrics.rs:387 src/ui/widgets.rs:2678 src/app.rs:10782
 #: src/ui/collection.rs:738
 msgid "Loading…"
 msgstr "Yükleniyor…"
@@ -541,12 +535,12 @@ msgctxt "artist"
 msgid "Follow"
 msgstr "Takip et"
 
-#: src/ui/widgets.rs:1171 src/ui/collection.rs:1759 src/ui/collection.rs:1781
+#: src/ui/widgets.rs:1171 src/ui/collection.rs:1801 src/ui/collection.rs:1823
 #: src/ui/show.rs:169
 msgid "Remove from Your Library"
 msgstr "Kitaplığından kaldır"
 
-#: src/ui/widgets.rs:1172 src/ui/collection.rs:1758
+#: src/ui/widgets.rs:1172 src/ui/collection.rs:1800
 msgid "Add to Your Library"
 msgstr "Kitaplığına ekle"
 
@@ -674,8 +668,8 @@ msgid ""
 "Proxy login applies to Web requests. Local playback uses this proxy only "
 "without a login."
 msgstr ""
-"Proxy girişi web istekleri için geçerlidir. Yerel çalma bu proxy'yi yalnızca"
-" kimlik doğrulamasız kullanır."
+"Proxy girişi web istekleri için geçerlidir. Yerel çalma bu proxy'yi yalnızca "
+"kimlik doğrulamasız kullanır."
 
 #: src/ui/widgets.rs:3316
 msgid ""
@@ -685,18 +679,18 @@ msgstr ""
 "Spotify sunucu adları proxy tarafından çözümlenir. Yerel çalma doğrudan "
 "bağlanır."
 
-#: src/app.rs:715
+#: src/app.rs:724
 msgid "Restoring proxy settings"
 msgstr "Proxy ayarları geri yükleniyor"
 
 #. Translators: {name} is the name of a speaker or other playback device.
-#: src/app.rs:1880
+#: src/app.rs:1904
 #, rust-format
 msgid "{name} is ready"
 msgstr "{name} hazır"
 
 #. Translators: {error} is a sentence saying why the proxy password could not be stored.
-#: src/app.rs:1906
+#: src/app.rs:1930
 #, rust-format
 msgid ""
 "{error} The original settings file is kept intact; changed preferences are "
@@ -706,45 +700,45 @@ msgstr ""
 "kaydedilmedi."
 
 #. Translators: {version} is a version number such as 1.4.0.
-#: src/app.rs:2030
+#: src/app.rs:2054
 #, rust-format
 msgid "Spotifast {version} is available"
 msgstr "Spotifast {version} sürümü hazır"
 
-#: src/app.rs:2047
+#: src/app.rs:2071
 msgid "Spotifast is up to date"
 msgstr "Spotifast güncel"
 
 #. Translators: {error} is an error message.
-#: src/app.rs:2055
+#: src/app.rs:2079
 #, rust-format
 msgid "Couldn't check for updates: {error}"
 msgstr "Güncellemeler denetlenemedi: {error}"
 
 #. Translators: {error} is an error message from the playback engine.
-#: src/app.rs:2129
+#: src/app.rs:2153
 #, rust-format
 msgid "Local playback: {error}"
 msgstr "Yerel çalma: {error}"
 
-#: src/app.rs:2318
+#: src/app.rs:2342
 msgid "Spotify audio disconnected. Reconnecting local playback"
 msgstr "Spotify ses bağlantısı kesildi. Yerel çalma yeniden bağlanıyor"
 
-#: src/app.rs:2425 src/app/radio.rs:191 src/ui/radio.rs:35 src/ui/radio.rs:77
+#: src/app.rs:2449 src/app/radio.rs:191 src/ui/radio.rs:35 src/ui/radio.rs:77
 msgid "Radio"
 msgstr "Radyo"
 
-#: src/app.rs:2459 src/api/models.rs:259
+#: src/app.rs:2483 src/api/models.rs:259
 msgid "Album"
 msgstr "Albüm"
 
-#: src/app.rs:2497 src/ui/show.rs:124
+#: src/app.rs:2521 src/ui/show.rs:124
 msgid "Podcast"
 msgstr "Podcast"
 
 #. Translators: {count} is the number of visualizer presets added.
-#: src/app.rs:2919
+#: src/app.rs:2940
 #, rust-format
 msgid "Added {count} MilkDrop preset"
 msgid_plural "Added {count} MilkDrop presets"
@@ -752,33 +746,33 @@ msgstr[0] "{count} MilkDrop hazır ayarı eklendi"
 msgstr[1] "{count} MilkDrop hazır ayarı eklendi"
 
 #. Translators: {error} is an error message.
-#: src/app.rs:2935
+#: src/app.rs:2956
 #, rust-format
 msgid "Couldn't fetch presets: {error}"
 msgstr "Hazır ayarlar alınamadı: {error}"
 
 #. Translators: {folder} is a folder path and {error} is an error message.
-#: src/app.rs:3046
+#: src/app.rs:3067
 #, rust-format
 msgid "Couldn't open {folder}: {error}"
 msgstr "{folder} açılamadı: {error}"
 
 #. Translators: {skin} is the name of a Winamp skin.
-#: src/app.rs:3062
+#: src/app.rs:3083
 #, rust-format
 msgid "Added {skin} skin"
 msgstr "{skin} teması eklendi"
 
-#: src/app.rs:3159
+#: src/app.rs:3180
 msgid "Proxy applied. Restarting local playback."
 msgstr "Proxy uygulandı. Yerel çalma yeniden başlatılıyor."
 
-#: src/app.rs:3161
+#: src/app.rs:3182
 msgid "Proxy settings applied"
 msgstr "Proxy ayarları uygulandı"
 
 #. Translators: {error} is an error message.
-#: src/app.rs:3168
+#: src/app.rs:3189
 #, rust-format
 msgid ""
 "Proxy could not be applied: {error}. Previous connection settings are still "
@@ -787,193 +781,193 @@ msgstr ""
 "Proxy uygulanamadı: {error}. Önceki bağlantı ayarları kullanılmaya devam "
 "ediyor."
 
-#: src/app.rs:4568 src/app.rs:8397
+#: src/app.rs:4589 src/app.rs:8421
 msgid "The clipboard has no Spotify song links"
 msgstr "Panoda Spotify şarkı bağlantısı yok"
 
-#: src/app.rs:4637
+#: src/app.rs:4658
 msgid "Queue cleared"
 msgstr "Sıra temizlendi"
 
 #. Translators: Keep {date} unchanged. It is a date in YYYY-MM-DD form.
-#: src/app.rs:4667 src/app.rs:18120
+#: src/app.rs:4688 src/app.rs:18285
 #, rust-format
 msgid "Queue {date}"
 msgstr "Sıra {date}"
 
-#: src/app.rs:5108
+#: src/app.rs:5129
 msgid "Your Spotify sign-in expired. Please sign in again."
 msgstr "Spotify oturumunuzun süresi doldu. Lütfen yeniden giriş yapın."
 
 #. Translators: {error} is an error message.
-#: src/app.rs:5115
+#: src/app.rs:5136
 #, rust-format
 msgid "Couldn't load your profile: {error}"
 msgstr "Profiliniz yüklenemedi: {error}"
 
 #. Translators: {error} is an error message.
-#: src/app.rs:5154
+#: src/app.rs:5175
 #, rust-format
 msgid "Couldn't list devices: {error}"
 msgstr "Cihazlar listelenemedi: {error}"
 
 #. Translators: {error} is an error message.
-#: src/app.rs:5477
+#: src/app.rs:5498
 #, rust-format
 msgid "Couldn't load more playlists: {error}"
 msgstr "Daha fazla çalma listesi yüklenemedi: {error}"
 
-#: src/app.rs:5523
+#: src/app.rs:5544
 msgid ""
 "Spotify hasn't confirmed your playlist changes yet. Try refreshing again."
 msgstr ""
-"Spotify çalma listesi değişikliklerinizi henüz onaylamadı. Tekrar yenilemeyi"
-" deneyin."
+"Spotify çalma listesi değişikliklerinizi henüz onaylamadı. Tekrar yenilemeyi "
+"deneyin."
 
 #. Translators: {name} is a playlist name.
-#: src/app.rs:5719
+#: src/app.rs:5740
 #, rust-format
 msgid "Created {name}"
 msgstr "{name} oluşturuldu"
 
 #. Translators: {error} is an error message.
-#: src/app.rs:5741
+#: src/app.rs:5762
 #, rust-format
 msgid "Couldn't create the playlist: {error}"
 msgstr "Çalma listesi oluşturulamadı: {error}"
 
-#: src/app.rs:5795
+#: src/app.rs:5816
 msgid "Playlist cover updated"
 msgstr "Çalma listesi kapağı güncellendi"
 
-#: src/app.rs:5804
+#: src/app.rs:5825
 msgid "Playlist updated"
 msgstr "Çalma listesi güncellendi"
 
 #. Translators: {error} is an error message.
-#: src/app.rs:5814 src/app.rs:5929
+#: src/app.rs:5835 src/app.rs:5950
 #, rust-format
 msgid "Couldn't update the playlist: {error}"
 msgstr "Çalma listesi güncellenemedi: {error}"
 
 #. Translators: {error} is an error message.
-#: src/app.rs:5888
+#: src/app.rs:5909
 #, rust-format
 msgid "Playlist change failed: {error}"
 msgstr "Çalma listesi değişikliği başarısız oldu: {error}"
 
-#: src/app.rs:5914
+#: src/app.rs:5935
 msgid "Added to Your Library"
 msgstr "Kitaplığına eklendi"
 
-#: src/app.rs:5916 src/app.rs:6108
+#: src/app.rs:5937 src/app.rs:6129
 msgid "Removed from Your Library"
 msgstr "Kitaplığından kaldırıldı"
 
-#: src/app.rs:6101
+#: src/app.rs:6122
 msgid "Added to Liked Songs"
 msgstr "Beğenilenler'e eklendi"
 
-#: src/app.rs:6103
+#: src/app.rs:6124
 msgid "Removed from Liked Songs"
 msgstr "Beğenilenler'den kaldırıldı"
 
-#: src/app.rs:6105
+#: src/app.rs:6126
 msgid "Following artist"
 msgstr "Sanatçı takip ediliyor"
 
-#: src/app.rs:6106
+#: src/app.rs:6127
 msgid "Unfollowed artist"
 msgstr "Sanatçı takipten çıkarıldı"
 
-#: src/app.rs:6107
+#: src/app.rs:6128
 msgid "Saved to Your Library"
 msgstr "Kitaplığına kaydedildi"
 
 #. Translators: {error} is an error message.
-#: src/app.rs:6122
+#: src/app.rs:6143
 #, rust-format
 msgid "Couldn't update your library: {error}"
 msgstr "Kitaplığınız güncellenemedi: {error}"
 
 #. Translators: {error} is an error message.
-#: src/app.rs:6374
+#: src/app.rs:6395
 #, rust-format
 msgid "Cannot open this song: {error}"
 msgstr "Bu şarkı açılamıyor: {error}"
 
-#: src/app.rs:6388
+#: src/app.rs:6409
 msgid "This episode's podcast is not on Spotify"
 msgstr "Bu bölümün podcast'i Spotify'da bulunmuyor"
 
 #. Translators: {error} is an error message.
-#: src/app.rs:6393
+#: src/app.rs:6414
 #, rust-format
 msgid "Cannot open this episode: {error}"
 msgstr "Bu bölüm açılamıyor: {error}"
 
-#: src/app.rs:6430
+#: src/app.rs:6451
 msgid "Choose a device from the devices menu first."
 msgstr "Önce cihazlar menüsünden bir cihaz seçin."
 
 #. Translators: {error} is an error message.
-#: src/app.rs:6453
+#: src/app.rs:6474
 #, rust-format
 msgid "Couldn't switch device: {error}"
 msgstr "Cihaz değiştirilemedi: {error}"
 
 #. Translators: {error} is an error message.
-#: src/app.rs:6464 src/app.rs:6488
+#: src/app.rs:6485 src/app.rs:6509
 #, rust-format
 msgid "Couldn't add to queue: {error}"
 msgstr "Sıraya eklenemedi: {error}"
 
-#: src/app.rs:6564
+#: src/app.rs:6588
 msgid "This song's album is not on Spotify"
 msgstr "Bu şarkının albümü Spotify'da bulunmuyor"
 
-#: src/app.rs:6581
+#: src/app.rs:6605
 msgid "Spotifast cannot open this kind of Spotify link"
 msgstr "Spotifast bu tür bir Spotify bağlantısını açamaz"
 
-#: src/app.rs:6744
+#: src/app.rs:6768
 msgid "Nothing is playing. Pick something first"
 msgstr "Hiçbir şey çalmıyor. Önce bir şey seçin"
 
-#: src/app.rs:7105
+#: src/app.rs:7129
 msgid "Choose a device, or enable playback on this computer"
 msgstr "Bir cihaz seçin veya bu bilgisayarda çalmayı etkinleştirin"
 
-#: src/app.rs:7467 src/app.rs:7472
+#: src/app.rs:7491 src/app.rs:7496
 msgid "Pick something to play"
 msgstr "Çalmak için bir şey seçin"
 
 #. Translators: {name} is an album name.
-#: src/app.rs:7748
+#: src/app.rs:7772
 #, rust-format
 msgid "Loading {name} to queue…"
 msgstr "{name} sıraya ekleniyor…"
 
-#: src/app.rs:7767
+#: src/app.rs:7791
 msgid "Playback device changed. Add the album to queue again"
 msgstr "Çalma cihazı değişti. Albümü sıraya tekrar ekleyin"
 
-#: src/app.rs:7776 src/app.rs:7794 src/app.rs:7803
+#: src/app.rs:7800 src/app.rs:7818 src/app.rs:7827
 msgid "Couldn't load the album's songs in order. Try again"
 msgstr "Albümün şarkıları sırayla yüklenemedi. Yeniden deneyin"
 
 #. Translators: {name} is an album name and {error} is an error message.
-#: src/app.rs:7783
+#: src/app.rs:7807
 #, rust-format
 msgid "Couldn't add {name} to queue: {error}"
 msgstr "{name} sıraya eklenemedi: {error}"
 
-#: src/app.rs:7841
+#: src/app.rs:7865
 msgid "This album has no playable songs to queue"
 msgstr "Bu albümde sıraya eklenebilecek çalınabilir şarkı yok"
 
 #. Translators: {count} is a number of songs and {name} is an album name.
-#: src/app.rs:7850
+#: src/app.rs:7874
 #, rust-format
 msgid "{count} song from {name} added to queue"
 msgid_plural "{count} songs from {name} added to queue"
@@ -981,7 +975,7 @@ msgstr[0] "{count} şarkı ({name}) sıraya eklendi"
 msgstr[1] "{count} şarkı ({name}) sıraya eklendi"
 
 #. Translators: {count} is a number of songs.
-#: src/app.rs:7894
+#: src/app.rs:7918
 #, rust-format
 msgid "{count} song added to queue"
 msgid_plural "{count} songs added to queue"
@@ -989,38 +983,38 @@ msgstr[0] "{count} şarkı sıraya eklendi"
 msgstr[1] "{count} şarkı sıraya eklendi"
 
 #. Translators: {name} is a song, episode, album, or playlist name.
-#: src/app.rs:7987
+#: src/app.rs:8011
 #, rust-format
 msgid "{name} added to queue"
 msgstr "{name} sıraya eklendi"
 
 #. Translators: {count} is the number of pasted links that failed.
-#: src/app.rs:8478
+#: src/app.rs:8502
 #, rust-format
 msgid "{count} pasted link could not be added"
 msgid_plural "{count} pasted links could not be added"
 msgstr[0] "Yapıştırılan {count} bağlantı eklenemedi"
 msgstr[1] "Yapıştırılan {count} bağlantı eklenemedi"
 
-#: src/app.rs:9291
+#: src/app.rs:9315
 msgid "Spotify doesn't let apps remove a playlist description, so it was kept"
 msgstr ""
-"Spotify uygulamaların çalma listesi açıklamasını silmesine izin vermiyor, bu"
-" nedenle korundu"
+"Spotify uygulamaların çalma listesi açıklamasını silmesine izin vermiyor, bu "
+"nedenle korundu"
 
-#: src/app.rs:9335 src/app.rs:9348
+#: src/app.rs:9359 src/app.rs:9372
 msgid "Link copied"
 msgstr "Bağlantı kopyalandı"
 
 #. Translators: {count} is a number of song links, always more than one.
-#: src/app.rs:9352
+#: src/app.rs:9376
 #, rust-format
 msgid "{count} link copied"
 msgid_plural "{count} links copied"
 msgstr[0] "{count} bağlantı kopyalandı"
 msgstr[1] "{count} bağlantı kopyalandı"
 
-#: src/app.rs:9607
+#: src/app.rs:9631
 msgid ""
 "Spotify doesn't let apps reorder your playlists, so this order is saved on "
 "this computer"
@@ -1028,77 +1022,77 @@ msgstr ""
 "Spotify uygulamaların çalma listelerinizi yeniden sıralamasına izin "
 "vermiyor, bu nedenle bu sıra bu bilgisayara kaydedildi"
 
-#: src/app.rs:9687
+#: src/app.rs:9711
 msgid "Restarting local playback"
 msgstr "Yerel çalma yeniden başlatılıyor"
 
-#: src/app.rs:9720
+#: src/app.rs:9744
 msgid "Local playback needs Spotify Premium"
 msgstr "Yerel çalma için Spotify Premium gerekir"
 
-#: src/app.rs:9732
+#: src/app.rs:9756
 msgid "Opening your browser to set up local playback"
 msgstr "Yerel çalmayı ayarlamak için tarayıcınız açılıyor"
 
-#: src/app.rs:9749
+#: src/app.rs:9773
 msgid "Play history cleared"
 msgstr "Çalma geçmişi temizlendi"
 
 #. Translators: {size} is a size in megabytes, such as 12.5.
-#: src/app.rs:9760
+#: src/app.rs:9784
 #, rust-format
 msgid "Cleared {size} MB of artwork"
 msgstr "{size} MB albüm kapağı temizlendi"
 
 #. Translators: {error} is an error message.
-#: src/app.rs:9766
+#: src/app.rs:9790
 #, rust-format
 msgid "Couldn't clear artwork: {error}"
 msgstr "Albüm kapakları temizlenemedi: {error}"
 
-#: src/app.rs:9946
+#: src/app.rs:9970
 msgid "Downloading MilkDrop preset packs"
 msgstr "MilkDrop hazır ayar paketleri indiriliyor"
 
 #. Translators: {name} is the name of a visualizer preset pack.
-#: src/app.rs:9980
+#: src/app.rs:10004
 #, rust-format
 msgid "Downloading {name} presets"
 msgstr "{name} hazır ayarları indiriliyor"
 
-#: src/app.rs:10803
+#: src/app.rs:10894
 msgid "Couldn't start playback"
 msgstr "Çalma başlatılamadı"
 
-#: src/app.rs:10804
+#: src/app.rs:10895
 msgid "Couldn't pause"
 msgstr "Duraklatılamadı"
 
-#: src/app.rs:10805
+#: src/app.rs:10896
 msgid "Couldn't skip"
 msgstr "Atlanamadı"
 
-#: src/app.rs:10806
+#: src/app.rs:10897
 msgid "Couldn't go back"
 msgstr "Geri gidilemedi"
 
-#: src/app.rs:10807
+#: src/app.rs:10898
 msgid "Couldn't seek"
 msgstr "Konum değiştirilemedi"
 
-#: src/app.rs:10808
+#: src/app.rs:10899
 msgid "Couldn't change the volume"
 msgstr "Ses düzeyi değiştirilemedi"
 
-#: src/app.rs:10809
+#: src/app.rs:10900
 msgid "Couldn't change shuffle"
 msgstr "Karışık çalma modu değiştirilemedi"
 
-#: src/app.rs:10810
+#: src/app.rs:10901
 msgid "Couldn't change repeat"
 msgstr "Tekrarlama modu değiştirilemedi"
 
-#: src/app.rs:10853
+#: src/app.rs:10944
 msgid ""
 "No audio output device was found. Connect or enable one, then press play "
 "again."
@@ -1106,42 +1100,42 @@ msgstr ""
 "Hiçbir ses çıkış cihazı bulunamadı. Bir cihaz bağlayın veya etkinleştirin, "
 "ardından tekrar çala basın."
 
-#: src/app.rs:10864
+#: src/app.rs:10955
 msgid ""
 "Spotify doesn't make this playlist's songs available to third-party apps."
 msgstr ""
-"Spotify bu çalma listesindeki şarkıları üçüncü taraf uygulamaların erişimine"
-" açmıyor."
+"Spotify bu çalma listesindeki şarkıları üçüncü taraf uygulamaların erişimine "
+"açmıyor."
 
-#: src/app.rs:10994
+#: src/app.rs:11085
 msgid "Spotify sign-in expired. Sign in again, then retry the cover upload."
 msgstr ""
 "Spotify oturumunuzun süresi doldu. Tekrar giriş yapın ve kapak yüklemeyi "
 "yeniden deneyin."
 
-#: src/app.rs:10999
+#: src/app.rs:11090
 msgid ""
 "Spotify refused this cover. Check that you own the playlist, then sign in "
 "again to grant image upload permission. If using a personal app, reconnect "
 "it in Settings too."
 msgstr ""
 "Spotify bu kapağı reddetti. Çalma listesinin size ait olduğunu kontrol edin "
-"ve görsel yükleme izni vermek için yeniden giriş yapın. Kişisel bir uygulama"
-" kullanıyorsanız Ayarlar'dan da yeniden bağlayın."
+"ve görsel yükleme izni vermek için yeniden giriş yapın. Kişisel bir uygulama "
+"kullanıyorsanız Ayarlar'dan da yeniden bağlayın."
 
-#: src/app.rs:11003
+#: src/app.rs:11094
 msgid "Spotify rejected the image size. Choose a smaller image."
 msgstr "Spotify görsel boyutunu reddetti. Daha küçük bir görsel seçin."
 
 #. Translators: {error} is an error message.
-#: src/app.rs:11006
+#: src/app.rs:11097
 #, rust-format
 msgid "Couldn't upload the cover: {error}. Try again."
 msgstr "Kapak yüklenemedi: {error}. Yeniden deneyin."
 
 #. Translators: Keep {track} unchanged. It is the name of the song,
 #. playlist, album, or artist the radio is based on, not translated.
-#: src/app.rs:18140 src/app/radio.rs:38
+#: src/app.rs:18305 src/app/radio.rs:38
 #, rust-format
 msgid "{track} Radio"
 msgstr "{track} Radyosu"
@@ -1173,8 +1167,8 @@ msgstr "Kişisel Spotify uygulaması"
 
 #: src/ui/settings.rs:253
 msgid ""
-"Use a personal Development Mode app for a separate API quota. The shared app"
-" stays active."
+"Use a personal Development Mode app for a separate API quota. The shared app "
+"stays active."
 msgstr ""
 "Ayrı bir API kotası için kişisel bir Geliştirici Modu uygulaması kullanın. "
 "Paylaşılan uygulama etkin kalır."
@@ -1527,8 +1521,8 @@ msgid ""
 "Middle-click a list, then move the pointer to scroll it. Off by default, "
 "because a middle click usually pastes on Linux."
 msgstr ""
-"Bir listeye orta tıklayın ve kaydırmak için imleci hareket ettirin. Linux'ta"
-" orta tıklama genellikle yapıştırdığı için varsayılan olarak kapalıdır."
+"Bir listeye orta tıklayın ve kaydırmak için imleci hareket ettirin. Linux'ta "
+"orta tıklama genellikle yapıştırdığı için varsayılan olarak kapalıdır."
 
 #: src/ui/settings.rs:876
 msgid ""
@@ -1628,8 +1622,8 @@ msgid ""
 "Off ignores environment variables. System uses them, and the OS proxy on "
 "macOS and Windows."
 msgstr ""
-"Kapalı, ortam değişkenlerini yok sayar. Sistem, bu değişkenleri ve macOS ile"
-" Windows'ta işletim sistemi proxy'sini kullanır."
+"Kapalı, ortam değişkenlerini yok sayar. Sistem, bu değişkenleri ve macOS ile "
+"Windows'ta işletim sistemi proxy'sini kullanır."
 
 #: src/ui/settings.rs:1347 src/ui/login.rs:249
 msgid "Apply settings"
@@ -1664,8 +1658,8 @@ msgid ""
 "Use classic Winamp .wsz skins. Press Ctrl+M or click the skin logo to "
 "return. Drop a skin on either window to add it."
 msgstr ""
-"Klasik Winamp .wsz temalarını kullanın. Geri dönmek için Ctrl+M tuşuna basın"
-" veya tema logosuna tıklayın. Eklemek için herhangi bir pencereye bir tema "
+"Klasik Winamp .wsz temalarını kullanın. Geri dönmek için Ctrl+M tuşuna basın "
+"veya tema logosuna tıklayın. Eklemek için herhangi bir pencereye bir tema "
 "sürükleyip bırakın."
 
 #: src/ui/settings.rs:1384
@@ -1757,8 +1751,8 @@ msgid ""
 "shortcuts."
 msgstr ""
 "Yerel çalma için bir projectM görselleştiricisi. Buradan, üst çubuktan, "
-"Cmd+Shift+K ile veya mini çaların V menüsünden açın. Kısayolları için ? veya"
-" F1 tuşuna basın."
+"Cmd+Shift+K ile veya mini çaların V menüsünden açın. Kısayolları için ? veya "
+"F1 tuşuna basın."
 
 #: src/ui/settings.rs:1582 src/ui/settings.rs:1812
 msgid "Presets"
@@ -1768,12 +1762,12 @@ msgstr "Hazır ayarlar"
 #: src/ui/settings.rs:1587
 #, rust-format
 msgid ""
-"None yet in {folder}. Add .milk files here. Spotifast downloads presets when"
-" MilkDrop first opens with an empty folder."
+"None yet in {folder}. Add .milk files here. Spotifast downloads presets when "
+"MilkDrop first opens with an empty folder."
 msgstr ""
 "{folder} konumunda henüz hazır ayar yok. Buraya .milk dosyaları ekleyin. "
-"Spotifast, MilkDrop boş bir klasörle ilk açıldığında hazır ayarları otomatik"
-" indirir."
+"Spotifast, MilkDrop boş bir klasörle ilk açıldığında hazır ayarları otomatik "
+"indirir."
 
 #. Translators: {folder} is the path of the MilkDrop presets folder.
 #: src/ui/settings.rs:1593
@@ -1783,8 +1777,8 @@ msgid ""
 "when MilkDrop first opens with an empty folder."
 msgstr ""
 "{folder} içinde bir hazır ayar var. Buraya .milk dosyaları ekleyin. "
-"Spotifast, MilkDrop boş bir klasörle ilk açıldığında hazır ayarları otomatik"
-" indirir."
+"Spotifast, MilkDrop boş bir klasörle ilk açıldığında hazır ayarları otomatik "
+"indirir."
 
 #. Translators: {count} is the number of presets, {folder} the path of the MilkDrop presets folder.
 #: src/ui/settings.rs:1599
@@ -1797,12 +1791,12 @@ msgid_plural ""
 "presets when MilkDrop first opens with an empty folder."
 msgstr[0] ""
 "{folder} içinde {count} hazır ayar var. Buraya .milk dosyaları ekleyin. "
-"Spotifast, MilkDrop boş bir klasörle ilk açıldığında hazır ayarları otomatik"
-" indirir."
+"Spotifast, MilkDrop boş bir klasörle ilk açıldığında hazır ayarları otomatik "
+"indirir."
 msgstr[1] ""
 "{folder} içinde {count} hazır ayar var. Buraya .milk dosyaları ekleyin. "
-"Spotifast, MilkDrop boş bir klasörle ilk açıldığında hazır ayarları otomatik"
-" indirir."
+"Spotifast, MilkDrop boş bir klasörle ilk açıldığında hazır ayarları otomatik "
+"indirir."
 
 #: src/ui/settings.rs:1608
 msgid "Time per preset"
@@ -1878,8 +1872,8 @@ msgstr "Ekolayzer"
 
 #: src/ui/settings.rs:1806
 msgid ""
-"A ten-band equalizer for playback on this computer. It does not affect other"
-" devices."
+"A ten-band equalizer for playback on this computer. It does not affect other "
+"devices."
 msgstr ""
 "Bu bilgisayarda çalma için on bantlı ekolayzer. Diğer cihazları etkilemez."
 
@@ -2081,8 +2075,8 @@ msgstr ""
 
 #: src/theme.rs:226
 msgid ""
-"The Omarchy palette could not be loaded. Keeping the last usable appearance."
-" See the log for details."
+"The Omarchy palette could not be loaded. Keeping the last usable appearance. "
+"See the log for details."
 msgstr ""
 "Omarchy paleti yüklenemedi. Son geçerli görünüm korunuyor. Ayrıntılar için "
 "günlüğe bakın."
@@ -2176,29 +2170,29 @@ msgstr "Burada henüz bir şey yok"
 msgid "Added songs appear here."
 msgstr "Eklenen şarkılar burada görünür."
 
-#: src/ui/collection.rs:1303 src/ui/home.rs:678
+#: src/ui/collection.rs:1345 src/ui/home.rs:678
 msgid "Your top songs"
 msgstr "En çok dinlediğin şarkılar"
 
-#: src/ui/collection.rs:1312
+#: src/ui/collection.rs:1354
 msgid "Your most-played tracks from the last four weeks."
 msgstr "Son dört haftada en çok dinlediğin parçalar."
 
-#: src/ui/collection.rs:1707
+#: src/ui/collection.rs:1749
 msgid "Collaborative Playlist"
 msgstr "Ortak çalma listesi"
 
-#: src/ui/collection.rs:1709
+#: src/ui/collection.rs:1751
 msgid "Public Playlist"
 msgstr "Herkese açık çalma listesi"
 
-#: src/ui/collection.rs:1780
+#: src/ui/collection.rs:1822
 msgid "Save to Your Library"
 msgstr "Kitaplığına kaydet"
 
 #. Translators: {count} is a number of songs and {duration} their total
 #. length, such as "2 hr 13 min".
-#: src/ui/collection.rs:1988
+#: src/ui/collection.rs:2030
 #, rust-format
 msgid "{count} song, {duration}"
 msgid_plural "{count} songs, {duration}"
@@ -2206,19 +2200,19 @@ msgstr[0] "{count} şarkı, {duration}"
 msgstr[1] "{count} şarkı, {duration}"
 
 #. Translators: {name} is the name of someone who added songs to the playlist.
-#: src/ui/collection.rs:2002
+#: src/ui/collection.rs:2044
 #, rust-format
 msgid "with {name}"
 msgstr "{name} ile"
 
 #. Translators: {first} and {second} are names of people who added songs.
-#: src/ui/collection.rs:2006
+#: src/ui/collection.rs:2048
 #, rust-format
 msgid "with {first} and {second}"
 msgstr "{first} ve {second} ile"
 
 #. Translators: {count} is how many other people added songs to the playlist.
-#: src/ui/collection.rs:2013
+#: src/ui/collection.rs:2055
 #, rust-format
 msgid "and {count} other"
 msgid_plural "and {count} others"
@@ -2279,9 +2273,9 @@ msgstr ""
 
 #: src/ui/dialogs.rs:42
 msgid ""
-"Your Premium account lets you create a free personal Spotify app. Connect it"
-" here to give supported requests your own allowance. Some pages still use "
-"the shared connection."
+"Your Premium account lets you create a free personal Spotify app. Connect it "
+"here to give supported requests your own allowance. Some pages still use the "
+"shared connection."
 msgstr ""
 "Premium hesabınız ücretsiz bir kişisel Spotify uygulaması oluşturmanıza "
 "olanak tanır. Desteklenen isteklerinize kendi kotanızı tanımlamak için "
@@ -2369,8 +2363,7 @@ msgstr "Bu şarkı “{playlist}” çalma listesinde zaten var. Tekrar eklensin
 #: src/ui/dialogs.rs:261
 #, rust-format
 msgid "This song is already in “{playlist}”. Add them anyway?"
-msgstr ""
-"Bu şarkı “{playlist}” çalma listesinde zaten var. Yine de eklensin mi?"
+msgstr "Bu şarkı “{playlist}” çalma listesinde zaten var. Yine de eklensin mi?"
 
 #. Translators: {name} is a song name and {playlist} a playlist name.
 #: src/ui/dialogs.rs:266
@@ -2389,8 +2382,7 @@ msgid "“{first}” and “{second}” are already in “{playlist}”. Add the
 msgstr ""
 "“{first}” ve “{second}” zaten “{playlist}” içinde var. Yine de eklensin mi?"
 
-#. Translators: {first} and {second} are song names, {count} is how many more
-#. songs are already in the playlist, and {playlist} is a playlist name.
+#. Translators: {first} and {second} are song names, {count} is how many more songs are already in the playlist, and {playlist} is a playlist name.
 #: src/ui/dialogs.rs:292
 #, rust-format
 msgid ""
@@ -2948,8 +2940,7 @@ msgstr "Yüklemeye hazır"
 
 #: src/ui/update.rs:115
 msgid "Music playing on this computer will stop when Spotifast restarts."
-msgstr ""
-"Spotifast yeniden başlatıldığında bu bilgisayarda çalan müzik duracak."
+msgstr "Spotifast yeniden başlatıldığında bu bilgisayarda çalan müzik duracak."
 
 #: src/ui/update.rs:122
 msgid "Restart to update"
@@ -3038,15 +3029,13 @@ msgstr "Mono çal"
 msgid "Play in stereo"
 msgstr "Stereo çal"
 
-#. Translators: {percent} is a number from 0 to 100, followed by a percent
-#. sign.
+#. Translators: {percent} is a number from 0 to 100, followed by a percent sign.
 #: src/ui/winamp/mod.rs:1147
 #, rust-format
 msgid "Balance: {percent}% left"
 msgstr "Denge: %{percent} sol"
 
-#. Translators: {percent} is a number from 0 to 100, followed by a percent
-#. sign.
+#. Translators: {percent} is a number from 0 to 100, followed by a percent sign.
 #: src/ui/winamp/mod.rs:1152
 #, rust-format
 msgid "Balance: {percent}% right"
@@ -3056,15 +3045,13 @@ msgstr "Denge: %{percent} sağ"
 msgid "Balance: center"
 msgstr "Denge: Merkez"
 
-#. Translators: {percent} is a number from 0 to 100, followed by a percent
-#. sign.
+#. Translators: {percent} is a number from 0 to 100, followed by a percent sign.
 #: src/ui/winamp/mod.rs:1160
 #, rust-format
 msgid "Volume: {percent}%"
 msgstr "Ses düzeyi: %{percent}"
 
-#. Translators: {position} and {duration} are times such as 2:12, {percent} a
-#. number from 0 to 100.
+#. Translators: {position} and {duration} are times such as 2:12, {percent} a number from 0 to 100.
 #: src/ui/winamp/mod.rs:1176
 #, rust-format
 msgid "Seek to: {position}/{duration} ({percent}%)"
@@ -3205,8 +3192,7 @@ msgctxt "month"
 msgid "Dec"
 msgstr "Ara"
 
-#. Translators: A date. {month} is an abbreviated month name; reorder as your
-#. language writes dates.
+#. Translators: A date. {month} is an abbreviated month name; reorder as your language writes dates.
 #: src/util.rs:94
 #, rust-format
 msgid "{month} {day}, {year}"

@@ -136,3 +136,7 @@ All 21 tests in the pinned fastframe-shell dependency passed, including wake-bef
 wait and cross-thread waking. Four launcher tests passed on the unchanged
 LF-normalized WSL copy; Jekyll passed in 7.484 seconds. Release validation and
 combined SpotiPhile queue validation are still pending at this checkpoint.
+
+The optimized build completed in 2m 38s; `spotifast.exe --version` returned
+`spotifast 0.12.0`. The lockfile and Nix vendor hash exactly match the reviewed
+upstream snapshot, but the Nix build itself remains a CI gate.

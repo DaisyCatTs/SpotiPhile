@@ -4401,22 +4401,18 @@ impl App {
         self.toast(gettext(self.locale, "Queue cleared"));
     }
 
-    /// Current and upcoming track URIs, deduplicated in playback order.
+    /// Current and loaded upcoming occurrences, in playback order.
     pub fn queue_playlist_uris(&self) -> Vec<String> {
-        let mut seen = std::collections::HashSet::new();
-        let mut uris = Vec::new();
         let queued = self.queue.get();
-        let rows = self.now_playing().map(|now| now.uri).into_iter().chain(
-            queued
-                .iter()
-                .flat_map(|queue| queue.queue.iter().map(|item| item.uri().to_string())),
-        );
-        for uri in rows {
-            if seen.insert(uri.clone()) {
-                uris.push(uri);
-            }
-        }
-        uris
+        self.now_playing()
+            .map(|now| now.uri)
+            .into_iter()
+            .chain(
+                queued
+                    .iter()
+                    .flat_map(|queue| queue.queue.iter().map(|item| item.uri().to_string())),
+            )
+            .collect()
     }
 
     /// Name for a playlist created from the queue.
@@ -16278,9 +16274,9 @@ mod tests {
     }
 
     /// Saving the queue writes the playing song and every row after it,
-    /// each song once, in playing order.
+    /// retaining repeated occurrences in playing order.
     #[test]
-    fn saving_the_queue_writes_each_song_once_in_order() {
+    fn saving_the_queue_preserves_repeated_occurrences_in_order() {
         let mut app = headless_app();
         app.local.track = Some(crate::player::LocalTrack {
             uri: "spotify:track:a".into(),
@@ -16298,8 +16294,14 @@ mod tests {
         );
         assert_eq!(
             app.queue_playlist_uris(),
-            vec!["spotify:track:a", "spotify:track:b", "spotify:track:c"],
-            "the playing song leads and a repeat wrap adds nothing"
+            vec![
+                "spotify:track:a",
+                "spotify:track:b",
+                "spotify:track:a",
+                "spotify:track:b",
+                "spotify:track:c"
+            ],
+            "the playing song leads and each upcoming occurrence remains"
         );
     }
 

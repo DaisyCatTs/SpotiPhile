@@ -52,3 +52,9 @@ passed on Windows, including wake thresholds/timeouts, stall timing, suspension,
 existing pause/resume, output-opening failure, seek gating and gapless queue
 coverage. Real Bluetooth/default-device switching is not yet manually verified.
 Upstream's CPU measurements are not measurements of this SpotiPhile build.
+
+Branch validation completed on Windows x64: full default/all-feature suites
+passed (946/969 library tests, one existing credential-store test ignored),
+integration suites passed, both Clippy configurations passed with warnings
+ denied, and the optimized build passed in 2m 23s with a version smoke.
+Protected cross-platform CI and actual device-switch testing remain pending.

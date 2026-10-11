@@ -883,19 +883,24 @@ impl ApiClient {
         uris: &[String],
         position: Option<u32>,
     ) -> Result<Option<String>> {
-        let mut body = json!({ "uris": uris });
-        if let Some(position) = position {
-            body["position"] = json!(position);
+        let mut snapshot = None;
+        for (index, chunk) in uris.chunks(100).enumerate() {
+            let mut body = json!({ "uris": chunk });
+            if let Some(position) = position {
+                // Advance the insertion point so later batches follow earlier ones.
+                body["position"] = json!(u64::from(position) + (index as u64 * 100));
+            }
+            let value = self
+                .write(
+                    Method::POST,
+                    &format!("/playlists/{id}/items"),
+                    &[],
+                    Some(&body),
+                )
+                .await?;
+            snapshot = Self::snapshot(value);
         }
-        let value = self
-            .write(
-                Method::POST,
-                &format!("/playlists/{id}/items"),
-                &[],
-                Some(&body),
-            )
-            .await?;
-        Ok(Self::snapshot(value))
+        Ok(snapshot)
     }
 
     pub async fn remove_playlist_items(
@@ -1347,6 +1352,127 @@ mod tests {
                 assert_eq!(query["device_id"], "phone");
             }
         }
+    }
+
+    #[tokio::test]
+    async fn playlist_batches_preserve_occurrences_positions_and_stop_on_failure() {
+        use tokio::io::{AsyncReadExt, AsyncWriteExt};
+        for (position, fail) in [(None, false), (Some(7), false), (None, true)] {
+            let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+            let address = listener.local_addr().unwrap();
+            let server = tokio::spawn(async move {
+                let mut bodies = Vec::new();
+                for index in 0..if fail { 2 } else { 3 } {
+                    let (mut socket, _) =
+                        tokio::time::timeout(Duration::from_secs(5), listener.accept())
+                            .await
+                            .unwrap()
+                            .unwrap();
+                    let mut headers = Vec::new();
+                    while !headers.ends_with(b"\r\n\r\n") {
+                        headers.push(socket.read_u8().await.unwrap());
+                        assert!(headers.len() < 8192);
+                    }
+                    let headers = String::from_utf8(headers).unwrap();
+                    assert!(headers.starts_with("POST /playlists/test/items HTTP/1.1"));
+                    let length: usize = headers
+                        .lines()
+                        .find_map(|line| {
+                            line.to_ascii_lowercase()
+                                .strip_prefix("content-length: ")
+                                .map(|value| value.parse().unwrap())
+                        })
+                        .unwrap();
+                    let mut body = vec![0; length];
+                    socket.read_exact(&mut body).await.unwrap();
+                    bodies.push(serde_json::from_slice::<Value>(&body).unwrap());
+                    let (status, body) = if fail && index == 1 {
+                        ("403 Forbidden", "{}".to_string())
+                    } else {
+                        (
+                            "201 Created",
+                            format!(r#"{{"snapshot_id":"batch-{index}"}}"#),
+                        )
+                    };
+                    socket.write_all(format!("HTTP/1.1 {status}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).as_bytes()).await.unwrap();
+                }
+                assert!(
+                    tokio::time::timeout(Duration::from_millis(50), listener.accept())
+                        .await
+                        .is_err()
+                );
+                bodies
+            });
+            let http = reqwest::Client::builder().no_proxy().build().unwrap();
+            let mut client = ApiClient::new(
+                http.clone(),
+                Arc::new(NetActivity::default()),
+                20,
+                50,
+                ApiSource::Shared,
+            );
+            client.base_url = Some(format!("http://{address}"));
+            client.set_token_provider(Some(TokenProvider::Web(WebTokens::new(
+                http,
+                crate::auth::StoredToken {
+                    access_token: "test-only".into(),
+                    expires_at: u64::MAX,
+                    ..Default::default()
+                },
+                crate::credentials::Store::in_memory(crate::paths::AppDirs {
+                    config: std::env::temp_dir().join("unused-queue-token/config"),
+                    state: std::env::temp_dir().join("unused-queue-token/state"),
+                    cache: std::env::temp_dir().join("unused-queue-token/cache"),
+                })
+                .lease(crate::credentials::Slot::Shared),
+                ApiSource::Shared,
+                Arc::new(|_| {}),
+            ))));
+            let uris: Vec<String> = (0..205)
+                .map(|index| format!("spotify:track:{}", index % 3))
+                .collect();
+            let result = client.add_playlist_items("test", &uris, position).await;
+            if fail {
+                assert_eq!(result.unwrap_err().status(), Some(403));
+            } else {
+                assert_eq!(result.unwrap(), Some("batch-2".into()));
+            }
+            let bodies = server.await.unwrap();
+            let written: Vec<String> = bodies
+                .iter()
+                .flat_map(|body| {
+                    serde_json::from_value::<Vec<String>>(body["uris"].clone()).unwrap()
+                })
+                .collect();
+            assert_eq!(written, uris[..if fail { 200 } else { 205 }]);
+            for (index, body) in bodies.iter().enumerate() {
+                assert_eq!(
+                    body["uris"].as_array().unwrap().len(),
+                    (205 - index * 100).min(100)
+                );
+                assert_eq!(
+                    body.get("position"),
+                    position
+                        .map(|value| json!(value as usize + index * 100))
+                        .as_ref()
+                );
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn empty_playlist_addition_needs_no_authentication_or_network() {
+        let client = ApiClient::new(
+            reqwest::Client::new(),
+            Arc::new(NetActivity::default()),
+            20,
+            50,
+            ApiSource::Shared,
+        );
+        assert_eq!(
+            client.add_playlist_items("test", &[], None).await.unwrap(),
+            None
+        );
     }
 
     #[tokio::test]

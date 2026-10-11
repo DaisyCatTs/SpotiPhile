@@ -1,3 +1,7 @@
+Development queue saving preserves the current item and every loaded upcoming
+occurrence, including repeated songs, in playback order. Large saves use ordered
+100-item playlist additions. See [validation and limitations](docs/features/queue-playlist-validation.md).
+
 <p align="center">
   <img src="docs/assets/images/logo.svg" alt="Spotifast logo" width="88" height="88">
 </p>

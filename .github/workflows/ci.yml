@@ -49,6 +49,8 @@ jobs:
         run: python3 packaging/test-launchers.py
       - name: Release name migration regressions
         run: python3 packaging/test-release-names.py
+      - name: Upstream ledger classification regressions
+        run: python3 -B .github/scripts/test-upstream-report.py
       - name: Clippy (default features)
         run: mbx clippy --locked --all-targets -- -D warnings
       - name: Clippy (all features)

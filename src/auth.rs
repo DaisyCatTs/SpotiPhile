@@ -334,7 +334,19 @@ fn decode_token_response(
 }
 
 /// The Web API grant, serialized only inside protected credential storage.
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
+/// Deliberately has no Debug implementation: it contains usable secrets.
+///
+/// Construction remains supported:
+/// ```
+/// let token = spotifast::auth::StoredToken::default();
+/// assert!(token.access_token.is_empty());
+/// ```
+/// Debug formatting must remain unavailable, even if a derive is added later:
+/// ```compile_fail
+/// let token = spotifast::auth::StoredToken::default();
+/// let _ = format!("{token:?}");
+/// ```
+#[derive(Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct StoredToken {
     pub client_id: String,
     pub access_token: String,
@@ -599,7 +611,7 @@ mod tests {
         let dir = std::env::temp_dir().join(format!("spotifast-token-{}", std::process::id()));
         let path = dir.join("token.json");
         token.save(&path).unwrap();
-        assert_eq!(StoredToken::load(&path), Some(token));
+        assert!(StoredToken::load(&path) == Some(token));
         StoredToken::remove(&path);
         let _ = std::fs::remove_dir_all(dir);
     }
@@ -627,7 +639,7 @@ mod tests {
             };
             token.save(&legacy).unwrap();
             StoredToken::migrate_legacy(&legacy, &shared, &personal).unwrap();
-            assert_eq!(StoredToken::load(target), Some(token));
+            assert!(StoredToken::load(target) == Some(token));
             assert!(!legacy.exists());
         }
         let _ = std::fs::remove_dir_all(dir);

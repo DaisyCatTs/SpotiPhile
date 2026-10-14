@@ -173,6 +173,10 @@ playlist saving #9 merged through protected checks. It deliberately ports six
 remaining changes. Together with main's ten upstream ports, the candidate
 contains sixteen of the seventeen commits after the immutable baseline.
 
+That count refers to the previously reviewed `dd2d5e3` snapshot. A subsequent
+fetch found twenty newer commits; they remain individually reviewed rather than
+being merged wholesale. One additional security port is recorded below.
+
 | Original upstream SHA | Candidate commit | Author | Behavior |
 | --- | --- | --- | --- |
 | `17f3a0db3547aee20b24c432a7b8fb5fe1709592` | `6ca455b` | Dennis | Closing a minimized window follows the existing tray setting from the logic pass. |
@@ -192,3 +196,17 @@ Additional tests and the offline Blend review fixture are in `66b4ae2`. Hover is
 tested with dark, light and custom blue palettes, not a hardcoded green. Blend
 rendering checks narrow/wide responsive columns, the byline and read-only label.
 See [validation](../features/upstream-final-functional-validation.md).
+
+## Prevent accidental token debug logging
+
+Upstream `e9854af0934affcb29e29b2f442b0b922a953772`, Douglas Silva, Spotifast #756,
+port `c0edf51`. StoredToken no longer implements Debug, preventing ordinary debug
+formatting from printing usable access/refresh tokens. Serialization, protected
+storage, cloning and equality stay unchanged. Existing persistence assertions
+still compare the complete value without debug-printing it on failure.
+
+Positive construction and negative debug-formatting doctests guard the contract.
+The security revision passed 974/998 default/all-feature library tests, both
+Clippy configurations, formatting, doctests and warnings-denied Rustdoc. Final
+optimized build passed in 3m 19s. Seventeen of the thirty-seven commits in the
+newly fetched snapshot are now deliberately ported on this candidate.

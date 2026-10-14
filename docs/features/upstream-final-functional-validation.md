@@ -58,3 +58,19 @@ protected platform CI, not tested on dual-GPU Mac hardware here. No new CPU/RAM,
 energy, authenticated Blend or sleep/logout measurement is claimed. The Blend
 classification is the upstream inference from supplied adders, not an explicit
 Spotify capability flag. No new request, grant or storage migration is introduced.
+
+## Additional security and inventory checks
+
+A subsequent safe fetch found twenty newer upstream commits, including
+StoredToken Debug hardening. That small security fix was deliberately ported:
+token values cannot be debug-formatted, while their protected storage format
+remains compatible. Positive/compile-fail doctests passed. The final security
+revision again passed 974/998 library tests, binary/integration checks, both
+Clippy configurations, formatting, doctests and Rustdoc. Its optimized build
+passed in 3m 19s.
+
+The read-only upstream watcher now distinguishes explicit Deferred and Rejected
+ledger entries. A mentioned SHA alone is not treated as rejection. Two Python
+regressions cover both statuses, incidental mentions and conflicting decisions;
+they are included in required quality CI. New upstream dependency and networking
+changes remain pending individual review, not silently accepted.

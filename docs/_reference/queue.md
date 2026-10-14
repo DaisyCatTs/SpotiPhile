@@ -140,6 +140,37 @@ counts once, and the notification reports only the rows actually added.
     can rewrite. While *Playing next* is empty, drop the song on the player
     bar's Queue button instead.
 
+## Manual queue controls (development)
+
+**Play Next** inserts selected playable songs or episodes before your manual
+queue. **Play Later** adds them at its end, before the playlist continues.
+Both preserve selected order and duplicates without starting playback. These
+controls require this computer to be the active player. Another Connect device
+continues to support the existing **Add to queue** append behavior.
+
+Select individual occurrences with click, modifier-click or Shift-click;
+Select All selects the visible rows. Manual rows can be removed, cut, moved
+as a block or moved to the top/bottom. Copy also works for context rows, but a
+selection containing context rows cannot be cut, removed or reordered. Paste
+appends playable Spotify track/episode links to the manual queue on this computer.
+Actions recheck their saved queue positions so a stale menu or drag cannot edit
+a different queue. Queue shortcuts leave text fields, dialogs and open menus
+alone and only run when the queue owns keyboard focus.
+
+Search filters loaded titles, artist/show subtitles and track album names
+without changing playback order or fetching more pages. Selection and ranges
+include visible matches only. Positional dragging, keyboard moves and Clear
+queue are disabled during search. Explicit top/bottom menu actions still mean
+the top/bottom of the whole manual queue, including hidden rows.
+
+Undo/Redo restores manual edits and selection while the active local playback,
+track sequence and context still match. It cannot undo a skip or restore songs
+already consumed. Playback/device/context changes invalidate incompatible
+history; making another edit discards Redo. History lasts only for this session,
+with a maximum of 20 edits and 8,192 retained before/after/context entries.
+Queues over 4,096 loaded upcoming rows remain editable without history snapshots.
+See the [validation and limits](../features/queue-controls-validation.md).
+
 ## Save queue as playlist (development)
 
 Saving creates a private playlist containing the current item followed by the

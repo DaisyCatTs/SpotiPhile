@@ -1,3 +1,8 @@
+Development local queue controls include Play Next, Play Later, multi-selection,
+block moves, clipboard editing, search and bounded Undo/Redo. Play Later places
+songs at the end of your manual queue, before the playlist continues.
+See [behavior and validation](docs/features/queue-controls-validation.md).
+
 Development queue saving preserves the current item and every loaded upcoming
 occurrence, including repeated songs, in playback order. Large saves use ordered
 100-item playlist additions. See [validation and limitations](docs/features/queue-playlist-validation.md).

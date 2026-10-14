@@ -335,6 +335,17 @@ fn decode_token_response(
 
 /// The Web API grant, serialized only inside protected credential storage.
 /// Deliberately has no Debug implementation: it contains usable secrets.
+///
+/// Construction remains supported:
+/// ```
+/// let token = spotifast::auth::StoredToken::default();
+/// assert!(token.access_token.is_empty());
+/// ```
+/// Debug formatting must remain unavailable, even if a derive is added later:
+/// ```compile_fail
+/// let token = spotifast::auth::StoredToken::default();
+/// let _ = format!("{token:?}");
+/// ```
 #[derive(Clone, Default, PartialEq, Serialize, Deserialize)]
 pub struct StoredToken {
     pub client_id: String,

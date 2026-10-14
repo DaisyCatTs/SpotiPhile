@@ -48,6 +48,10 @@ reviving old write IDs or positions.
 - Deterministic native demo tests cover menus, buttons, keyboard focus,
   filtered selection and block drag payloads, including text-editor and
   collection-shortcut isolation.
+- Eight native captures were inspected in dark/light themes at 900 by 650 and
+  1280 by 800 pixels. See the [Before/After comparison](../reviews/queue-promotion/index.html).
+- Independent source review found no blocking issue in occurrence edits,
+  stale guards, clipboard handling, filtered selection or history restoration.
 - The initial new edge-move Undo regression incorrectly expected old pending
   positions. Inspection confirmed restoration deliberately rebuilds them. The
   corrected test checks fresh indexes, matching occurrence URIs and absent old

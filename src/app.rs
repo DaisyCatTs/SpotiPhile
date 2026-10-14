@@ -15031,7 +15031,8 @@ mod tests {
                 .iter()
                 .map(|pending| pending.manual_index)
                 .collect::<Vec<_>>(),
-            [1, 2, 3, 0]
+            [0, 1, 2, 3],
+            "undo creates fresh pending writes in restored queue order"
         );
         assert_eq!(queue_uris(&app).1.last().unwrap(), "spotify:track:ctx");
         app.apply(Action::RedoQueue, &ctx);
@@ -15043,6 +15044,13 @@ mod tests {
                 .collect::<Vec<_>>(),
             [0, 1, 2, 3]
         );
+        for pending in &app.pending_queue_adds {
+            assert_eq!(app.manual_queue[pending.manual_index], pending.item.uri());
+            assert!(
+                pending.write.is_none(),
+                "restored local writes must not inherit remote IDs"
+            );
+        }
         app.backend.shutdown();
     }
 

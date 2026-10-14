@@ -575,6 +575,7 @@ pub fn picked_menu(
     });
     ui.add_space(4.0);
     menu_separator(ui, &palette);
+    play_next_menu(ui, app, songs);
     if menu_item(
         ui,
         &palette,
@@ -795,6 +796,95 @@ pub(crate) fn playlist_picker(
     field
 }
 
+/// Exposes truthful local insertion without changing remote Add to queue.
+fn play_next_menu(ui: &mut Ui, app: &mut App, items: &[PlayableItem]) {
+    let enabled = items.iter().any(|item| app.can_play_next(item));
+    for (later, label) in [
+        (false, gettext(app.locale, "Play next")),
+        (true, gettext(app.locale, "Play later")),
+    ] {
+        let (response, clicked) = menu_item_response(
+            ui,
+            &app.palette,
+            Some(Icon::ListPlus),
+            &label,
+            enabled && (!later || app.can_edit_manual_queue()),
+            false,
+        );
+        if !app.queue_locally_reorderable() {
+            response.on_hover_text(if later {
+                gettext(app.locale, "Play later requires playback on this computer")
+            } else {
+                gettext(app.locale, "Play next requires playback on this computer")
+            });
+        }
+        if clicked {
+            app.actions.push(if later {
+                Action::PlayLater {
+                    items: items.to_vec(),
+                }
+            } else {
+                Action::PlayNext {
+                    items: items.to_vec(),
+                }
+            });
+        }
+    }
+}
+
+fn queue_selection_menu(ui: &mut Ui, app: &mut App) {
+    let rows: Vec<_> = app.queue_selection.rows.iter().copied().collect();
+    let editable = app.can_edit_queue_rows(&rows);
+    for (position, icon, label) in [
+        (0, Icon::ChevronUp, gettext(app.locale, "Move to top")),
+        (
+            app.manual_queue.len(),
+            Icon::ChevronDown,
+            gettext(app.locale, "Move to bottom"),
+        ),
+    ] {
+        let edge = if position == 0 {
+            rows.iter().copied().eq(0..rows.len())
+        } else {
+            rows.iter()
+                .copied()
+                .eq(app.manual_queue.len().saturating_sub(rows.len())..app.manual_queue.len())
+        };
+        if menu_item_response(
+            ui,
+            &app.palette,
+            Some(icon),
+            &label,
+            editable && !edge,
+            false,
+        )
+        .1
+        {
+            app.actions.push(Action::MoveQueueRows {
+                rows: rows.clone(),
+                position,
+                expected_queue: app.manual_queue.clone(),
+            });
+        }
+    }
+    if menu_item_response(
+        ui,
+        &app.palette,
+        Some(Icon::Trash),
+        &gettext(app.locale, "Remove selected"),
+        editable,
+        false,
+    )
+    .1
+    {
+        app.actions.push(Action::RemoveQueueRows {
+            rows,
+            expected_queue: app.manual_queue.clone(),
+        });
+    }
+    menu_separator(ui, &app.palette);
+}
+
 pub fn item_menu(
     ui: &mut Ui,
     app: &mut App,
@@ -808,6 +898,53 @@ pub fn item_menu(
     ui.set_max_width(300.0);
     let uri = item.uri().to_string();
     let label = item.name().to_string();
+    if matches!(context, Some(RowContext::Queue))
+        && let Some(index) = index.filter(|index| *index < app.queued_rows_len())
+    {
+        let movable = app.can_move_queue_row(index, item);
+        for (to_end, icon, label) in [
+            (false, Icon::ChevronUp, gettext(locale, "Move to top")),
+            (true, Icon::ChevronDown, gettext(locale, "Move to bottom")),
+        ] {
+            let at_edge = if to_end {
+                index + 1 >= app.manual_queue.len()
+            } else {
+                index == 0
+            };
+            let (response, clicked) =
+                menu_item_response(ui, &palette, Some(icon), &label, movable && !at_edge, false);
+            if !app.queue_locally_reorderable() {
+                response.on_hover_text(gettext(
+                    locale,
+                    "Queue reordering requires playback on this computer",
+                ));
+            }
+            if clicked {
+                app.actions.push(Action::MoveQueueToEdge {
+                    index,
+                    expected_queue: app.manual_queue.clone(),
+                    to_end,
+                });
+            }
+        }
+        if menu_item_response(
+            ui,
+            &palette,
+            Some(Icon::Trash),
+            &gettext(locale, "Remove from queue"),
+            app.can_edit_queue_rows(&[index]),
+            false,
+        )
+        .1
+        {
+            app.actions.push(Action::RemoveQueueRows {
+                rows: vec![index],
+                expected_queue: app.manual_queue.clone(),
+            });
+        }
+        menu_separator(ui, &palette);
+    }
+    play_next_menu(ui, app, std::slice::from_ref(item));
     if menu_item(
         ui,
         &palette,
@@ -1281,8 +1418,31 @@ fn track_row_contents(
     if !ui.is_rect_visible(rect) && !response.has_focus() && !response.clicked() {
         return (response, None);
     }
+    // A queue occurrence may only move when the complete displayed manual
+    // prefix and every selected occurrence are still editable. Context-only
+    // selections remain ordinary external copies.
+    let queue_drag_allowed = if matches!(row.context, RowContext::Queue) {
+        let rows: Vec<_> = if row.picked {
+            app.queue_selection.rows.iter().copied().collect()
+        } else {
+            vec![row.index]
+        };
+        if rows
+            .iter()
+            .any(|index| *index < app.manual_queue.len().max(app.queued_rows_len()))
+        {
+            app.can_edit_queue_rows(&rows)
+        } else {
+            true
+        }
+    } else {
+        true
+    };
     // Start a sidebar drag only after egui's drag threshold.
-    if row.item.is_track() && response.drag_started_by(egui::PointerButton::Primary) {
+    if queue_drag_allowed
+        && (row.item.is_track() || matches!(row.context, RowContext::Queue))
+        && response.drag_started_by(egui::PointerButton::Primary)
+    {
         let items = dragged_items(row.item, row.picked, row.picked_songs);
         let source_playlist = match row.context {
             RowContext::Context {
@@ -1307,10 +1467,22 @@ fn track_row_contents(
                 _ => None,
             })
             .flatten();
+        let queue_rows = if matches!(row.context, RowContext::Queue) {
+            let rows = if row.picked {
+                app.queue_selection.rows.iter().copied().collect::<Vec<_>>()
+            } else {
+                vec![row.index]
+            };
+            app.can_edit_queue_rows(&rows)
+                .then(|| (rows, app.manual_queue.clone()))
+        } else {
+            None
+        };
         let preview = items.first().unwrap_or(row.item);
         egui::DragAndDrop::set_payload(
             ui.ctx(),
             DragTrack {
+                queue_rows,
                 title: preview.name().to_string(),
                 image: preview.image(64).map(str::to_string),
                 items,
@@ -1857,6 +2029,9 @@ fn track_row_contents(
                     } => Some(playlist),
                     _ => None,
                 };
+                if matches!(row.context, RowContext::Queue) {
+                    queue_selection_menu(ui, app);
+                }
                 picked_menu(ui, app, row.picked_songs, editable);
             } else {
                 item_menu(ui, app, row.item, Some(row.context), Some(row.index));
@@ -3858,6 +4033,7 @@ mod tests {
     #[test]
     fn dragging_multiple_songs_labels_the_first_and_the_rest() {
         let track = DragTrack {
+            queue_rows: None,
             title: "Fitraten (VDJ Fly LoFi)".into(),
             image: None,
             items: vec![

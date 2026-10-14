@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:,">
+<title>Local queue controls: native comparison</title>
+<style>
+body{font:16px system-ui;margin:24px;color:#18202a;background:#f5f6f8}h1{font-size:24px}p{max-width:1000px;line-height:1.5}nav{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin:20px 0}select,button{font:inherit;padding:8px;border:1px solid #687587;border-radius:4px;background:white;color:inherit}button[aria-pressed=true]{background:#18202a;color:white}button:focus-visible,select:focus-visible{outline:3px solid #2769cf;outline-offset:3px}img{display:block;width:100%;height:auto;border:1px solid #a4adba}a{color:#1657a6}
+</style>
+<h1>Local queue controls</h1>
+<p>Queue search joins the existing inspector. Play Next, Play Later, selection, edge moves, clipboard controls and bounded Undo/Redo reuse existing menus and keyboard conventions. Application chrome and themes remain unchanged.</p>
+<p>Windows x64 native captures with identical offline playing-next fixtures, dark/light themes and narrow/wide windows. Before: functional upstream candidate 66b4ae2. After: queue extraction 71fa388 plus validated catalogue/test corrections. Screenshots show the added search field; automated rendered tests cover menus, selection and keyboard behavior. Minor pointer hover and transient scrollbar differences are capture artifacts. Authenticated playback is not tested here.</p>
+<nav aria-label="Comparison controls">
+<label>Theme <select id="theme"><option value="dark">Dark</option><option value="light">Light</option></select></label>
+<label>Window <select id="size"><option value="1280x800">Wide: 1280 × 800</option><option value="900x650">Narrow: 900 × 650</option></select></label>
+<button id="before" aria-pressed="false">Before</button><button id="after" aria-pressed="true">After</button>
+<a id="original" href="after-dark-1280x800.png">Open original image</a>
+</nav>
+<p id="status" aria-live="polite"></p>
+<img id="capture" src="after-dark-1280x800.png" alt="After: native queue, dark theme, 1600 by 800">
+<script>
+const theme=document.getElementById('theme'),size=document.getElementById('size'),capture=document.getElementById('capture');let stage='after';
+function update(){const name=`${stage}-${theme.value}-${size.value}.png`;capture.src=name;capture.alt=`${stage==='after'?'After':'Before'}: native queue, ${theme.value}, ${size.value}`;document.getElementById('original').href=name;document.getElementById('status').textContent=`${stage==='after'?'After':'Before'} · ${theme.value} · ${size.value}`;for(const view of ['before','after'])document.getElementById(view).setAttribute('aria-pressed',String(stage===view));}
+for(const view of ['before','after'])document.getElementById(view).addEventListener('click',()=>{stage=view;update()});theme.addEventListener('change',update);size.addEventListener('change',update);update();
+</script>
+</html>

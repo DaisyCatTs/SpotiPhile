@@ -165,6 +165,20 @@ struct PendingAlbumQueue {
     tracks: Vec<Track>,
 }
 
+#[derive(Clone)]
+struct ManualQueueSnapshot {
+    rows: Vec<PlayableItem>,
+    selection: RowSelection,
+}
+
+struct ManualQueueEdit {
+    before: ManualQueueSnapshot,
+    after: ManualQueueSnapshot,
+    track_sequence: u64,
+    current: String,
+    context: Vec<String>,
+}
+
 struct PendingQueueAdd {
     item: PlayableItem,
     at: Instant,
@@ -519,6 +533,10 @@ pub struct App {
     /// The page it belongs to, what that page's list looked like when the
     /// rows were picked, and the rows.
     pub selection: Option<(Page, String, RowSelection)>,
+    /// Queue selection is independent of any collection behind its side panel.
+    pub queue_selection: RowSelection,
+    pub queue_selection_view: Vec<String>,
+    pub queue_search: crate::queue_edit::QueueSearch,
     pub table_sorts: HashMap<Page, TableSort>,
     /// User ids resolved to display names; `None` while unknown, so an id
     /// is asked about only once per run.
@@ -541,6 +559,9 @@ pub struct App {
     pending_queue_batches: HashMap<u64, Target>,
     album_queue_serial: u64,
     last_album_queue: Option<(String, Instant)>,
+    last_play_next: Option<(Vec<String>, Instant, Vec<String>)>,
+    queue_undo: Vec<ManualQueueEdit>,
+    queue_redo: Vec<ManualQueueEdit>,
     /// The account's playlist tree from Spotify, folders and all; empty
     /// until the session answers.
     pub rootlist: Vec<crate::player::RootlistEntry>,
@@ -931,6 +952,9 @@ impl App {
             scrolling: fastframe_scroll::Scrolling::default(),
             autoscroll: crate::autoscroll::Autoscroll::default(),
             selection: None,
+            queue_selection: RowSelection::default(),
+            queue_selection_view: Vec::new(),
+            queue_search: crate::queue_edit::QueueSearch::default(),
             table_sorts: session
                 .sorts
                 .iter()
@@ -949,6 +973,9 @@ impl App {
             pending_queue_batches: HashMap::new(),
             album_queue_serial: 0,
             last_album_queue: None,
+            last_play_next: None,
+            queue_undo: Vec::new(),
+            queue_redo: Vec::new(),
             rootlist: Vec::new(),
             rootlist_cache: session.rootlist.clone(),
             editable_by_grant: std::collections::BTreeSet::new(),
@@ -2104,6 +2131,7 @@ impl App {
     }
 
     fn handle_playback(&mut self, status: LocalPlayback) {
+        self.clear_queue_history();
         match &status {
             LocalPlayback::Ready { device_id } => {
                 self.local_device_id = Some(device_id.clone());
@@ -2133,11 +2161,16 @@ impl App {
     }
 
     fn reset_data(&mut self) {
+        self.clear_queue_history();
+        self.queue_selection = RowSelection::default();
+        self.queue_selection_view.clear();
+        self.queue_search = crate::queue_edit::QueueSearch::default();
         self.local_transfer_sequence = None;
         self.queue_start_pending = None;
         self.pending_album_queues.clear();
         self.pending_queue_batches.clear();
         self.last_album_queue = None;
+        self.last_play_next = None;
         self.cover_uploads.clear();
         self.uploaded_covers.clear();
         // Pages still on their way belong to the signed-out account's load.
@@ -2230,6 +2263,14 @@ impl App {
     }
 
     fn handle_local(&mut self, state: LocalState) {
+        if state.track_sequence != self.local.track_sequence
+            || state.track.as_ref().map(|track| &track.uri)
+                != self.local.track.as_ref().map(|track| &track.uri)
+            || state.connected != self.local.connected
+            || matches!(state.playback, Playback::Stopped | Playback::Loading)
+        {
+            self.clear_queue_history();
+        }
         if self
             .local_transfer_sequence
             .is_some_and(|sequence| sequence != state.track_sequence)
@@ -4265,6 +4306,7 @@ impl App {
     /// rows as a fresh list instead used to take seconds, threw the
     /// context away, and left Spotify's copy of the queue to reappear.
     fn play_queue_item(&mut self, index: usize, uri: String) {
+        self.clear_queue_history();
         if self.resume_only() {
             // Nothing is playing anywhere, so there is no live queue to
             // consume: play the shown rows as a plain list.
@@ -4359,6 +4401,244 @@ impl App {
         self.local.is_active() && matches!(self.target(), Target::Local)
     }
 
+    /// A menu may only move a displayed occurrence belonging to the manual queue.
+    pub fn can_move_queue_row(&self, index: usize, item: &PlayableItem) -> bool {
+        self.can_edit_manual_queue()
+            && self
+                .manual_queue
+                .get(index)
+                .is_some_and(|uri| uri == item.uri())
+    }
+
+    pub fn can_edit_manual_queue(&self) -> bool {
+        self.queue_locally_reorderable()
+            && self.queue.get().is_some_and(|queue| {
+                queue.queue.len() >= self.manual_queue.len()
+                    && queue
+                        .queue
+                        .iter()
+                        .take(self.manual_queue.len())
+                        .map(|row| row.uri())
+                        .eq(self.manual_queue.iter().map(String::as_str))
+            })
+    }
+
+    pub fn can_edit_queue_rows(&self, rows: &[usize]) -> bool {
+        !rows.is_empty()
+            && self.can_edit_manual_queue()
+            && rows.iter().all(|&row| row < self.manual_queue.len())
+    }
+
+    pub fn sync_queue_selection(&mut self) {
+        let visible = self.queue_search.visible(
+            self.queue
+                .get()
+                .map(|queue| queue.queue.as_slice())
+                .unwrap_or_default(),
+        );
+        self.queue_selection
+            .rows
+            .retain(|index| visible.binary_search(index).is_ok());
+        self.queue_selection.anchor = self
+            .queue_selection
+            .anchor
+            .filter(|index| visible.binary_search(index).is_ok());
+        let unchanged = self.queue.get().map_or_else(
+            || self.queue_selection_view.is_empty(),
+            |queue| {
+                self.queue_selection_view
+                    .iter()
+                    .map(String::as_str)
+                    .eq(queue.queue.iter().map(PlayableItem::uri))
+            },
+        );
+        if unchanged {
+            return;
+        }
+        let view = self
+            .queue
+            .get()
+            .map(|queue| {
+                queue
+                    .queue
+                    .iter()
+                    .map(|item| item.uri().to_string())
+                    .collect()
+            })
+            .unwrap_or_default();
+        if self.queue_selection_view != view {
+            self.queue_selection = RowSelection::default();
+            self.queue_selection_view = view;
+        }
+    }
+
+    pub fn pick_queue_row(&mut self, row: usize, pick: RowPick) {
+        self.sync_queue_selection();
+        if row >= self.queue_selection_view.len() {
+            return;
+        }
+        let selected = &mut self.queue_selection;
+        match pick {
+            RowPick::Only => {
+                let only = selected.rows.len() == 1 && selected.rows.contains(&row);
+                selected.rows.clear();
+                selected.anchor = if only { None } else { Some(row) };
+                if !only {
+                    selected.rows.insert(row);
+                }
+            }
+            RowPick::Toggle => {
+                if !selected.rows.remove(&row) {
+                    selected.rows.insert(row);
+                }
+                selected.anchor = Some(row);
+            }
+            RowPick::Range => {
+                let anchor = selected
+                    .anchor
+                    .unwrap_or(row)
+                    .min(self.queue_selection_view.len() - 1);
+                let visible = self.queue_search.visible(
+                    self.queue
+                        .get()
+                        .map(|queue| queue.queue.as_slice())
+                        .unwrap_or_default(),
+                );
+                selected.rows = visible
+                    .iter()
+                    .copied()
+                    .filter(|index| (anchor.min(row)..=anchor.max(row)).contains(index))
+                    .collect();
+                selected.anchor = Some(anchor);
+            }
+        }
+    }
+
+    pub fn select_all_queue_rows(&mut self) {
+        self.sync_queue_selection();
+        self.queue_selection.rows = self
+            .queue_search
+            .visible(
+                self.queue
+                    .get()
+                    .map(|queue| queue.queue.as_slice())
+                    .unwrap_or_default(),
+            )
+            .iter()
+            .copied()
+            .collect();
+        self.queue_selection.anchor = self.queue_selection.rows.first().copied();
+    }
+
+    pub fn selected_queue_items(&self) -> Vec<PlayableItem> {
+        self.queue
+            .get()
+            .map(|queue| {
+                self.queue_selection
+                    .rows
+                    .iter()
+                    .filter_map(|&row| queue.queue.get(row).cloned())
+                    .collect()
+            })
+            .unwrap_or_default()
+    }
+
+    fn apply_manual_queue_order(&mut self, order: &[usize]) {
+        let old_len = self.manual_queue.len();
+        let old_manual = self.manual_queue.clone();
+        self.manual_queue = order.iter().map(|&row| old_manual[row].clone()).collect();
+        if let Loadable::Loaded(queue) = &mut self.queue {
+            let old_rows: Vec<_> = queue.queue.drain(..old_len).collect();
+            queue
+                .queue
+                .splice(0..0, order.iter().map(|&row| old_rows[row].clone()));
+        }
+        self.pending_queue_adds.retain_mut(|pending| {
+            if pending.manual_index >= old_len {
+                return true;
+            }
+            if let Some(row) = order.iter().position(|&old| old == pending.manual_index) {
+                pending.manual_index = row;
+                true
+            } else {
+                false
+            }
+        });
+        let remap = |row: usize| {
+            if row < old_len {
+                order.iter().position(|&old| old == row)
+            } else {
+                Some(row - old_len + order.len())
+            }
+        };
+        self.queue_selection.rows = self
+            .queue_selection
+            .rows
+            .iter()
+            .filter_map(|&row| remap(row))
+            .collect();
+        self.queue_selection.anchor = self.queue_selection.anchor.and_then(remap);
+        self.queue_selection_view = self
+            .queue
+            .get()
+            .map(|queue| {
+                queue
+                    .queue
+                    .iter()
+                    .map(|item| item.uri().to_string())
+                    .collect()
+            })
+            .unwrap_or_default();
+        self.last_play_next = None;
+        self.session_dirty = true;
+        self.resync_local_queue();
+    }
+
+    fn paste_queue(&mut self, text: &str) {
+        if !self.can_edit_manual_queue() {
+            return;
+        }
+        let items: Vec<_> = text
+            .split(|c: char| c.is_whitespace() || c == ',')
+            .filter_map(crate::link::parse)
+            .filter(|uri| matches!(util::uri_kind(uri), Some("track" | "episode")))
+            .map(|uri| {
+                self.known_song(&uri).unwrap_or_else(|| {
+                    if util::uri_kind(&uri) == Some("episode") {
+                        PlayableItem::Episode(crate::api::models::Episode {
+                            id: util::uri_id(&uri).unwrap_or_default().to_string(),
+                            name: uri.clone(),
+                            uri,
+                            ..Default::default()
+                        })
+                    } else {
+                        self.optimistic_queue_item(&uri, &uri)
+                    }
+                })
+            })
+            .collect();
+        let items: Vec<_> = items
+            .into_iter()
+            .filter(|item| self.can_play_next(item))
+            .collect();
+        if items.is_empty() {
+            self.toast(gettext(
+                self.locale,
+                "The clipboard has no Spotify song links",
+            ));
+            return;
+        }
+        self.insert_queue_items(items, self.manual_queue.len(), false);
+    }
+
+    /// Whether Play Next can guarantee this row's position on this computer.
+    pub fn can_play_next(&self, item: &PlayableItem) -> bool {
+        self.queue_locally_reorderable()
+            && matches!(util::uri_kind(item.uri()), Some("track" | "episode"))
+            && !matches!(item, PlayableItem::Track(track)
+                if track.is_local || track.is_playable == Some(false))
+    }
+
     /// Whether the active local queue has rows that can be cleared.
     pub fn can_clear_queue(&self) -> bool {
         self.queue_locally_reorderable() && self.queued_rows_len() > 0
@@ -4371,6 +4651,7 @@ impl App {
         }
         self.pending_album_queues.clear();
         self.last_album_queue = None;
+        self.last_play_next = None;
         // `queue_one` writes every queued song to both lists, so they hold
         // the same wishes and adding their counts asks for twice the rows
         // Next up was given. The extra row taken is the context's own copy
@@ -4496,6 +4777,7 @@ impl App {
     }
 
     fn remove_manual_queue_row(&mut self, index: usize) {
+        self.clear_queue_history();
         self.manual_queue.remove(index);
         self.pending_queue_adds.retain_mut(|addition| {
             if addition.manual_index == index {
@@ -6759,6 +7041,7 @@ impl App {
     /// in one ordered exchange: two independent requests race, and shuffle
     /// sometimes lost.
     fn play_request(&mut self, request: PlayRequest, shuffle_first: bool) {
+        self.clear_queue_history();
         // Shuffle applies across contexts until disabled. A selected row still
         // starts first; otherwise choose a random starting track.
         let mut request = request;
@@ -7437,6 +7720,7 @@ impl App {
     }
 
     fn transfer(&mut self, device_id: String) {
+        self.clear_queue_history();
         if Some(device_id.as_str()) == self.local_device_id.as_deref() {
             self.selected_device = None;
             self.show_devices = false;
@@ -7671,6 +7955,62 @@ impl App {
             )
             .replace("{count}", &count.to_string()),
         );
+    }
+
+    /// Positional insert shared by drag/drop and Play Next. Drag/drop retains
+    /// its append fallback and add debounce; Play Next checks capabilities and
+    /// debounces its complete selection independently before calling this.
+    fn insert_queue_items(
+        &mut self,
+        items: Vec<PlayableItem>,
+        position: usize,
+        debounce_adds: bool,
+    ) {
+        if !self.queue_locally_reorderable() {
+            let songs = items
+                .into_iter()
+                .map(|item| (item.uri().to_string(), item.name().to_string()))
+                .collect();
+            self.queue_many(songs);
+            return;
+        }
+        let position = position.min(self.queued_rows_len());
+        let repeats: Vec<bool> = items
+            .iter()
+            .map(|item| debounce_adds && self.queued_moments_ago(item.uri()))
+            .collect();
+        let mut inserted = 0;
+        for (item, repeat) in items.into_iter().zip(repeats) {
+            if repeat {
+                continue;
+            }
+            let uri = item.uri().to_string();
+            let at = (position + inserted).min(self.manual_queue.len());
+            // Inserting here shifts every later manual_queue row
+            // right by one; keep pending additions pointing at their
+            // own song rather than the one now sitting in their slot.
+            for addition in &mut self.pending_queue_adds {
+                if addition.manual_index >= at {
+                    addition.manual_index += 1;
+                }
+            }
+            self.pending_queue_adds.push(PendingQueueAdd {
+                item: item.clone(),
+                at: Instant::now(),
+                manual_index: at,
+                write: None,
+            });
+            if let Loadable::Loaded(queue) = &mut self.queue {
+                queue.queue.insert(at.min(queue.queue.len()), item);
+            }
+            self.manual_queue.insert(at, uri);
+            inserted += 1;
+        }
+        if inserted > 0 {
+            self.session_dirty = true;
+            self.queued_toast(inserted);
+            self.resync_local_queue();
+        }
     }
 
     /// Replays the manually queued songs on the local engine in their
@@ -8254,7 +8594,189 @@ impl App {
         }
     }
 
+    fn clear_queue_history(&mut self) {
+        self.queue_undo.clear();
+        self.queue_redo.clear();
+    }
+
+    fn manual_queue_snapshot(&self) -> Option<ManualQueueSnapshot> {
+        if self.local.playback == Playback::Loading
+            || !self.can_edit_manual_queue()
+            || self
+                .queue
+                .get()
+                .is_none_or(|queue| queue.queue.len() > 4096)
+        {
+            return None;
+        }
+        Some(ManualQueueSnapshot {
+            rows: self.queue.get()?.queue[..self.manual_queue.len()].to_vec(),
+            selection: self.queue_selection.clone(),
+        })
+    }
+
+    fn queue_history_matches(&self, edit: &ManualQueueEdit, redo: bool) -> bool {
+        let expected = if redo { &edit.before } else { &edit.after };
+        self.local.playback != Playback::Loading
+            && self.can_edit_manual_queue()
+            && self.local.track_sequence == edit.track_sequence
+            && self.current_track_uri().as_deref() == Some(edit.current.as_str())
+            && self
+                .manual_queue
+                .iter()
+                .map(String::as_str)
+                .eq(expected.rows.iter().map(PlayableItem::uri))
+            && self.queue.get().is_some_and(|queue| {
+                queue.queue[self.manual_queue.len()..]
+                    .iter()
+                    .map(PlayableItem::uri)
+                    .eq(edit.context.iter().map(String::as_str))
+            })
+    }
+
+    pub fn can_undo_queue(&self) -> bool {
+        self.queue_undo
+            .last()
+            .is_some_and(|edit| self.queue_history_matches(edit, false))
+    }
+
+    pub fn can_redo_queue(&self) -> bool {
+        self.queue_redo
+            .last()
+            .is_some_and(|edit| self.queue_history_matches(edit, true))
+    }
+
+    fn restore_queue_edit(&mut self, redo: bool) {
+        if !(if redo {
+            self.can_redo_queue()
+        } else {
+            self.can_undo_queue()
+        }) {
+            self.clear_queue_history();
+            return;
+        }
+        let edit = if redo {
+            self.queue_redo.pop()
+        } else {
+            self.queue_undo.pop()
+        }
+        .expect("checked history entry");
+        let restored = if redo { &edit.after } else { &edit.before };
+        let old_len = self.manual_queue.len();
+        self.manual_queue = restored
+            .rows
+            .iter()
+            .map(|row| row.uri().to_string())
+            .collect();
+        if let Loadable::Loaded(queue) = &mut self.queue {
+            queue.queue.splice(..old_len, restored.rows.iter().cloned());
+        }
+        // Local resync writes every restored occurrence afresh. Old pending
+        // positions and remote write IDs must not be resurrected.
+        self.pending_queue_adds = restored
+            .rows
+            .iter()
+            .enumerate()
+            .map(|(manual_index, item)| PendingQueueAdd {
+                item: item.clone(),
+                at: Instant::now(),
+                manual_index,
+                write: None,
+            })
+            .collect();
+        self.queue_selection = restored.selection.clone();
+        self.queue_selection_view = self
+            .queue
+            .get()
+            .map(|queue| {
+                queue
+                    .queue
+                    .iter()
+                    .map(|row| row.uri().to_string())
+                    .collect()
+            })
+            .unwrap_or_default();
+        self.last_play_next = None;
+        self.queue_cleared = None;
+        self.session_dirty = true;
+        self.resync_local_queue();
+        if redo {
+            self.queue_undo.push(edit);
+        } else {
+            self.queue_redo.push(edit);
+        }
+    }
+
     pub(crate) fn apply(&mut self, action: Action, ctx: &egui::Context) {
+        if matches!(
+            &action,
+            Action::Next
+                | Action::Previous
+                | Action::Transfer(_)
+                | Action::SetShuffle(_)
+                | Action::ToggleShuffle
+        ) {
+            self.clear_queue_history();
+        }
+        let record = matches!(
+            &action,
+            Action::AddToQueue { .. }
+                | Action::QueueMany { .. }
+                | Action::PlayNext { .. }
+                | Action::PlayLater { .. }
+                | Action::PasteQueue(_)
+                | Action::MoveQueueToEdge { .. }
+                | Action::RemoveQueueRows { .. }
+                | Action::MoveQueueRows { .. }
+                | Action::MoveInQueue { .. }
+                | Action::InsertInQueue { .. }
+                | Action::ClearQueue
+        );
+        if record
+            && ((!self.queue_undo.is_empty() && !self.can_undo_queue())
+                || (!self.queue_redo.is_empty() && !self.can_redo_queue()))
+        {
+            self.clear_queue_history();
+        }
+        let before = record.then(|| self.manual_queue_snapshot()).flatten();
+        self.apply_inner(action, ctx);
+        if let Some(before) = before {
+            if let Some(after) = self.manual_queue_snapshot() {
+                if before.rows != after.rows {
+                    self.queue_redo.clear();
+                    let context = self.queue.get().expect("snapshot requires queue").queue
+                        [self.manual_queue.len()..]
+                        .iter()
+                        .map(|row| row.uri().to_string())
+                        .collect();
+                    self.queue_undo.push(ManualQueueEdit {
+                        before,
+                        after,
+                        track_sequence: self.local.track_sequence,
+                        current: self.current_track_uri().unwrap_or_default().to_string(),
+                        context,
+                    });
+                    // Bound retained metadata as well as the number of edits.
+                    while self.queue_undo.len() > 20
+                        || self
+                            .queue_undo
+                            .iter()
+                            .map(|edit| {
+                                edit.before.rows.len() + edit.after.rows.len() + edit.context.len()
+                            })
+                            .sum::<usize>()
+                            > 8192
+                    {
+                        self.queue_undo.remove(0);
+                    }
+                }
+            } else {
+                self.clear_queue_history();
+            }
+        }
+    }
+
+    fn apply_inner(&mut self, action: Action, ctx: &egui::Context) {
         if matches!(
             &action,
             Action::Open(_)
@@ -8484,6 +9006,43 @@ impl App {
             Action::SetRepeat(mode) => self.set_repeat(mode),
             Action::AddToQueue { uri, label } => self.add_to_queue(uri, label),
             Action::QueueMany { songs } => self.queue_many(songs),
+            Action::PlayNext { items } => {
+                // Recheck at application time: the target may have changed
+                // since the menu was drawn. Remote append is not Play Next.
+                let items: Vec<_> = items
+                    .into_iter()
+                    .filter(|item| self.can_play_next(item))
+                    .collect();
+                if items.is_empty() {
+                    return;
+                }
+                let uris: Vec<_> = items.iter().map(|item| item.uri().to_string()).collect();
+                if self
+                    .last_play_next
+                    .as_ref()
+                    .is_some_and(|(previous, at, queue)| {
+                        previous == &uris
+                            && queue == &self.manual_queue
+                            && at.elapsed() < QUEUE_ADD_DEBOUNCE
+                    })
+                {
+                    return;
+                }
+                self.insert_queue_items(items, 0, false);
+                self.last_play_next = Some((uris, Instant::now(), self.manual_queue.clone()));
+            }
+            Action::PlayLater { items } => {
+                if !self.can_edit_manual_queue() {
+                    return;
+                }
+                let items: Vec<_> = items
+                    .into_iter()
+                    .filter(|item| self.can_play_next(item))
+                    .collect();
+                if !items.is_empty() {
+                    self.insert_queue_items(items, self.manual_queue.len(), false);
+                }
+            }
             Action::MoveInQueue { from, to } => {
                 if !self.queue_locally_reorderable() {
                     return;
@@ -8513,52 +9072,53 @@ impl App {
                 self.session_dirty = true;
                 self.resync_local_queue();
             }
-            Action::InsertInQueue { items, position } => {
-                if !self.queue_locally_reorderable() {
-                    let songs = items
-                        .into_iter()
-                        .map(|item| (item.uri().to_string(), item.name().to_string()))
-                        .collect();
-                    self.queue_many(songs);
+            Action::MoveQueueToEdge {
+                index,
+                expected_queue,
+                to_end,
+            } => {
+                if expected_queue != self.manual_queue || !self.can_edit_queue_rows(&[index]) {
                     return;
                 }
-                let position = position.min(self.queued_rows_len());
-                let repeats: Vec<bool> = items
-                    .iter()
-                    .map(|item| self.queued_moments_ago(item.uri()))
-                    .collect();
-                let mut inserted = 0;
-                for (item, repeat) in items.into_iter().zip(repeats) {
-                    if repeat {
-                        continue;
-                    }
-                    let uri = item.uri().to_string();
-                    let at = (position + inserted).min(self.manual_queue.len());
-                    // Inserting here shifts every later manual_queue row
-                    // right by one; keep pending additions pointing at their
-                    // own song rather than the one now sitting in their slot.
-                    for addition in &mut self.pending_queue_adds {
-                        if addition.manual_index >= at {
-                            addition.manual_index += 1;
-                        }
-                    }
-                    self.pending_queue_adds.push(PendingQueueAdd {
-                        item: item.clone(),
-                        at: Instant::now(),
-                        manual_index: at,
-                        write: None,
-                    });
-                    if let Loadable::Loaded(queue) = &mut self.queue {
-                        queue.queue.insert(at.min(queue.queue.len()), item);
-                    }
-                    self.manual_queue.insert(at, uri);
-                    inserted += 1;
+                let position = if to_end { self.manual_queue.len() } else { 0 };
+                if let Some(order) =
+                    crate::queue_edit::moved_order(self.manual_queue.len(), &[index], position)
+                {
+                    self.apply_manual_queue_order(&order);
                 }
-                if inserted > 0 {
-                    self.session_dirty = true;
-                    self.queued_toast(inserted);
-                    self.resync_local_queue();
+            }
+            Action::RemoveQueueRows {
+                rows,
+                expected_queue,
+            } => {
+                if expected_queue != self.manual_queue || !self.can_edit_queue_rows(&rows) {
+                    return;
                 }
+                if let Some(order) =
+                    crate::queue_edit::removed_order(self.manual_queue.len(), &rows)
+                {
+                    self.apply_manual_queue_order(&order);
+                }
+            }
+            Action::MoveQueueRows {
+                rows,
+                position,
+                expected_queue,
+            } => {
+                if expected_queue != self.manual_queue || !self.can_edit_queue_rows(&rows) {
+                    return;
+                }
+                if let Some(order) =
+                    crate::queue_edit::moved_order(self.manual_queue.len(), &rows, position)
+                {
+                    self.apply_manual_queue_order(&order);
+                }
+            }
+            Action::PasteQueue(text) => self.paste_queue(&text),
+            Action::UndoQueue => self.restore_queue_edit(false),
+            Action::RedoQueue => self.restore_queue_edit(true),
+            Action::InsertInQueue { items, position } => {
+                self.insert_queue_items(items, position, true)
             }
             Action::SetSavedMany { uris, saved } => {
                 let mut changed_tracks = false;
@@ -8822,6 +9382,11 @@ impl App {
             }
             Action::ClearQueue => self.clear_queue(),
             Action::SaveQueueAsPlaylist => self.save_queue_as_playlist(),
+            Action::SetQueueSearch(query) => {
+                if self.queue_search.set_query(query) {
+                    self.queue_selection = RowSelection::default();
+                }
+            }
             Action::SaveRadio(seed) => self.save_radio(&seed),
             Action::RefreshQueue => self.refresh_queue(true),
             Action::CopyLink(uri) => {
@@ -14294,6 +14859,839 @@ mod tests {
         );
     }
 
+    #[test]
+    fn queue_edge_moves_preserve_occurrences_pending_indexes_and_context() {
+        let mut app = app_with_local_manual_queue();
+        app.local.playback = Playback::Paused;
+        app.manual_queue = ["a", "b", "c", "b"]
+            .map(|id| format!("spotify:track:{id}"))
+            .to_vec();
+        app.queue = loaded_queue(
+            "spotify:track:playing",
+            &[
+                "spotify:track:a",
+                "spotify:track:b",
+                "spotify:track:c",
+                "spotify:track:b",
+                "spotify:track:ctx",
+            ],
+        );
+        app.pending_queue_adds = app
+            .manual_queue
+            .iter()
+            .enumerate()
+            .map(|(index, uri)| PendingQueueAdd {
+                item: queued_song(uri),
+                at: Instant::now(),
+                manual_index: index,
+                write: None,
+            })
+            .collect();
+        let ctx = egui::Context::default();
+        app.apply(
+            Action::MoveQueueToEdge {
+                index: 3,
+                expected_queue: app.manual_queue.clone(),
+                to_end: false,
+            },
+            &ctx,
+        );
+        assert_eq!(
+            app.manual_queue,
+            [
+                "spotify:track:b",
+                "spotify:track:a",
+                "spotify:track:b",
+                "spotify:track:c"
+            ]
+        );
+        assert_eq!(
+            app.pending_queue_adds
+                .iter()
+                .map(|pending| pending.manual_index)
+                .collect::<Vec<_>>(),
+            [1, 2, 3, 0]
+        );
+        assert_eq!(queue_uris(&app).1.last().unwrap(), "spotify:track:ctx");
+        let commands = app.backend.take_player_commands();
+        assert!(matches!(commands.first(), Some(PlayerCommand::ClearQueue)));
+        let uris: Vec<_> = commands
+            .iter()
+            .skip(1)
+            .map(|command| match command {
+                PlayerCommand::AddToQueue(uri) => uri.as_str(),
+                other => panic!("queue move changed playback: {other:?}"),
+            })
+            .collect();
+        assert_eq!(
+            uris,
+            app.manual_queue
+                .iter()
+                .map(String::as_str)
+                .collect::<Vec<_>>()
+        );
+        app.apply(
+            Action::MoveQueueToEdge {
+                index: 0,
+                expected_queue: app.manual_queue.clone(),
+                to_end: true,
+            },
+            &ctx,
+        );
+        assert_eq!(
+            app.manual_queue,
+            [
+                "spotify:track:a",
+                "spotify:track:b",
+                "spotify:track:c",
+                "spotify:track:b"
+            ]
+        );
+        assert_eq!(
+            app.pending_queue_adds
+                .iter()
+                .map(|pending| pending.manual_index)
+                .collect::<Vec<_>>(),
+            [0, 1, 2, 3]
+        );
+        assert_eq!(app.local.playback, Playback::Paused);
+        assert_eq!(queue_uris(&app).0.as_deref(), Some("spotify:track:playing"));
+        assert_eq!(queue_uris(&app).1.last().unwrap(), "spotify:track:ctx");
+        assert!(app.session_dirty);
+    }
+
+    #[test]
+    fn queue_edge_moves_record_history_for_duplicates_pending_indexes_and_context() {
+        let mut app = app_with_local_manual_queue();
+        app.local.playback = Playback::Paused;
+        app.manual_queue = ["a", "b", "c", "b"]
+            .map(|id| format!("spotify:track:{id}"))
+            .to_vec();
+        app.queue = loaded_queue(
+            "spotify:track:playing",
+            &[
+                "spotify:track:a",
+                "spotify:track:b",
+                "spotify:track:c",
+                "spotify:track:b",
+                "spotify:track:ctx",
+            ],
+        );
+        app.pending_queue_adds = app
+            .manual_queue
+            .iter()
+            .enumerate()
+            .map(|(index, uri)| PendingQueueAdd {
+                item: queued_song(uri),
+                at: Instant::now(),
+                manual_index: index,
+                write: None,
+            })
+            .collect();
+        let ctx = egui::Context::default();
+        let before = queue_uris(&app);
+
+        app.apply(
+            Action::MoveQueueToEdge {
+                index: 3,
+                expected_queue: app.manual_queue.clone(),
+                to_end: false,
+            },
+            &ctx,
+        );
+        let moved_to_top = app.manual_queue.clone();
+        assert!(app.can_undo_queue());
+        app.apply(Action::UndoQueue, &ctx);
+        assert_eq!(queue_uris(&app), before);
+        assert_eq!(
+            app.pending_queue_adds
+                .iter()
+                .map(|pending| pending.manual_index)
+                .collect::<Vec<_>>(),
+            [0, 1, 2, 3]
+        );
+        app.apply(Action::RedoQueue, &ctx);
+        assert_eq!(app.manual_queue, moved_to_top);
+        assert_eq!(queue_uris(&app).1.last().unwrap(), "spotify:track:ctx");
+
+        app.apply(
+            Action::MoveQueueToEdge {
+                index: 0,
+                expected_queue: app.manual_queue.clone(),
+                to_end: true,
+            },
+            &ctx,
+        );
+        assert_eq!(queue_uris(&app), before);
+        assert!(app.can_undo_queue());
+        app.apply(Action::UndoQueue, &ctx);
+        assert_eq!(app.manual_queue, moved_to_top);
+        assert_eq!(
+            app.pending_queue_adds
+                .iter()
+                .map(|pending| pending.manual_index)
+                .collect::<Vec<_>>(),
+            [0, 1, 2, 3],
+            "undo creates fresh pending writes in restored queue order"
+        );
+        assert_eq!(queue_uris(&app).1.last().unwrap(), "spotify:track:ctx");
+        app.apply(Action::RedoQueue, &ctx);
+        assert_eq!(queue_uris(&app), before);
+        assert_eq!(
+            app.pending_queue_adds
+                .iter()
+                .map(|pending| pending.manual_index)
+                .collect::<Vec<_>>(),
+            [0, 1, 2, 3]
+        );
+        for pending in &app.pending_queue_adds {
+            assert_eq!(app.manual_queue[pending.manual_index], pending.item.uri());
+            assert!(
+                pending.write.is_none(),
+                "restored local writes must not inherit remote IDs"
+            );
+        }
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn queue_edge_moves_reject_stale_indexes_remote_inactive_and_context_rows() {
+        for scenario in 0..7 {
+            let mut app = app_with_local_manual_queue();
+            let expected_queue = app.manual_queue.clone();
+            let mut index = 1;
+            match scenario {
+                0 => app.consume_manual_queue_head("spotify:track:a"),
+                1 => {
+                    app.local_ready = false;
+                    app.selected_device = Some("phone".into());
+                }
+                2 => app.local.playback = Playback::Stopped,
+                3 => index = 3,
+                4 => {
+                    app.queue = loaded_queue(
+                        "spotify:track:playing",
+                        &["spotify:track:a", "spotify:track:other", "spotify:track:c"],
+                    )
+                }
+                5 => {
+                    app.queue = loaded_queue(
+                        "spotify:track:playing",
+                        &["spotify:track:a", "spotify:track:b", "spotify:track:ctx"],
+                    )
+                }
+                6 => {
+                    index = 0;
+                    app.queue = loaded_queue(
+                        "spotify:track:playing",
+                        &[
+                            "spotify:track:a",
+                            "spotify:track:c",
+                            "spotify:track:b",
+                            "spotify:track:ctx",
+                        ],
+                    );
+                }
+                _ => unreachable!(),
+            }
+            let before = (app.manual_queue.clone(), queue_uris(&app));
+            app.session_dirty = false;
+            app.apply(
+                Action::MoveQueueToEdge {
+                    index,
+                    expected_queue,
+                    to_end: false,
+                },
+                &egui::Context::default(),
+            );
+            assert_eq!(
+                (app.manual_queue.clone(), queue_uris(&app)),
+                before,
+                "scenario {scenario}"
+            );
+            assert!(app.backend.take_player_commands().is_empty());
+            assert!(app.backend.take_queue_requests().is_empty());
+            assert!(!app.session_dirty);
+        }
+    }
+
+    #[test]
+    fn queue_edge_moves_at_the_same_edge_are_no_ops() {
+        for (index, to_end) in [(0, false), (2, true)] {
+            let mut app = app_with_local_manual_queue();
+            app.session_dirty = false;
+            let before = queue_uris(&app);
+            app.apply(
+                Action::MoveQueueToEdge {
+                    index,
+                    expected_queue: app.manual_queue.clone(),
+                    to_end,
+                },
+                &egui::Context::default(),
+            );
+            assert_eq!(queue_uris(&app), before);
+            assert!(app.backend.take_player_commands().is_empty());
+            assert!(!app.session_dirty);
+        }
+    }
+
+    #[test]
+    fn queue_edge_moves_hold_order_against_an_old_queue_answer() {
+        let mut app = app_with_local_manual_queue();
+        app.refresh_queue(true);
+        let old_seq = app.queue_seq;
+        let old_queue = app.queue.get().unwrap().clone();
+        app.apply(
+            Action::MoveQueueToEdge {
+                index: 2,
+                expected_queue: app.manual_queue.clone(),
+                to_end: false,
+            },
+            &egui::Context::default(),
+        );
+        let before = queue_uris(&app);
+        app.handle_api(ApiResponse::Queue {
+            seq: old_seq,
+            result: Ok(old_queue),
+        });
+        assert_eq!(queue_uris(&app), before);
+        assert!(app.queue_reorder_pending.is_some());
+    }
+
+    #[test]
+    fn queue_history_restores_removed_duplicates_context_selection_and_pending_indexes() {
+        let mut app = app_with_local_manual_queue();
+        app.local.playback = Playback::Paused;
+        app.manual_queue = vec![
+            "spotify:track:a".into(),
+            "spotify:track:b".into(),
+            "spotify:track:a".into(),
+        ];
+        app.queue = loaded_queue(
+            "spotify:track:playing",
+            &[
+                "spotify:track:a",
+                "spotify:track:b",
+                "spotify:track:a",
+                "spotify:track:ctx",
+            ],
+        );
+        let ctx = egui::Context::default();
+        let before = queue_uris(&app);
+        app.sync_queue_selection();
+        app.pick_queue_row(1, RowPick::Only);
+        app.apply(
+            Action::RemoveQueueRows {
+                rows: vec![1],
+                expected_queue: app.manual_queue.clone(),
+            },
+            &ctx,
+        );
+        let after = queue_uris(&app);
+        assert!(app.can_undo_queue());
+        app.apply(Action::UndoQueue, &ctx);
+        assert_eq!(queue_uris(&app), before);
+        assert_eq!(
+            app.queue_selection.rows.iter().copied().collect::<Vec<_>>(),
+            vec![1]
+        );
+        assert!(app.can_redo_queue());
+        let confirmed = app.queue.get().unwrap().clone();
+        app.handle_api(ApiResponse::Queue {
+            seq: app.queue_seq,
+            result: Ok(confirmed),
+        });
+        assert_eq!(
+            app.queue_stale_retries, 0,
+            "undo must accept confirmation of restored rows"
+        );
+        assert_eq!(app.local.playback, Playback::Paused);
+        assert!(
+            app.pending_queue_adds
+                .iter()
+                .enumerate()
+                .all(|(index, pending)| pending.manual_index == index && pending.write.is_none())
+        );
+        app.apply(Action::RedoQueue, &ctx);
+        assert_eq!(queue_uris(&app), after);
+        assert!(app.can_undo_queue());
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn queue_history_multi_step_and_new_edit_discards_redo() {
+        let mut app = app_with_local_manual_queue();
+        let ctx = egui::Context::default();
+        let before = app.manual_queue.clone();
+        app.apply(
+            Action::MoveQueueRows {
+                rows: vec![0],
+                position: 3,
+                expected_queue: before.clone(),
+            },
+            &ctx,
+        );
+        let moved = app.manual_queue.clone();
+        app.apply(Action::ClearQueue, &ctx);
+        assert!(app.manual_queue.is_empty());
+        app.apply(Action::UndoQueue, &ctx);
+        assert_eq!(app.manual_queue, moved);
+        app.apply(Action::UndoQueue, &ctx);
+        assert_eq!(app.manual_queue, before);
+        app.apply(Action::RedoQueue, &ctx);
+        assert_eq!(app.manual_queue, moved);
+        app.apply(
+            Action::PlayLater {
+                items: vec![queued_song("spotify:track:new")],
+            },
+            &ctx,
+        );
+        assert!(!app.can_redo_queue());
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn queue_history_same_song_next_and_sequence_change_cannot_resurrect_rows() {
+        for natural in [false, true] {
+            let mut app = app_with_local_manual_queue();
+            let ctx = egui::Context::default();
+            app.apply(Action::ClearQueue, &ctx);
+            assert!(app.can_undo_queue());
+            if natural {
+                let mut state = app.local.clone();
+                state.track_sequence += 1;
+                app.handle_local(state);
+            } else {
+                app.apply(Action::Next, &ctx);
+            }
+            let after = queue_uris(&app);
+            assert!(!app.can_undo_queue());
+            app.apply(Action::UndoQueue, &ctx);
+            assert_eq!(queue_uris(&app), after);
+            app.backend.shutdown();
+        }
+    }
+
+    #[test]
+    fn queue_history_rejects_changed_context_remote_disconnect_and_stale_answers() {
+        for kind in 0..4 {
+            let mut app = app_with_local_manual_queue();
+            let ctx = egui::Context::default();
+            let seq = app.queue_seq;
+            let stale = app.queue.get().unwrap().clone();
+            app.apply(Action::ClearQueue, &ctx);
+            if kind == 0 {
+                if let Loadable::Loaded(queue) = &mut app.queue {
+                    queue.queue.push(queued_song("spotify:track:external"));
+                }
+            } else if kind == 1 {
+                app.local_ready = false;
+                app.selected_device = Some("phone".into());
+            } else if kind == 2 {
+                app.handle_playback(LocalPlayback::Unavailable);
+            } else {
+                app.handle_api(ApiResponse::Queue {
+                    seq,
+                    result: Ok(stale),
+                });
+                assert!(
+                    app.can_undo_queue(),
+                    "old queue answer must not destroy a valid edit"
+                );
+                app.backend.shutdown();
+                continue;
+            }
+            assert!(!app.can_undo_queue());
+            let after = queue_uris(&app);
+            app.apply(Action::UndoQueue, &ctx);
+            assert_eq!(queue_uris(&app), after);
+            app.backend.shutdown();
+        }
+    }
+
+    #[test]
+    fn queue_history_no_op_and_limits_preserve_normal_editing() {
+        let mut app = app_with_local_manual_queue();
+        let ctx = egui::Context::default();
+        app.apply(
+            Action::MoveQueueRows {
+                rows: vec![0],
+                position: 0,
+                expected_queue: app.manual_queue.clone(),
+            },
+            &ctx,
+        );
+        assert!(!app.can_undo_queue());
+        for index in 0..30 {
+            app.apply(
+                Action::PlayLater {
+                    items: vec![queued_song(&format!("spotify:track:new{index}"))],
+                },
+                &ctx,
+            );
+        }
+        assert_eq!(app.queue_undo.len(), 20);
+        if let Loadable::Loaded(queue) = &mut app.queue {
+            while queue.queue.len() <= 4096 {
+                queue.queue.push(queued_song("spotify:track:context"));
+            }
+        }
+        app.apply(Action::ClearQueue, &ctx);
+        assert!(
+            app.manual_queue.is_empty(),
+            "history limits must not prevent editing"
+        );
+        assert!(!app.can_undo_queue());
+        app.reset_data();
+        assert!(app.queue_undo.is_empty() && app.queue_redo.is_empty());
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn queue_batch_remove_preserves_duplicate_occurrences_context_and_paused_playback() {
+        let mut app = app_with_local_manual_queue();
+        app.local.playback = Playback::Paused;
+        app.manual_queue = ["a", "b", "a", "c"]
+            .map(|id| format!("spotify:track:{id}"))
+            .to_vec();
+        app.queue = loaded_queue(
+            "spotify:track:playing",
+            &[
+                "spotify:track:a",
+                "spotify:track:b",
+                "spotify:track:a",
+                "spotify:track:c",
+                "spotify:track:ctx",
+            ],
+        );
+        app.pending_queue_adds = app
+            .manual_queue
+            .iter()
+            .enumerate()
+            .map(|(index, uri)| PendingQueueAdd {
+                item: queued_song(uri),
+                at: Instant::now(),
+                manual_index: index,
+                write: None,
+            })
+            .collect();
+        app.sync_queue_selection();
+        app.queue_selection.rows = [1, 2, 4].into_iter().collect();
+        app.queue_selection.anchor = Some(4);
+        app.apply(
+            Action::RemoveQueueRows {
+                rows: vec![2, 1, 2],
+                expected_queue: app.manual_queue.clone(),
+            },
+            &egui::Context::default(),
+        );
+        assert_eq!(app.manual_queue, ["spotify:track:a", "spotify:track:c"]);
+        assert_eq!(
+            queue_uris(&app).1,
+            ["spotify:track:a", "spotify:track:c", "spotify:track:ctx"]
+        );
+        assert_eq!(
+            app.pending_queue_adds
+                .iter()
+                .map(|pending| pending.manual_index)
+                .collect::<Vec<_>>(),
+            [0, 1]
+        );
+        assert_eq!(
+            app.queue_selection.rows.iter().copied().collect::<Vec<_>>(),
+            [2]
+        );
+        assert_eq!(app.queue_selection.anchor, Some(2));
+        assert_eq!(queue_uris(&app).0.as_deref(), Some("spotify:track:playing"));
+        assert_eq!(app.local.playback, Playback::Paused);
+        assert!(app.session_dirty);
+        let commands = app.backend.take_player_commands();
+        assert!(matches!(commands.first(), Some(PlayerCommand::ClearQueue)));
+        assert_eq!(commands.len(), 3);
+        assert!(
+            commands
+                .iter()
+                .skip(1)
+                .all(|command| matches!(command, PlayerCommand::AddToQueue(_)))
+        );
+    }
+
+    #[test]
+    fn queue_batch_move_remaps_noncontiguous_selection_and_pending_occurrences() {
+        let mut app = app_with_local_manual_queue();
+        app.manual_queue.push("spotify:track:b".into());
+        app.queue = loaded_queue(
+            "spotify:track:playing",
+            &[
+                "spotify:track:a",
+                "spotify:track:b",
+                "spotify:track:c",
+                "spotify:track:b",
+                "spotify:track:ctx",
+            ],
+        );
+        app.pending_queue_adds = app
+            .manual_queue
+            .iter()
+            .enumerate()
+            .map(|(index, uri)| PendingQueueAdd {
+                item: queued_song(uri),
+                at: Instant::now(),
+                manual_index: index,
+                write: None,
+            })
+            .collect();
+        app.sync_queue_selection();
+        app.queue_selection.rows = [1, 3].into_iter().collect();
+        app.queue_selection.anchor = Some(3);
+        let ctx = egui::Context::default();
+        app.apply(
+            Action::MoveQueueRows {
+                rows: vec![3, 1],
+                position: 0,
+                expected_queue: app.manual_queue.clone(),
+            },
+            &ctx,
+        );
+        assert_eq!(
+            app.manual_queue,
+            [
+                "spotify:track:b",
+                "spotify:track:b",
+                "spotify:track:a",
+                "spotify:track:c"
+            ]
+        );
+        assert_eq!(
+            app.pending_queue_adds
+                .iter()
+                .map(|pending| pending.manual_index)
+                .collect::<Vec<_>>(),
+            [2, 0, 3, 1]
+        );
+        assert_eq!(
+            app.queue_selection.rows.iter().copied().collect::<Vec<_>>(),
+            [0, 1]
+        );
+        assert_eq!(app.queue_selection.anchor, Some(1));
+        app.sync_queue_selection();
+        assert_eq!(
+            app.queue_selection.rows.len(),
+            2,
+            "a redraw keeps the moved block selected"
+        );
+        app.apply(
+            Action::MoveQueueRows {
+                rows: vec![0, 1],
+                position: 4,
+                expected_queue: app.manual_queue.clone(),
+            },
+            &ctx,
+        );
+        assert_eq!(
+            app.manual_queue,
+            [
+                "spotify:track:a",
+                "spotify:track:c",
+                "spotify:track:b",
+                "spotify:track:b"
+            ]
+        );
+        assert_eq!(
+            app.queue_selection.rows.iter().copied().collect::<Vec<_>>(),
+            [2, 3]
+        );
+        assert_eq!(queue_uris(&app).1.last().unwrap(), "spotify:track:ctx");
+        for pending in &app.pending_queue_adds {
+            assert_eq!(pending.item.uri(), app.manual_queue[pending.manual_index]);
+        }
+    }
+
+    #[test]
+    fn queue_batch_edits_reject_stale_mixed_context_remote_and_inactive_requests() {
+        for remove in [false, true] {
+            for scenario in 0..7 {
+                let mut app = app_with_local_manual_queue();
+                let expected_queue = app.manual_queue.clone();
+                let mut rows = vec![1];
+                match scenario {
+                    0 => app.consume_manual_queue_head("spotify:track:a"),
+                    1 => {
+                        app.local_ready = false;
+                        app.selected_device = Some("phone".into());
+                    }
+                    2 => app.local.playback = Playback::Stopped,
+                    3 => rows = vec![1, 3],
+                    4 => rows = vec![usize::MAX],
+                    5 => rows.clear(),
+                    6 => {
+                        app.queue = loaded_queue(
+                            "spotify:track:playing",
+                            &[
+                                "spotify:track:a",
+                                "spotify:track:c",
+                                "spotify:track:b",
+                                "spotify:track:ctx",
+                            ],
+                        )
+                    }
+                    _ => unreachable!(),
+                }
+                let before = (app.manual_queue.clone(), queue_uris(&app));
+                app.session_dirty = false;
+                let action = if remove {
+                    Action::RemoveQueueRows {
+                        rows,
+                        expected_queue,
+                    }
+                } else {
+                    Action::MoveQueueRows {
+                        rows,
+                        position: 0,
+                        expected_queue,
+                    }
+                };
+                app.apply(action, &egui::Context::default());
+                assert_eq!(
+                    (app.manual_queue.clone(), queue_uris(&app)),
+                    before,
+                    "remove={remove}, scenario={scenario}"
+                );
+                assert!(!app.session_dirty);
+                assert!(app.backend.take_player_commands().is_empty());
+                assert!(app.backend.take_queue_requests().is_empty());
+            }
+        }
+    }
+
+    #[test]
+    fn queue_batch_remove_cannot_be_undone_by_an_old_queue_answer() {
+        let mut app = app_with_local_manual_queue();
+        app.refresh_queue(true);
+        let seq = app.queue_seq;
+        let old_queue = app.queue.get().unwrap().clone();
+        app.apply(
+            Action::RemoveQueueRows {
+                rows: vec![0, 2],
+                expected_queue: app.manual_queue.clone(),
+            },
+            &egui::Context::default(),
+        );
+        let before = queue_uris(&app);
+        app.handle_api(ApiResponse::Queue {
+            seq,
+            result: Ok(old_queue),
+        });
+        assert_eq!(queue_uris(&app), before);
+        assert_eq!(app.manual_queue, ["spotify:track:b"]);
+    }
+
+    #[test]
+    fn queue_search_selection_edits_original_occurrences_only() {
+        let mut app = app_with_local_manual_queue();
+        for (index, item) in app.queue.get_mut().unwrap().queue.iter_mut().enumerate() {
+            if let PlayableItem::Track(track) = item {
+                track.name = if index == 0 || index == 2 {
+                    "Match"
+                } else {
+                    "Hidden"
+                }
+                .into();
+            }
+        }
+        let ctx = egui::Context::default();
+        let before = queue_uris(&app);
+        app.pick_queue_row(1, RowPick::Only);
+        app.apply(Action::SetQueueSearch("match".into()), &ctx);
+        assert!(app.queue_selection.rows.is_empty());
+        assert_eq!(
+            queue_uris(&app),
+            before,
+            "search cannot change playback order"
+        );
+        app.pick_queue_row(0, RowPick::Only);
+        app.pick_queue_row(2, RowPick::Range);
+        assert_eq!(
+            app.queue_selection.rows.iter().copied().collect::<Vec<_>>(),
+            [0, 2]
+        );
+        app.select_all_queue_rows();
+        assert_eq!(
+            app.queue_selection.rows.iter().copied().collect::<Vec<_>>(),
+            [0, 2]
+        );
+        app.apply(
+            Action::RemoveQueueRows {
+                rows: vec![0, 2],
+                expected_queue: app.manual_queue.clone(),
+            },
+            &ctx,
+        );
+        assert_eq!(app.manual_queue, ["spotify:track:b"]);
+        assert_eq!(queue_uris(&app).1.last().unwrap(), "spotify:track:ctx");
+        app.apply(Action::SetQueueSearch(String::new()), &ctx);
+        app.select_all_queue_rows();
+        assert_eq!(app.queue_selection.rows.len(), 2);
+        app.apply(Action::SetQueueSearch("hidden".into()), &ctx);
+        app.select_all_queue_rows();
+        assert_eq!(app.queue_selection.rows.len(), 2);
+        if let PlayableItem::Track(track) = &mut app.queue.get_mut().unwrap().queue[0] {
+            track.name = "Renamed".into();
+        }
+        app.sync_queue_selection();
+        assert_eq!(
+            app.queue_selection.rows.iter().copied().collect::<Vec<_>>(),
+            [1],
+            "hidden metadata-renamed rows cannot remain selected"
+        );
+    }
+
+    #[test]
+    fn queue_selection_supports_toggle_range_and_clears_on_external_order_change() {
+        let mut app = app_with_local_manual_queue();
+        app.pick_queue_row(1, RowPick::Only);
+        app.pick_queue_row(3, RowPick::Range);
+        assert_eq!(
+            app.queue_selection.rows.iter().copied().collect::<Vec<_>>(),
+            [1, 2, 3]
+        );
+        app.pick_queue_row(2, RowPick::Toggle);
+        assert_eq!(
+            app.queue_selection.rows.iter().copied().collect::<Vec<_>>(),
+            [1, 3]
+        );
+        assert_eq!(
+            app.selected_queue_items()
+                .iter()
+                .map(|item| item.uri())
+                .collect::<Vec<_>>(),
+            ["spotify:track:b", "spotify:track:ctx"]
+        );
+        app.pick_queue_row(usize::MAX, RowPick::Only);
+        assert_eq!(app.queue_selection.rows.len(), 2);
+        app.select_all_queue_rows();
+        assert_eq!(app.queue_selection.rows.len(), 4);
+        assert!(
+            app.selection.is_none(),
+            "queue selection does not become collection selection"
+        );
+        app.queue = loaded_queue(
+            "spotify:track:playing",
+            &[
+                "spotify:track:b",
+                "spotify:track:a",
+                "spotify:track:c",
+                "spotify:track:ctx",
+            ],
+        );
+        app.sync_queue_selection();
+        assert!(app.queue_selection.rows.is_empty());
+        assert!(app.queue_selection.anchor.is_none());
+        app.pick_queue_row(0, RowPick::Only);
+        app.pick_queue_row(0, RowPick::Only);
+        assert!(app.queue_selection.rows.is_empty());
+    }
+
     /// Inserting a dropped song into "Playing next" must keep every earlier
     /// pending addition pointing at its own song, not the newly inserted row.
     #[test]
@@ -14350,6 +15748,441 @@ mod tests {
                 "pending addition must still name the song at its own index"
             );
         }
+    }
+
+    #[test]
+    fn queue_paste_appends_track_episode_duplicates_and_allows_repeated_pastes() {
+        let mut app = app_with_local_manual_queue();
+        app.local.playback = Playback::Paused;
+        let ctx = egui::Context::default();
+        let text = "https://open.spotify.com/track/new?si=test, spotify:episode:episode1\nspotify:track:new";
+        for _ in 0..2 {
+            app.apply(Action::PasteQueue(text.into()), &ctx);
+        }
+        assert_eq!(
+            app.manual_queue,
+            [
+                "spotify:track:a",
+                "spotify:track:b",
+                "spotify:track:c",
+                "spotify:track:new",
+                "spotify:episode:episode1",
+                "spotify:track:new",
+                "spotify:track:new",
+                "spotify:episode:episode1",
+                "spotify:track:new"
+            ]
+        );
+        let queue = app.queue.get().unwrap();
+        assert!(
+            matches!(&queue.queue[4], PlayableItem::Episode(episode) if episode.uri == "spotify:episode:episode1")
+        );
+        assert!(matches!(&queue.queue[7], PlayableItem::Episode(_)));
+        assert_eq!(queue.queue.last().unwrap().uri(), "spotify:track:ctx");
+        assert_eq!(app.local.playback, Playback::Paused);
+        assert_eq!(queue_uris(&app).0.as_deref(), Some("spotify:track:playing"));
+    }
+
+    #[test]
+    fn queue_paste_rejects_invalid_links_unavailable_tracks_and_remote_playback() {
+        let ctx = egui::Context::default();
+        for scenario in 0..4 {
+            let mut app = app_with_local_manual_queue();
+            let text = match scenario {
+                0 => "https://evil.example/track/a spotify:album:album1 nonsense",
+                1 => {
+                    app.copied_songs = vec![PlayableItem::Track(crate::api::models::Track {
+                        uri: "spotify:track:blocked".into(),
+                        is_playable: Some(false),
+                        ..Default::default()
+                    })];
+                    "spotify:track:blocked"
+                }
+                2 => {
+                    app.local_ready = false;
+                    app.selected_device = Some("phone".into());
+                    "spotify:track:new"
+                }
+                3 => {
+                    app.local.playback = Playback::Stopped;
+                    "spotify:track:new"
+                }
+                _ => unreachable!(),
+            };
+            let before = (app.manual_queue.clone(), queue_uris(&app));
+            app.session_dirty = false;
+            app.apply(Action::PasteQueue(text.into()), &ctx);
+            assert_eq!(
+                (app.manual_queue.clone(), queue_uris(&app)),
+                before,
+                "scenario {scenario}"
+            );
+            assert!(!app.session_dirty);
+            assert!(app.backend.take_player_commands().is_empty());
+            assert!(app.backend.take_queue_requests().is_empty());
+        }
+    }
+
+    #[test]
+    fn play_later_appends_selected_duplicates_before_context_without_starting_playback() {
+        let mut app = app_with_local_manual_queue();
+        app.local.playback = Playback::Paused;
+        let ctx = egui::Context::default();
+        for _ in 0..2 {
+            app.apply(
+                Action::PlayLater {
+                    items: vec![
+                        queued_song("spotify:track:b"),
+                        queued_song("spotify:track:new"),
+                        queued_song("spotify:track:b"),
+                    ],
+                },
+                &ctx,
+            );
+        }
+        assert_eq!(
+            app.manual_queue,
+            [
+                "spotify:track:a",
+                "spotify:track:b",
+                "spotify:track:c",
+                "spotify:track:b",
+                "spotify:track:new",
+                "spotify:track:b",
+                "spotify:track:b",
+                "spotify:track:new",
+                "spotify:track:b"
+            ]
+        );
+        assert_eq!(queue_uris(&app).1.last().unwrap(), "spotify:track:ctx");
+        assert_eq!(queue_uris(&app).0.as_deref(), Some("spotify:track:playing"));
+        assert_eq!(app.local.playback, Playback::Paused);
+        let commands = app.backend.take_player_commands();
+        assert_eq!(
+            commands
+                .iter()
+                .filter(|command| matches!(command, PlayerCommand::ClearQueue))
+                .count(),
+            2
+        );
+        assert!(commands.iter().all(|command| matches!(
+            command,
+            PlayerCommand::ClearQueue | PlayerCommand::AddToQueue(_)
+        )));
+    }
+
+    #[test]
+    fn play_later_filters_unavailable_and_local_tracks_without_dropping_valid_items() {
+        let mut app = app_with_local_manual_queue();
+        app.apply(
+            Action::PlayLater {
+                items: vec![
+                    PlayableItem::Track(crate::api::models::Track {
+                        uri: "spotify:track:blocked".into(),
+                        is_playable: Some(false),
+                        ..Default::default()
+                    }),
+                    queued_song("spotify:track:valid"),
+                    PlayableItem::Track(crate::api::models::Track {
+                        uri: "spotify:track:local".into(),
+                        is_local: true,
+                        ..Default::default()
+                    }),
+                ],
+            },
+            &egui::Context::default(),
+        );
+        assert_eq!(
+            app.manual_queue,
+            [
+                "spotify:track:a",
+                "spotify:track:b",
+                "spotify:track:c",
+                "spotify:track:valid"
+            ]
+        );
+        assert_eq!(queue_uris(&app).1.last().unwrap(), "spotify:track:ctx");
+        assert_eq!(app.pending_queue_adds.len(), 1);
+        assert_eq!(app.pending_queue_adds[0].item.uri(), "spotify:track:valid");
+    }
+
+    #[test]
+    fn play_later_rejects_stale_prefix_remote_and_inactive_playback() {
+        for scenario in 0..3 {
+            let mut app = app_with_local_manual_queue();
+            match scenario {
+                0 => {
+                    app.queue = loaded_queue(
+                        "spotify:track:playing",
+                        &[
+                            "spotify:track:a",
+                            "spotify:track:c",
+                            "spotify:track:b",
+                            "spotify:track:ctx",
+                        ],
+                    )
+                }
+                1 => {
+                    app.local_ready = false;
+                    app.selected_device = Some("phone".into());
+                }
+                2 => app.local.playback = Playback::Stopped,
+                _ => unreachable!(),
+            }
+            let before = (app.manual_queue.clone(), queue_uris(&app));
+            app.session_dirty = false;
+            app.apply(
+                Action::PlayLater {
+                    items: vec![queued_song("spotify:track:new")],
+                },
+                &egui::Context::default(),
+            );
+            assert_eq!(
+                (app.manual_queue.clone(), queue_uris(&app)),
+                before,
+                "scenario {scenario}"
+            );
+            assert!(app.pending_queue_adds.is_empty());
+            assert!(!app.session_dirty);
+            assert!(app.backend.take_player_commands().is_empty());
+            assert!(app.backend.take_queue_requests().is_empty());
+        }
+    }
+
+    fn play_next_test_app() -> App {
+        let mut app = headless_app();
+        app.auth = AuthStatus::Connected {
+            username: "alice".into(),
+        };
+        app.local_ready = true;
+        app.local.track = Some(crate::player::LocalTrack {
+            uri: "spotify:track:playing".into(),
+            ..Default::default()
+        });
+        app.local.playback = Playback::Paused;
+        app.queue = loaded_queue("spotify:track:playing", &["spotify:track:context"]);
+        app
+    }
+
+    #[test]
+    fn play_next_preserves_selected_duplicates_manual_rows_and_context() {
+        let mut app = play_next_test_app();
+        let ctx = egui::Context::default();
+        app.apply(
+            Action::AddToQueue {
+                uri: "spotify:track:old".into(),
+                label: "Old".into(),
+            },
+            &ctx,
+        );
+        app.backend.take_player_commands();
+        app.session_dirty = false;
+        app.apply(
+            Action::PlayNext {
+                items: vec![
+                    queued_song("spotify:track:b"),
+                    queued_song("spotify:track:c"),
+                    queued_song("spotify:track:b"),
+                ],
+            },
+            &ctx,
+        );
+        assert_eq!(
+            app.manual_queue,
+            [
+                "spotify:track:b",
+                "spotify:track:c",
+                "spotify:track:b",
+                "spotify:track:old"
+            ]
+        );
+        assert_eq!(
+            queue_uris(&app),
+            (
+                Some("spotify:track:playing".into()),
+                vec![
+                    "spotify:track:b".into(),
+                    "spotify:track:c".into(),
+                    "spotify:track:b".into(),
+                    "spotify:track:old".into(),
+                    "spotify:track:context".into(),
+                ]
+            )
+        );
+        assert_eq!(
+            app.local.playback,
+            Playback::Paused,
+            "queueing must not resume or skip playback"
+        );
+        assert!(app.session_dirty);
+        for pending in &app.pending_queue_adds {
+            assert_eq!(app.manual_queue[pending.manual_index], pending.item.uri());
+        }
+        let commands = app.backend.take_player_commands();
+        assert!(matches!(commands.first(), Some(PlayerCommand::ClearQueue)));
+        let sent: Vec<_> = commands
+            .iter()
+            .skip(1)
+            .map(|command| match command {
+                PlayerCommand::AddToQueue(uri) => uri.as_str(),
+                unexpected => panic!("Play Next must only rewrite the queue: {unexpected:?}"),
+            })
+            .collect();
+        assert_eq!(
+            sent,
+            app.manual_queue
+                .iter()
+                .map(String::as_str)
+                .collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn play_next_rechecks_target_and_never_appends_remotely() {
+        for remote in [false, true] {
+            let mut app = play_next_test_app();
+            if remote {
+                app.local_ready = false;
+                app.selected_device = Some("phone".into());
+            } else {
+                app.local.playback = Playback::Stopped;
+            }
+            let before = queue_uris(&app);
+            app.session_dirty = false;
+            app.apply(
+                Action::PlayNext {
+                    items: vec![queued_song("spotify:track:new")],
+                },
+                &egui::Context::default(),
+            );
+            assert_eq!(queue_uris(&app), before);
+            assert!(app.manual_queue.is_empty());
+            assert!(app.pending_queue_adds.is_empty());
+            assert!(app.backend.take_player_commands().is_empty());
+            assert!(app.backend.take_queue_requests().is_empty());
+            assert!(!app.session_dirty);
+        }
+    }
+
+    #[test]
+    fn play_next_filters_unavailable_local_and_non_playable_uris() {
+        let mut app = play_next_test_app();
+        let mut unavailable = queued_song("spotify:track:unavailable");
+        let PlayableItem::Track(track) = &mut unavailable else {
+            unreachable!()
+        };
+        track.is_playable = Some(false);
+        let mut local = queued_song("spotify:track:local");
+        let PlayableItem::Track(track) = &mut local else {
+            unreachable!()
+        };
+        track.is_local = true;
+        app.apply(
+            Action::PlayNext {
+                items: vec![
+                    unavailable,
+                    local,
+                    queued_song("spotify:local:a:b:c:1"),
+                    queued_song(""),
+                    queued_song("spotify:album:wrong-kind"),
+                    queued_song("spotify:track:available"),
+                ],
+            },
+            &egui::Context::default(),
+        );
+        assert_eq!(app.manual_queue, ["spotify:track:available"]);
+        assert_eq!(app.pending_queue_adds.len(), 1);
+    }
+
+    #[test]
+    fn play_next_debounces_its_selection_without_losing_add_to_queue_copies() {
+        let mut app = play_next_test_app();
+        let ctx = egui::Context::default();
+        app.apply(
+            Action::AddToQueue {
+                uri: "spotify:track:b".into(),
+                label: "B".into(),
+            },
+            &ctx,
+        );
+        let next = Action::PlayNext {
+            items: vec![
+                queued_song("spotify:track:b"),
+                queued_song("spotify:track:b"),
+            ],
+        };
+        app.apply(next.clone(), &ctx);
+        assert_eq!(
+            app.manual_queue,
+            ["spotify:track:b", "spotify:track:b", "spotify:track:b"]
+        );
+        app.backend.take_player_commands();
+        app.apply(next.clone(), &ctx);
+        assert_eq!(
+            app.manual_queue.len(),
+            3,
+            "a repeated click is debounced as one selection"
+        );
+        assert!(app.backend.take_player_commands().is_empty());
+        app.last_play_next.as_mut().unwrap().1 = Instant::now() - QUEUE_ADD_DEBOUNCE;
+        app.apply(next, &ctx);
+        assert_eq!(
+            app.manual_queue.len(),
+            5,
+            "later intentional copies remain separate occurrences"
+        );
+    }
+
+    #[test]
+    fn play_next_accepts_a_repeat_after_queue_consumption_or_removal() {
+        for consumed in [false, true] {
+            let mut app = play_next_test_app();
+            let ctx = egui::Context::default();
+            let action = Action::PlayNext {
+                items: vec![queued_song("spotify:track:new")],
+            };
+            app.apply(action.clone(), &ctx);
+            if consumed {
+                app.consume_manual_queue_head("spotify:track:new");
+            } else {
+                app.remove_manual_queue_row(0);
+            }
+            app.backend.take_player_commands();
+            app.apply(action, &ctx);
+            assert_eq!(app.manual_queue, ["spotify:track:new"]);
+            assert_eq!(app.pending_queue_adds.len(), 1);
+            assert_eq!(app.pending_queue_adds[0].manual_index, 0);
+            let commands = app.backend.take_player_commands();
+            assert_eq!(commands.len(), 2);
+            assert!(matches!(commands[0], PlayerCommand::ClearQueue));
+            assert!(matches!(&commands[1], PlayerCommand::AddToQueue(uri)
+                if uri == "spotify:track:new"));
+        }
+    }
+
+    #[test]
+    fn play_next_holds_order_against_pre_insert_queue_answers() {
+        let mut app = play_next_test_app();
+        app.refresh_queue(true);
+        let old_seq = app.queue_seq;
+        app.apply(
+            Action::PlayNext {
+                items: vec![queued_song("spotify:track:new")],
+            },
+            &egui::Context::default(),
+        );
+        app.handle_api(ApiResponse::Queue {
+            seq: old_seq,
+            result: Ok(Queue {
+                currently_playing: Some(queued_song("spotify:track:playing")),
+                queue: vec![queued_song("spotify:track:context")],
+            }),
+        });
+        assert_eq!(
+            queue_uris(&app).1,
+            ["spotify:track:new", "spotify:track:context"]
+        );
+        assert!(app.queue_reorder_pending.is_some());
     }
 
     /// A stale queue answer whose current track does not match the active

@@ -777,6 +777,15 @@ fn populate_blend(app: &mut App) {
     if let Some(playlists) = app.library.playlists.get_mut() {
         for playlist in playlists {
             playlist.images.clear();
+            if playlist.id == "pl1" {
+                playlist.name = "Your Blend".into();
+                playlist.owner = Owner {
+                    id: Some("spotify".into()),
+                    display_name: Some("Spotify".into()),
+                    uri: Some("spotify:user:spotify".into()),
+                };
+                playlist.collaborative = false;
+            }
         }
     }
     for item in &mut page.items.items {
@@ -1322,6 +1331,17 @@ mod tests {
                 for blend in [false, true] {
                     let (ctx, mut app) = accessible_app("blend-attribution");
                     populate_blend(&mut app);
+                    let library_blend = app
+                        .library
+                        .playlists
+                        .get()
+                        .unwrap()
+                        .iter()
+                        .find(|playlist| playlist.id == "pl1")
+                        .unwrap();
+                    assert_eq!(library_blend.name, "Your Blend");
+                    assert_eq!(library_blend.owner.id.as_deref(), Some("spotify"));
+                    assert!(!library_blend.collaborative);
                     if !blend {
                         app.playlist_pages
                             .get_mut("pl1")

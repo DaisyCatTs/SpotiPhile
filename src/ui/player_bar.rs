@@ -509,6 +509,7 @@ fn now_playing_block(app: &mut App, ui: &mut egui::Ui, region: Rect, now: Option
         egui::DragAndDrop::set_payload(
             ui.ctx(),
             DragTrack {
+                queue_rows: None,
                 title: item.name().to_string(),
                 image: item.image(64).map(str::to_string),
                 items: vec![item.clone()],

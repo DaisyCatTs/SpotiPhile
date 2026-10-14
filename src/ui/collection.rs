@@ -920,6 +920,12 @@ fn list_shortcuts(
     if ui.ctx().text_edit_focused() || app.dialog.is_some() {
         return;
     }
+    if app.show_queue_panel
+        && app.queue_tab == crate::model::QueueTab::Queue
+        && super::queue::owns_keyboard_focus(ui.ctx())
+    {
+        return;
+    }
     let editable = match &table.context {
         RowContext::Context {
             editable_playlist: Some((id, _)),

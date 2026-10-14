@@ -2356,6 +2356,15 @@ impl Worker {
                 }
             }
         };
+        self.sign_in_grant(source, grant, http);
+    }
+
+    fn sign_in_grant(
+        &mut self,
+        source: ApiSource,
+        grant: crate::auth::Grant,
+        http: reqwest::Client,
+    ) {
         let listener = match crate::auth::listen_for_redirect(grant.redirect_port) {
             Ok(listener) => listener,
             Err(error) => {
@@ -5495,14 +5504,21 @@ mod authorization_tests {
     fn occupied_login_port_reports_persistent_failure_before_browser_sign_in() {
         let (runtime, mut worker, events) = worker("occupied-login-port");
         let _entered = runtime.enter();
-        let _occupied =
-            std::net::TcpListener::bind(("127.0.0.1", crate::auth::WEB_REDIRECT_PORT)).unwrap();
-        for _ in 0..2 {
-            worker.sign_in_source(ApiSource::Shared);
+        let occupied = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let port = occupied.local_addr().unwrap().port();
+        for source in [ApiSource::Shared, ApiSource::Personal] {
+            let mut grant = crate::auth::Grant::shared_web_api();
+            grant.redirect_port = port;
+            let lease = worker.credentials.lease(web_slot(source));
+            let restore_pending = worker.restore_pending;
+            worker.sign_in_grant(source, grant, worker.http.client().unwrap());
             let received: Vec<_> = events.try_iter().collect();
-            assert!(received.iter().any(|event| matches!(event,
-                Event::Auth(AuthStatus::Failed(message)) if message.contains("8989")
-            )));
+            assert!(received.iter().any(|event| match (source, event) {
+                (ApiSource::Shared, Event::Auth(AuthStatus::Failed(message)))
+                | (ApiSource::Personal, Event::Error(message)) =>
+                    message.contains(&port.to_string()),
+                _ => false,
+            }));
             assert!(
                 !received.iter().any(|event| matches!(
                     event,
@@ -5512,6 +5528,11 @@ mod authorization_tests {
             assert!(worker.cancel_signin.is_none());
             assert!(worker.authorizing_source.is_none());
             assert_eq!(worker.authorization_attempt, 0);
+            assert!(
+                lease.current(),
+                "port conflicts must preserve existing grants"
+            );
+            assert_eq!(worker.restore_pending, restore_pending);
         }
     }
 

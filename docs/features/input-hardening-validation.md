@@ -46,3 +46,9 @@ target suites, formatting, both warnings-denied Clippy configurations, doctests,
 warnings-denied Rustdoc, Jekyll, optimized build and `spotifast 0.12.0` smoke.
 No real Spotify credentials or authenticated callbacks are used.
 Native macOS/Linux execution requires protected CI before promotion.
+
+Promotion branch is based on main after PR #13 merged (`1e75f2c`). Its source,
+Cargo manifests, lockfile and Nix configuration match the locally validated
+candidate exactly. Promotion ports are `799293a`, `814ae58` and `e8f8fcc`,
+respectively; original candidate SHAs above identify the validation checkpoint.
+The PR must pass its own required checks before squash promotion.

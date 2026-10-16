@@ -41,3 +41,36 @@ No authenticated sign-in or macOS/Linux runtime session was exercised. Tests use
 dummy flows and isolated credential stores; existing local Spotify credentials
 and login settings are not changed. No new grant, dependency, persistence schema,
 browser engine or layout change is introduced.
+
+## PR #13 review corrections
+
+The initial direct grant-start regression missed the production personal-app
+configuration command, which revoked its old grant before reserving the callback.
+Replacement now preflights HTTP configuration, the Client ID and the listener
+before revocation, stored deletion or API replacement. It hands that same listener
+to authorization without a release/rebind gap. If an existing authorization owns
+the port, its cancellation completes first and the queued replacement repeats
+preflight. Explicit removal or sign-out discards the queued replacement.
+
+The application saves only the backend-accepted Client ID, even while the field
+contains an edited draft or another preference is saved. A failed preflight
+restores the existing configuration in both the field and settings file. The
+verified personal grant indicator remains unchanged on failure.
+
+Listener creation uses Tokio TcpSocket and restores SO_REUSEADDR only on Unix,
+matching [Tokio's listener defaults](https://docs.rs/tokio/1.53.1/tokio/net/struct.TcpSocket.html).
+Windows retains address reuse disabled. A Unix-only regression completes three
+synthetic callbacks with immediate rebinding while also checking that a live
+listener remains exclusive. That regression requires Unix CI; it was not run on
+Windows.
+
+Targeted Windows tests passed for the production configuration command with an
+occupied ephemeral port, including a queued shared authorization, retained dummy
+stored grant/token provider, credential generation, API account/state and restore
+flags. Owned-listener cancellation/removal and draft persistence/rollback tests
+passed. Independent source review cleared the corrections. Corrected Windows
+validation passed: 1,033 default and 1,057 all-feature library tests (two existing
+ignored tests each), all target suites, formatting, both warnings-denied Clippy
+configurations, doctests, warnings-denied Rustdoc, optimized build and
+`spotifast 0.12.0` version smoke. Jekyll and final diff checks also passed.
+Unix runtime validation remains assigned to required CI before promotion.

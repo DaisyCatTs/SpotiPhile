@@ -171,11 +171,14 @@ pub async fn wait_for_code(
 /// Reserve the callback port before offering or opening browser sign-in.
 pub fn listen_for_redirect(port: u16) -> Result<TcpListener> {
     let address: SocketAddr = ([127, 0, 0, 1], port).into();
-    let listener = std::net::TcpListener::bind(address).with_context(|| {
+    let socket = tokio::net::TcpSocket::new_v4()?;
+    // Match Tokio's listener defaults. Windows reuse permits socket hijacking.
+    #[cfg(unix)]
+    socket.set_reuseaddr(true)?;
+    socket.bind(address).with_context(|| {
         format!("Cannot start Spotify sign-in: port {port} is in use or unavailable. Close the app using this port, then try again.")
     })?;
-    listener.set_nonblocking(true)?;
-    Ok(TcpListener::from_std(listener)?)
+    Ok(socket.listen(128)?)
 }
 
 pub async fn wait_for_code_on_listener(
@@ -564,6 +567,40 @@ mod tests {
             .unwrap();
         assert_eq!(code, "test-code");
         drop(cancel);
+    }
+
+    #[cfg(unix)]
+    #[tokio::test]
+    async fn redirect_listener_rebinds_immediately_after_completed_callbacks() {
+        use tokio::io::AsyncReadExt;
+        let mut listener = listen_for_redirect(0).unwrap();
+        let port = listener.local_addr().unwrap().port();
+        for _ in 0..3 {
+            assert!(
+                listen_for_redirect(port).is_err(),
+                "active listener stays exclusive"
+            );
+            let (_cancel, receiver) = watch::channel(false);
+            let waiting = tokio::spawn(async move {
+                wait_for_code_on_listener(listener, "state", receiver).await
+            });
+            let mut browser = tokio::net::TcpStream::connect(("127.0.0.1", port))
+                .await
+                .unwrap();
+            browser
+                .write_all(b"GET /login?code=test-code&state=state HTTP/1.1\r\n\r\n")
+                .await
+                .unwrap();
+            let mut response = Vec::new();
+            tokio::time::timeout(Duration::from_secs(2), browser.read_to_end(&mut response))
+                .await
+                .unwrap()
+                .unwrap();
+            assert_eq!(waiting.await.unwrap().unwrap(), "test-code");
+            assert!(response.starts_with(b"HTTP/1.1 200 OK"));
+            drop(browser);
+            listener = listen_for_redirect(port).unwrap();
+        }
     }
 
     #[test]

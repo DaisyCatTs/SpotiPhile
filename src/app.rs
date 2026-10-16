@@ -491,6 +491,8 @@ pub struct App {
     pub sign_in_url: Option<String>,
     /// The verified personal Web API application, when acceleration is ready.
     pub web_app: Option<String>,
+    /// Persist the accepted configuration, never an unsubmitted Client ID draft.
+    configured_web_client_id: Option<String>,
     pending_remote_position: Option<(u32, Instant)>,
     pending_remote_volume: Option<(u8, Instant)>,
     /// A local volume set here that the engine has not echoed back yet. It
@@ -775,6 +777,7 @@ impl App {
         let mut app = Self {
             custom_themes: theme::Catalog::default(),
             dirs,
+            configured_web_client_id: settings.web_client_id.clone(),
             settings,
             applied_proxy,
             applied_proxy_preferences,
@@ -2021,6 +2024,11 @@ impl App {
                     Err(error) => log::debug!("album type unavailable for {uri}: {error}"),
                 },
                 Event::WebApp { client_id } => self.web_app = client_id,
+                Event::WebAppConfiguration { client_id } => {
+                    self.configured_web_client_id = client_id.clone();
+                    self.settings.web_client_id = client_id;
+                    self.save_settings();
+                }
                 Event::UpdateSupport(result) => {
                     if result.is_ok()
                         && self.settings.download_updates_automatically
@@ -3213,6 +3221,7 @@ impl App {
             return;
         }
         let mut saved = self.settings.clone();
+        saved.web_client_id = self.configured_web_client_id.clone();
         self.applied_proxy_preferences.apply_to(&mut saved);
         saved.save(&self.dirs.settings_file());
     }
@@ -9489,7 +9498,6 @@ impl App {
                 self.auth = AuthStatus::SignedOut;
             }
             Action::ConfigurePersonalWebApp => {
-                self.save_settings();
                 self.backend.send(Command::ConfigurePersonalWebApp(
                     self.settings.web_client_id.clone(),
                 ));
@@ -17643,6 +17651,37 @@ mod tests {
         restarted.maybe_suggest_personal_app();
         assert!(restarted.dialog.is_none(), "dismissal survives a restart");
         assert!(app.toasts.is_empty(), "the old daily reminder is replaced");
+    }
+
+    #[test]
+    fn personal_client_drafts_cannot_replace_the_saved_configuration() {
+        let mut app = test_app("personal-client-draft-persistence");
+        app.offline = false;
+        app.handle_backend_events(vec![Event::WebAppConfiguration {
+            client_id: Some("old-client".into()),
+        }]);
+        app.settings.web_client_id = Some("new-draft".into());
+        app.save_settings();
+        assert_eq!(
+            Settings::load(&app.dirs.settings_file())
+                .web_client_id
+                .as_deref(),
+            Some("old-client")
+        );
+        app.handle_backend_events(vec![Event::WebAppConfiguration {
+            client_id: Some("old-client".into()),
+        }]);
+        assert_eq!(app.settings.web_client_id.as_deref(), Some("old-client"));
+        for accepted in [Some("new-client".to_string()), None] {
+            app.handle_backend_events(vec![Event::WebAppConfiguration {
+                client_id: accepted.clone(),
+            }]);
+            assert_eq!(
+                Settings::load(&app.dirs.settings_file()).web_client_id,
+                accepted
+            );
+        }
+        app.backend.shutdown();
     }
 
     #[test]

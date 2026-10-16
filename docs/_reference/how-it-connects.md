@@ -34,6 +34,10 @@ app's verification is still waiting.
 Web API sign-in opens the browser only after its local callback port is available. If
 port 8989 is occupied, the sign-in screen keeps the error visible. Close the
 app using that port, then choose **Try again**.
+Changing the personal app keeps the existing grant and saved Client ID if that
+preflight fails. An edited Client ID is saved only after the backend accepts the
+configuration. An authorization already using the port is cancelled before a
+queued replacement checks and reserves it.
 
 Since 0.8.0, local playback retains the artist IDs
 already supplied by librespot. Artist links in the player bar work before the

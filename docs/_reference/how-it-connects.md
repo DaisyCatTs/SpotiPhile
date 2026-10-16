@@ -38,6 +38,8 @@ Changing the personal app keeps the existing grant and saved Client ID if that
 preflight fails. An edited Client ID is saved only after the backend accepts the
 configuration. An authorization already using the port is cancelled before a
 queued replacement checks and reserves it.
+Each callback connection gets five seconds and at most 8 KiB for its request
+line, so a stalled or oversized request does not hold the listener indefinitely.
 
 Since 0.8.0, local playback retains the artist IDs
 already supplied by librespot. Artist links in the player bar work before the
@@ -177,6 +179,8 @@ closest 640-pixel URL. Compact rows, page tint extraction, and softened loading
 previews use 64-pixel thumbnails. These URLs remain unchanged and follow the
 configured proxy and normal artwork cache. Choosing an artwork size and reusing
 known details add no Web API request.
+Downloaded artwork is rejected above 8 MiB, using both declared length and
+received chunks so an oversized response is not buffered in full first.
 
 A ready sharp cover stays visible until its replacement is ready. A 300-pixel
 grid cover already loaded for the same item can preview a larger page cover

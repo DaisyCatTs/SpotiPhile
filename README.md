@@ -1,3 +1,7 @@
+Development input hardening confines MilkDrop preset filenames, bounds incoming
+artwork and callback reads, and rejects inconsistent STORED ZIP sizes.
+See [validation and limits](docs/features/input-hardening-validation.md).
+
 Development local queue controls include Play Next, Play Later, multi-selection,
 block moves, clipboard editing, search and bounded Undo/Redo. Play Later places
 songs at the end of your manual queue, before the playlist continues.

@@ -325,6 +325,9 @@ pub fn show(app: &mut App, ui: &mut egui::Ui) {
             let search_width = fit.search;
             let id = egui::Id::new("global-search");
             let before = app.search.query.clone();
+            let selected = egui::TextEdit::load_state(ui.ctx(), id)
+                .and_then(|state| state.cursor.char_range())
+                .is_some_and(|range| !range.is_empty());
             let response = super::widgets::search_field(
                 ui,
                 &palette,
@@ -345,6 +348,11 @@ pub fn show(app: &mut App, ui: &mut egui::Ui) {
                 app.actions.push(Action::Open(Page::Search));
             }
             if app.search.query != before {
+                // Typing over a selection, or emptying the field, starts a
+                // new query rather than editing the last one.
+                if selected || app.search.query.is_empty() {
+                    app.actions.push(Action::EndSearchRun);
+                }
                 app.search.typed_at = Some(std::time::Instant::now());
                 if !cleared && !matches!(app.page(), Page::Search) {
                     app.actions.push(Action::Open(Page::Search));
@@ -352,7 +360,7 @@ pub fn show(app: &mut App, ui: &mut egui::Ui) {
             }
             if response.lost_focus() && ui.input(|input| input.key_pressed(egui::Key::Enter)) {
                 let query = app.search.query.clone();
-                app.actions.push(Action::Search(query));
+                app.actions.push(Action::SubmitSearch(query));
             }
             if response.has_focus() && ui.input(|input| input.key_pressed(egui::Key::Escape)) {
                 response.surrender_focus();

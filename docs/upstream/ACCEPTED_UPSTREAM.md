@@ -224,3 +224,13 @@ authorization state. Production callback identities, ports, PKCE/state checks,
 protected storage and independent playback consent stay unchanged. No new
 permission or network destination is added. See
 [validation and limitations](../features/login-port-validation.md).
+
+## One Recent search per typing run
+
+Original `4ebfcf06931519de76733fa1048523445c3fcbc2`, Samet Karaş, Spotifast #747.
+Focused port `8263958` retains author credit. Enter uses a distinct SubmitSearch
+action so clicking an identical recent query cannot claim an in-flight typed
+entry. Existing entries and stale/split responses have regression coverage;
+native keyboard replacement, Enter and chip clicks are covered by `f45c87d`.
+No layout, request, permission, dependency or persisted schema is added.
+See [validation](../features/recent-search-validation.md).

@@ -1,3 +1,7 @@
+Development Recent searches keep one entry while a query is extended or
+shortened through typing pauses. Separate searches and existing entries stay
+independent. See [validation](docs/features/recent-search-validation.md).
+
 Development local queue controls include Play Next, Play Later, multi-selection,
 block moves, clipboard editing, search and bounded Undo/Redo. Play Later places
 songs at the end of your manual queue, before the playlist continues.

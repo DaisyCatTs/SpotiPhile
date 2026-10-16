@@ -2972,12 +2972,7 @@ mod tests {
             .expect("Ctrl+A selects the real search field");
         assert_eq!(selection.as_sorted_char_range(), 0.into()..2.into());
         app.actions.clear();
-        view_frame(
-            &ctx,
-            &mut app,
-            vec![egui::Event::Text("abba".into())],
-            draw,
-        );
+        view_frame(&ctx, &mut app, vec![egui::Event::Text("abba".into())], draw);
         assert_eq!(app.search.query, "abba");
         assert!(matches!(app.actions.as_slice(), [Action::EndSearchRun]));
         assert_eq!(app.search.edit_run, run, "drawing must defer the action");
@@ -2988,12 +2983,7 @@ mod tests {
 
         // Further typing extends the new run, never the independent prefix's run.
         app.actions.clear();
-        view_frame(
-            &ctx,
-            &mut app,
-            vec![egui::Event::Text("s".into())],
-            draw,
-        );
+        view_frame(&ctx, &mut app, vec![egui::Event::Text("s".into())], draw);
         assert_eq!(app.search.query, "abbas");
         assert!(app.actions.is_empty());
         assert_eq!(app.search.edit_run, run + 1);

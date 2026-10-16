@@ -33,9 +33,16 @@ reference, nearby search tests, and all search action producers. Only the
 three owned Rust files were formatted with installed Rust 1.98.0 rustfmt.
 `git diff --check` passed.
 
-No Cargo commands, builds, tests, or application runs were performed, as
-requested. Parent integration must run the CONTRIBUTING.md checks through
-the root build pipeline. No platform runtime coverage is claimed.
+Parent Windows integration passed 1,038 default and 1,062 all-feature library
+tests (two existing ignored tests each), all target suites, formatting, both
+warnings-denied Clippy configurations, doctests and warnings-denied Rustdoc.
+The optimized build and version smoke passed. Two additional native egui tests
+passed: Ctrl+A replacement ends the run through a deferred action, continued
+typing keeps the new run, Enter submits, and a Recent chip emits a separate
+search. The complete all-feature suite then passed 1,064 library tests (two
+existing ignored), followed by all-feature Clippy and an unchanged release smoke.
+Jekyll and final diff checks passed. Independent source review found no blockers.
+No macOS/Linux runtime coverage or authenticated search is claimed.
 
 New regression tests in `src/app.rs`:
 
@@ -45,9 +52,8 @@ New regression tests in `src/app.rs`:
 - `an_identical_recent_search_does_not_submit_the_typing_run`
 - `typing_history_handles_split_answers_and_rejects_stale_replies`
 
-Manual follow-up: type with debounce-length pauses; extend and backspace;
-replace selected text with a prefix; clear and retype; press Enter with a
-pending answer and with loaded results; choose an identical recent entry;
-open a search link. Check that independent entries survive and the field's
-selection replacement starts a new run. Selection detection is covered at
-the action/state level here, not by a rendered keyboard interaction test.
+Native input regressions in `src/demo.rs` complement the state tests:
+`replacing_selected_global_search_ends_its_run_after_drawing` and
+`global_search_enter_submits_but_recent_search_click_searches`. These exercise
+the actual TextEdit and chip widgets. Authenticated catalogue/network latency
+and non-Windows runtime behavior remain unverified locally.

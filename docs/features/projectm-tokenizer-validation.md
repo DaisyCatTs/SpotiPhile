@@ -44,8 +44,9 @@ calculated `sha256-90XLra1Vry6gx0iS1EdXl/9mWX9+4Tcr+Vq879Lg1z4=`.
 Its lockfile SHA-256 matches the Git blob independently:
 `2f94ea1ca1ae72a844ece5914bb26aba1b630322232f4170029ec5b239411ae7`.
 The real hash is now applied. Discovery is not a successful package build.
-Full Nix package and cross-platform CI, default Clippy, documentation checks
-and native MilkDrop rendering remain pending. This candidate is not merge-ready.
+Default warnings-denied Clippy, doctests and warnings-denied Rustdoc also passed.
+Full Nix package and cross-platform CI and native MilkDrop rendering remain
+pending. This candidate is not merge-ready.
 
 ## Attribution and licensing
 

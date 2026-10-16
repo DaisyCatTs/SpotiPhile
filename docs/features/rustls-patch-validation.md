@@ -48,11 +48,19 @@ passed. Windows default/all-feature suites passed 1,036/1,060 library tests
 (two inherited ignored each), plus all target suites. Formatting, both
 warnings-denied Clippy configurations, doctests, warnings-denied Rustdoc and
 the optimized build passed. The release reports `spotifast 0.12.0`.
-Nix hash discovery and complete cross-platform validation are pending.
+Nix hash discovery passed; complete package and cross-platform validation
+remain pending.
 No authenticated account operation or actual user credential is used by tests.
 
 The first isolated hash-discovery run reused the old fixed-output archive and
 failed its deliberate expectation of a mismatch. This was not package
 validation. The follow-up audit commit sets a dummy hash on that audit branch
 only, forcing dependency retrieval and hash calculation. The product branch
-retains its real hash until the result is known.
+now uses the independently calculated real hash.
+
+[Discovery run 38845059701](https://github.com/DaisyCatTs/SpotiPhile/actions/runs/38845059701)
+calculated `sha256-T2yhL/h4jW2NpP6+NvHSuIS7UADMtPG74qLfbLYf4ns=`.
+Its Cargo.lock SHA-256 is
+`6ac8b77af81fc189db668f2534da6869105776fb38fa41796ed1f093273c18e0`,
+independently matched against the Git blob in `b2e8796`. The full package
+build remains a separate required gate.

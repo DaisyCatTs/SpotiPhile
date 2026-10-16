@@ -34,7 +34,17 @@ cl /nologo /EHsc /std:c++17 /I $parserRoot tests/native/projectm-tokenizer.cpp "
 & .cache/projectm-tokenizer-regression.exe
 ```
 
-Full application builds, test suites, Nix vendor hash refresh, cross-platform CI
+Windows default/all-feature library suites passed 1,036/1,060 tests (two
+inherited ignored each), plus all target suites. Formatting, all-feature
+warnings-denied Clippy and the optimized build passed. Independent final source
+review found no material findings.
+
+[Hash discovery run](https://github.com/DaisyCatTs/SpotiPhile/actions/runs/38845414893)
+calculated `sha256-90XLra1Vry6gx0iS1EdXl/9mWX9+4Tcr+Vq879Lg1z4=`.
+Its lockfile SHA-256 matches the Git blob independently:
+`2f94ea1ca1ae72a844ece5914bb26aba1b630322232f4170029ec5b239411ae7`.
+The real hash is now applied. Discovery is not a successful package build.
+Full Nix package and cross-platform CI, default Clippy, documentation checks
 and native MilkDrop rendering remain pending. This candidate is not merge-ready.
 
 ## Attribution and licensing

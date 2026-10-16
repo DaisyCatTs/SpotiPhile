@@ -2940,6 +2940,111 @@ mod tests {
         app.backend.shutdown();
     }
 
+    #[test]
+    fn replacing_selected_global_search_ends_its_run_after_drawing() {
+        let (ctx, mut app) = accessible_app("global-search-selection-run");
+        app.open(Page::Search);
+        app.search.query = "ab".into();
+        app.search.committed = "ab".into();
+        app.settings.search_history = vec!["ab".into()];
+        // A successful paused search owns this entry until its typing run ends.
+        let run = app.search.edit_run;
+        app.search.typed_entry = Some((run, "ab".into()));
+        app.search.committed_run = Some((run, true));
+        let draw = crate::ui::topbar::show;
+        view_frame(&ctx, &mut app, vec![], draw);
+        ctx.memory_mut(|memory| memory.request_focus(egui::Id::new("global-search")));
+        view_frame(
+            &ctx,
+            &mut app,
+            vec![keyboard(
+                egui::Key::A,
+                egui::Modifiers {
+                    ctrl: true,
+                    command: true,
+                    ..Default::default()
+                },
+            )],
+            draw,
+        );
+        let selection = egui::TextEdit::load_state(&ctx, egui::Id::new("global-search"))
+            .and_then(|state| state.cursor.char_range())
+            .expect("Ctrl+A selects the real search field");
+        assert_eq!(selection.as_sorted_char_range(), 0.into()..2.into());
+        app.actions.clear();
+        view_frame(
+            &ctx,
+            &mut app,
+            vec![egui::Event::Text("abba".into())],
+            draw,
+        );
+        assert_eq!(app.search.query, "abba");
+        assert!(matches!(app.actions.as_slice(), [Action::EndSearchRun]));
+        assert_eq!(app.search.edit_run, run, "drawing must defer the action");
+        accessible_frame(&ctx, &mut app, vec![]);
+        assert_eq!(app.search.edit_run, run + 1);
+        assert_eq!(app.settings.search_history, ["ab"]);
+        assert_eq!(app.search.typed_entry, Some((run, "ab".into())));
+
+        // Further typing extends the new run, never the independent prefix's run.
+        app.actions.clear();
+        view_frame(
+            &ctx,
+            &mut app,
+            vec![egui::Event::Text("s".into())],
+            draw,
+        );
+        assert_eq!(app.search.query, "abbas");
+        assert!(app.actions.is_empty());
+        assert_eq!(app.search.edit_run, run + 1);
+        app.backend.shutdown();
+    }
+
+    #[test]
+    fn global_search_enter_submits_but_recent_search_click_searches() {
+        let (ctx, mut app) = accessible_app("global-search-enter-action");
+        app.open(Page::Search);
+        let draw = crate::ui::topbar::show;
+        view_frame(&ctx, &mut app, vec![], draw);
+        ctx.memory_mut(|memory| memory.request_focus(egui::Id::new("global-search")));
+        view_frame(&ctx, &mut app, vec![], draw);
+        app.actions.clear();
+        let query = app.search.query.clone();
+        view_frame(
+            &ctx,
+            &mut app,
+            vec![keyboard(egui::Key::Enter, egui::Modifiers::NONE)],
+            draw,
+        );
+        assert!(matches!(
+            app.actions.as_slice(),
+            [Action::SubmitSearch(found)] if found == &query
+        ));
+
+        app.actions.clear();
+        app.search.query.clear();
+        app.search.committed.clear();
+        app.search.typed_at = None;
+        search_frame(&ctx, &mut app, vec![]);
+        let text = search_frame(&ctx, &mut app, vec![]);
+        let position = text
+            .iter()
+            .find(|(label, _)| label == "ambient")
+            .expect("recent search chip")
+            .1
+            .center();
+        search_frame(
+            &ctx,
+            &mut app,
+            pointer_click(position, egui::PointerButton::Primary),
+        );
+        assert!(matches!(
+            app.actions.as_slice(),
+            [Action::Search(found)] if found == "ambient"
+        ));
+        app.backend.shutdown();
+    }
+
     /// #596: clearing the global search from another page empties the field
     /// without leaving that page.
     #[test]

@@ -234,3 +234,19 @@ test uses the same principle for an entire three-rebind sequence, retaining
 failure for every other error and for ten unsuccessful attempts. Production
 listener settings remain unchanged. The original Nix failure and pending fresh
 Unix validation are recorded in the login feature validation document.
+
+## Bound external inputs and preset filenames
+
+Three focused ports retain Carmine Paolino's original author credit:
+
+| Original upstream SHA | Port | Behavior |
+| --- | --- | --- |
+| `34aa7dffbc25c4477abadeddeb9c17420a241bd0` | `8521f5e` | Reject non-plain MilkDrop preset pack filenames before joining the destination. |
+| `f70a58acb8bf5adee89463884c5a750e61a1b12c` | `486192f` | Bound incoming artwork as received; reject inconsistent STORED ZIP sizes. |
+| `b60ea0120793a6b10edfef5ba69e6d5f1ab9c3f1` | `9ce7e69` | Bound each callback request line by bytes and time. |
+
+The callback port's adjacent-test conflict was resolved by retaining both
+regressions and our existing listener/configuration fixes. All local Windows
+gates and independent source review passed. Native macOS/Linux execution and
+protected promotion remain outstanding. See
+[validation and precise limits](../features/input-hardening-validation.md).

@@ -96,6 +96,9 @@ A classic look for your music, with Winamp 2 `.wsz` skins, an equalizer,
 a playlist, and animated sound displays. Switch with **Ctrl+M**
 (**Cmd+Shift+M** on macOS), the shrink button, or Settings.
 
+Development macOS builds check that a saved mini-player position is on a
+connected display before restoring it. See [validation and limits](docs/features/winamp-display-validation.md).
+
 <p align="center">
   <img src="docs/assets/images/winamp.png" alt="Spotifast's Winamp mini player with the built-in skin, equalizer, and playlist" width="320">
 </p>

@@ -32,10 +32,13 @@ The existing NSScreen dependency feature is already enabled.
 
 ## Validation status
 
-Cargo, compilation, lint and test execution are pending the parent pipeline;
-none were run for this implementation task. Source diff review and whitespace
-validation are performed locally. This Windows environment cannot validate
-AppKit behavior or physical macOS display disconnection.
+Parent Windows validation passed 1,037 default and 1,061 all-feature library
+tests (two existing ignored tests each), all target suites, formatting and both
+warnings-denied Clippy configurations. Independent source review found no
+blocker in coordinate conversion, platform guards, existing AppKit API features
+or the fallback behavior. Doctests, warnings-denied Rustdoc, Jekyll, the optimized
+build and `spotifast 0.12.0` smoke passed. This Windows environment cannot validate AppKit
+behavior or physical macOS display disconnection.
 
 On macOS hardware, verify these cases before claiming runtime coverage:
 

@@ -224,3 +224,14 @@ authorization state. Production callback identities, ports, PKCE/state checks,
 protected storage and independent playback consent stay unchanged. No new
 permission or network destination is added. See
 [validation and limitations](../features/login-port-validation.md).
+
+## Winamp positions after macOS display changes
+
+Original `54e222431566caeebc76e3cd6ef68b812ec2e0d9`, HEOJUNFO, Spotifast #774.
+Focused port `c4d18f6` retains original author and co-author credit. Connected
+visible display areas are converted from AppKit to window coordinates before
+restoring native Winamp. The fixed-limit fallback and Windows behavior remain;
+added regression coverage includes nonfinite positions and fallback bounds.
+Windows checks passed; macOS compilation and display hardware behavior still
+require their respective validation. See
+[validation and limitations](../features/winamp-display-validation.md).

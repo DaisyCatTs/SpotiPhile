@@ -163,12 +163,29 @@ pub struct TokenResponse {
 pub async fn wait_for_code(
     port: u16,
     expected_state: &str,
+    cancel: watch::Receiver<bool>,
+) -> Result<String> {
+    wait_for_code_on_listener(listen_for_redirect(port)?, expected_state, cancel).await
+}
+
+/// Reserve the callback port before offering or opening browser sign-in.
+pub fn listen_for_redirect(port: u16) -> Result<TcpListener> {
+    let address: SocketAddr = ([127, 0, 0, 1], port).into();
+    let socket = tokio::net::TcpSocket::new_v4()?;
+    // Match Tokio's listener defaults. Windows reuse permits socket hijacking.
+    #[cfg(unix)]
+    socket.set_reuseaddr(true)?;
+    socket.bind(address).with_context(|| {
+        format!("Cannot start Spotify sign-in: port {port} is in use or unavailable. Close the app using this port, then try again.")
+    })?;
+    Ok(socket.listen(128)?)
+}
+
+pub async fn wait_for_code_on_listener(
+    listener: TcpListener,
+    expected_state: &str,
     mut cancel: watch::Receiver<bool>,
 ) -> Result<String> {
-    let address: SocketAddr = ([127, 0, 0, 1], port).into();
-    let listener = TcpListener::bind(address)
-        .await
-        .with_context(|| format!("unable to listen on {address} for the Spotify redirect"))?;
     let deadline = tokio::time::sleep(LOGIN_TIMEOUT);
     tokio::pin!(deadline);
 
@@ -521,6 +538,95 @@ mod tests {
     }
 
     use super::*;
+
+    #[tokio::test]
+    async fn redirect_listener_can_retry_after_port_is_released() {
+        // A test running alongside can be handed the port between its
+        // release and the retry, so that case tries again on another port.
+        let (listener, port) = (0..10)
+            .find_map(|_| {
+                let occupied = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+                let port = occupied.local_addr().unwrap().port();
+                let error = listen_for_redirect(port).unwrap_err().to_string();
+                assert!(error.contains(&port.to_string()));
+                assert!(error.contains("try again"));
+                drop(occupied);
+                Some((listen_for_redirect(port).ok()?, port))
+            })
+            .expect("a released port can be listened on again");
+        let (cancel, receiver) = watch::channel(false);
+        let waiting =
+            tokio::spawn(
+                async move { wait_for_code_on_listener(listener, "state", receiver).await },
+            );
+        let mut browser = tokio::net::TcpStream::connect(("127.0.0.1", port))
+            .await
+            .unwrap();
+        browser
+            .write_all(b"GET /login?code=test-code&state=state HTTP/1.1\r\n\r\n")
+            .await
+            .unwrap();
+        let code = tokio::time::timeout(Duration::from_secs(2), waiting)
+            .await
+            .unwrap()
+            .unwrap()
+            .unwrap();
+        assert_eq!(code, "test-code");
+        drop(cancel);
+    }
+
+    #[cfg(unix)]
+    #[tokio::test]
+    async fn redirect_listener_rebinds_immediately_after_completed_callbacks() {
+        use tokio::io::AsyncReadExt;
+        let mut collisions = Vec::new();
+        // Parallel socket tests can acquire an ephemeral port during the
+        // deliberate listener-free gap. Retry the entire experiment on a
+        // fresh port, never skip a failed rebind within a successful sequence.
+        'attempt: for _ in 0..10 {
+            let mut listener = listen_for_redirect(0).unwrap();
+            let port = listener.local_addr().unwrap().port();
+            for _ in 0..3 {
+                assert!(
+                    listen_for_redirect(port).is_err(),
+                    "active listener stays exclusive"
+                );
+                let (_cancel, receiver) = watch::channel(false);
+                let waiting = tokio::spawn(async move {
+                    wait_for_code_on_listener(listener, "state", receiver).await
+                });
+                let mut browser = tokio::net::TcpStream::connect(("127.0.0.1", port))
+                    .await
+                    .unwrap();
+                browser
+                    .write_all(b"GET /login?code=test-code&state=state HTTP/1.1\r\n\r\n")
+                    .await
+                    .unwrap();
+                let mut response = Vec::new();
+                tokio::time::timeout(Duration::from_secs(2), browser.read_to_end(&mut response))
+                    .await
+                    .unwrap()
+                    .unwrap();
+                assert_eq!(waiting.await.unwrap().unwrap(), "test-code");
+                assert!(response.starts_with(b"HTTP/1.1 200 OK"));
+                drop(browser);
+                listener = match listen_for_redirect(port) {
+                    Ok(listener) => listener,
+                    Err(error)
+                        if error
+                            .downcast_ref::<std::io::Error>()
+                            .is_some_and(|error| error.kind() == std::io::ErrorKind::AddrInUse) =>
+                    {
+                        collisions.push(format!("port {port}: {error:#}"));
+                        continue 'attempt;
+                    }
+                    Err(error) => panic!("callback rebind failed: {error:#}"),
+                };
+            }
+            return;
+        }
+        panic!("no complete immediate-rebind sequence succeeded: {collisions:?}");
+    }
 
     #[test]
     fn old_web_grants_require_image_upload_consent() {

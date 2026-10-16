@@ -839,6 +839,10 @@ pub enum Event {
         uri: String,
         result: Result<bool, String>,
     },
+    /// The accepted personal app configuration, including rollback after a failed preflight.
+    WebAppConfiguration {
+        client_id: Option<String>,
+    },
     /// The verified personal Web API app, or `None` when it is disabled.
     WebApp {
         client_id: Option<String>,
@@ -1360,7 +1364,10 @@ struct Worker {
     premium: Option<bool>,
     cancel_signin: Option<watch::Sender<bool>>,
     authorizing_source: Option<ApiSource>,
-    pending_authorization: Option<ApiSource>,
+    /// Replacement personal Client ID waiting for the cancelled flow to release its listener.
+    pending_authorization: Option<String>,
+    #[cfg(test)]
+    personal_redirect_port: Option<u16>,
     reconnects: Vec<Instant>,
     /// What the engine was playing when it went down, to load again once
     /// the next one is up.
@@ -1421,6 +1428,8 @@ impl Worker {
             cancel_signin: None,
             authorizing_source: None,
             pending_authorization: None,
+            #[cfg(test)]
+            personal_redirect_port: None,
             reconnects: Vec::new(),
             resume: None,
             resume_verify: None,
@@ -1824,7 +1833,7 @@ impl Worker {
                             self.api.clear(source);
                         }
                         if let Some(pending) = self.pending_authorization.take() {
-                            self.sign_in_source(pending);
+                            self.configure_personal_web_app(Some(pending));
                         }
                     }
                 }
@@ -2313,7 +2322,7 @@ impl Worker {
         self.cancel_signin = None;
         self.authorizing_source = None;
         if let Some(pending) = self.pending_authorization.take() {
-            self.sign_in_source(pending);
+            self.configure_personal_web_app(Some(pending));
         }
     }
 
@@ -2321,7 +2330,7 @@ impl Worker {
         if self.authorization_attempt == attempt {
             self.cancel_signin = None;
             if let Some(pending) = self.pending_authorization.take() {
-                self.sign_in_source(pending);
+                self.configure_personal_web_app(Some(pending));
             }
         }
     }
@@ -2356,6 +2365,36 @@ impl Worker {
                 }
             }
         };
+        self.sign_in_grant(source, grant, http);
+    }
+
+    fn sign_in_grant(
+        &mut self,
+        source: ApiSource,
+        grant: crate::auth::Grant,
+        http: reqwest::Client,
+    ) {
+        let listener = match crate::auth::listen_for_redirect(grant.redirect_port) {
+            Ok(listener) => listener,
+            Err(error) => {
+                if source == ApiSource::Shared {
+                    self.emit(Event::Auth(AuthStatus::Failed(error.to_string())));
+                } else {
+                    self.emit(Event::Error(error.to_string()));
+                }
+                return;
+            }
+        };
+        self.sign_in_on_listener(source, grant, http, listener);
+    }
+
+    fn sign_in_on_listener(
+        &mut self,
+        source: ApiSource,
+        grant: crate::auth::Grant,
+        http: reqwest::Client,
+        listener: tokio::net::TcpListener,
+    ) {
         self.credentials.invalidate(web_slot(source));
         self.restore_pending[web_slot(source).index()] = false;
         let lease = self.credentials.lease(web_slot(source));
@@ -2382,8 +2421,8 @@ impl Worker {
         let commands = self.commands.clone();
         tokio::spawn(async move {
             let result = async {
-                let code =
-                    crate::auth::wait_for_code(grant.redirect_port, &flow.state, cancel_rx).await?;
+                let code = crate::auth::wait_for_code_on_listener(listener, &flow.state, cancel_rx)
+                    .await?;
                 let response =
                     crate::auth::exchange_code(&http, &grant, &code, &flow.verifier).await?;
                 crate::auth::StoredToken::from_response(&grant.client_id, response, None)
@@ -2414,15 +2453,44 @@ impl Worker {
     }
 
     fn configure_personal_web_app(&mut self, client_id: Option<String>) {
-        let authorization_in_flight = if let Some(cancel) = self.cancel_signin.as_ref() {
+        // An existing flow may own the same callback port. Cancel it first,
+        // but keep the configured grant until its listener has been released
+        // and the replacement can reserve that port successfully.
+        if let Some(cancel) = self.cancel_signin.as_ref() {
             let _ = cancel.send(true);
             self.credentials.invalidate(
                 self.authorizing_source
                     .map_or(CredentialSlot::Playback, web_slot),
             );
-            true
+            if let Some(client_id) = client_id {
+                self.pending_authorization = Some(client_id);
+                return;
+            }
+        }
+        let prepared = if let Some(client_id) = client_id.as_deref() {
+            let prepare = || -> anyhow::Result<_> {
+                let http = self.http.client().map_err(anyhow::Error::msg)?;
+                let grant = crate::auth::Grant::personal_web_api(client_id)?;
+                #[cfg(test)]
+                let grant = crate::auth::Grant {
+                    redirect_port: self.personal_redirect_port.unwrap_or(grant.redirect_port),
+                    ..grant
+                };
+                let listener = crate::auth::listen_for_redirect(grant.redirect_port)?;
+                Ok((grant, http, listener))
+            };
+            match prepare() {
+                Ok(prepared) => Some(prepared),
+                Err(error) => {
+                    self.emit(Event::Error(error.to_string()));
+                    self.emit(Event::WebAppConfiguration {
+                        client_id: self.web_client_id.clone(),
+                    });
+                    return;
+                }
+            }
         } else {
-            false
+            None
         };
         if let Err(error) = self.credentials.revoke(CredentialSlot::Personal) {
             self.emit(Event::Error(error.to_string()));
@@ -2430,16 +2498,14 @@ impl Worker {
         self.delete_stored_grant(CredentialSlot::Personal);
         self.web_tokens[CredentialSlot::Personal.index()] = None;
         self.web_client_id = client_id;
+        self.emit(Event::WebAppConfiguration {
+            client_id: self.web_client_id.clone(),
+        });
         self.api.clear(ApiSource::Personal);
         self.emit(Event::WebApp { client_id: None });
-        if self.web_client_id.is_some() {
-            if authorization_in_flight {
-                self.pending_authorization = Some(ApiSource::Personal);
-            } else {
-                self.sign_in_source(ApiSource::Personal);
-            }
-        } else {
-            self.pending_authorization = None;
+        self.pending_authorization = None;
+        if let Some((grant, http, listener)) = prepared {
+            self.sign_in_on_listener(ApiSource::Personal, grant, http, listener);
         }
     }
 
@@ -5478,6 +5544,150 @@ mod authorization_tests {
             Waker::default(),
         );
         (runtime, worker, events)
+    }
+
+    #[test]
+    fn configuring_personal_app_preserves_existing_grant_when_callback_is_occupied() {
+        for in_flight in [false, true] {
+            let (runtime, mut worker, events) = worker(if in_flight {
+                "configure-personal-queued-port-conflict"
+            } else {
+                "configure-personal-port-conflict"
+            });
+            let occupied = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+            let port = occupied.local_addr().unwrap().port();
+            worker.personal_redirect_port = Some(port);
+            worker
+                .api
+                .install(ApiSource::Personal, AccountId::new("alice"))
+                .unwrap();
+            let token = crate::auth::StoredToken {
+                client_id: "personal".into(),
+                access_token: "dummy-access".into(),
+                refresh_token: "dummy-refresh".into(),
+                ..Default::default()
+            };
+            let lease = worker.credentials.lease(CredentialSlot::Personal);
+            runtime
+                .block_on(lease.save(StoredGrant::Web(token.clone())))
+                .unwrap();
+            let active = WebTokens::new(
+                worker.http.clone(),
+                token.clone(),
+                lease.clone(),
+                ApiSource::Personal,
+                Arc::new(|_| {}),
+            );
+            worker.web_tokens[CredentialSlot::Personal.index()] = Some(active.clone());
+            let state = worker.api.state(ApiSource::Personal);
+            let restore_pending = worker.restore_pending;
+            let (cancel, cancelled) = watch::channel(false);
+            if in_flight {
+                worker.cancel_signin = Some(cancel);
+                worker.authorizing_source = Some(ApiSource::Shared);
+            }
+            let (commands, receiver) = mpsc::unbounded_channel();
+            commands
+                .send(Command::ConfigurePersonalWebApp(Some("replacement".into())))
+                .unwrap();
+            if in_flight {
+                commands
+                    .send(Command::SignInEnded {
+                        source: ApiSource::Shared,
+                        attempt: 0,
+                    })
+                    .unwrap();
+            }
+            commands.send(Command::Shutdown).unwrap();
+            runtime.block_on(worker.run(receiver));
+            assert_eq!(worker.web_client_id.as_deref(), Some("personal"));
+            assert!(Arc::ptr_eq(
+                worker.web_tokens[CredentialSlot::Personal.index()]
+                    .as_ref()
+                    .unwrap(),
+                &active
+            ));
+            assert_eq!(worker.api.state(ApiSource::Personal), state);
+            assert_eq!(worker.api.account(), Some(AccountId::new("alice")));
+            assert_eq!(worker.restore_pending, restore_pending);
+            assert!(lease.current());
+            assert!(matches!(runtime.block_on(lease.load()).unwrap().grant,
+                Some(StoredGrant::Web(saved)) if saved == token));
+            assert!(worker.pending_authorization.is_none());
+            assert!(worker.cancel_signin.is_none());
+            assert_eq!(*cancelled.borrow(), in_flight);
+            let emitted: Vec<_> = events.try_iter().collect();
+            assert!(emitted.iter().any(|event| matches!(event, Event::Error(message) if message.contains(&port.to_string()))));
+            assert!(!emitted.iter().any(|event| matches!(
+                event,
+                Event::WebApp { .. } | Event::Auth(AuthStatus::WaitingForBrowser { .. })
+            )));
+            assert!(emitted.iter().any(|event| matches!(event, Event::WebAppConfiguration { client_id: Some(id) } if id == "personal")));
+        }
+    }
+
+    #[test]
+    fn personal_app_reconfiguration_waits_for_its_own_callback_listener_to_close() {
+        let (runtime, mut worker, events) = worker("configure-personal-owned-listener");
+        let _entered = runtime.enter();
+        let listener = crate::auth::listen_for_redirect(0).unwrap();
+        worker.personal_redirect_port = Some(listener.local_addr().unwrap().port());
+        let (cancel, cancelled) = watch::channel(false);
+        worker.cancel_signin = Some(cancel);
+        worker.authorizing_source = Some(ApiSource::Personal);
+        worker.configure_personal_web_app(Some("replacement".into()));
+        assert!(*cancelled.borrow());
+        assert_eq!(worker.pending_authorization.as_deref(), Some("replacement"));
+        assert_eq!(worker.web_client_id.as_deref(), Some("personal"));
+        assert!(
+            events.try_iter().next().is_none(),
+            "the owned listener must not be mistaken for an external conflict"
+        );
+        // Explicit removal supersedes the queued replacement without waiting.
+        worker.configure_personal_web_app(None);
+        assert!(worker.pending_authorization.is_none());
+        assert!(worker.web_client_id.is_none());
+        assert!(
+            events
+                .try_iter()
+                .any(|event| matches!(event, Event::WebAppConfiguration { client_id: None }))
+        );
+    }
+
+    #[test]
+    fn occupied_login_port_reports_persistent_failure_before_browser_sign_in() {
+        let (runtime, mut worker, events) = worker("occupied-login-port");
+        let _entered = runtime.enter();
+        let occupied = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let port = occupied.local_addr().unwrap().port();
+        for source in [ApiSource::Shared, ApiSource::Personal] {
+            let mut grant = crate::auth::Grant::shared_web_api();
+            grant.redirect_port = port;
+            let lease = worker.credentials.lease(web_slot(source));
+            let restore_pending = worker.restore_pending;
+            worker.sign_in_grant(source, grant, worker.http.client().unwrap());
+            let received: Vec<_> = events.try_iter().collect();
+            assert!(received.iter().any(|event| match (source, event) {
+                (ApiSource::Shared, Event::Auth(AuthStatus::Failed(message)))
+                | (ApiSource::Personal, Event::Error(message)) =>
+                    message.contains(&port.to_string()),
+                _ => false,
+            }));
+            assert!(
+                !received.iter().any(|event| matches!(
+                    event,
+                    Event::Auth(AuthStatus::WaitingForBrowser { .. })
+                ))
+            );
+            assert!(worker.cancel_signin.is_none());
+            assert!(worker.authorizing_source.is_none());
+            assert_eq!(worker.authorization_attempt, 0);
+            assert!(
+                lease.current(),
+                "port conflicts must preserve existing grants"
+            );
+            assert_eq!(worker.restore_pending, restore_pending);
+        }
     }
 
     #[test]

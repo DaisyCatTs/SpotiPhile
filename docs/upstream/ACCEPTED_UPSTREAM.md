@@ -210,3 +210,27 @@ The security revision passed 974/998 default/all-feature library tests, both
 Clippy configurations, formatting, doctests and warnings-denied Rustdoc. Final
 optimized build passed in 3m 19s. Seventeen of the thirty-seven commits in the
 newly fetched snapshot are now deliberately ported on this candidate.
+
+## Reserve the Web API callback before sign-in
+
+Original `98b37e7d333c76193f80967ab301b089de010c60`, Sam Boland, Spotifast #768.
+Focused port `f9fc182` retains original author credit and the source SHA in its
+commit message. Adaptation `54adcd5` isolates the backend regression from the
+machine's fixed callback port, checks both shared/personal errors and verifies
+existing credential generations and restore flags survive a bind failure.
+
+The listener is acquired before grant invalidation, browser launch or new
+authorization state. Production callback identities, ports, PKCE/state checks,
+protected storage and independent playback consent stay unchanged. No new
+permission or network destination is added. See
+[validation and limitations](../features/login-port-validation.md).
+
+## Isolate released-port callback regressions
+
+Original `f91ee83166b7b4a0474d48a7dd25f39231ed8759`, Dennis, Spotifast #847,
+focused port `a48d5ab`. The released-listener test retries setup on a fresh port
+when parallel tests claim its ephemeral port. Our added Unix completed-callback
+test uses the same principle for an entire three-rebind sequence, retaining
+failure for every other error and for ten unsuccessful attempts. Production
+listener settings remain unchanged. The original Nix failure and pending fresh
+Unix validation are recorded in the login feature validation document.

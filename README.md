@@ -78,6 +78,8 @@ stops with an error. Decoder queue waits remain bounded.
 
 1. Open Spotifast and choose **Sign in with Spotify**. Approve access in your
    browser, then return to the app to see your library.
+   Web API sign-in reserves its local callback port before opening the browser.
+   If port 8989 is occupied, close the app using it and choose **Try again**.
 2. To listen on this computer, open the device menu in the bottom player bar
    and choose **Set up playback here**, also available in Settings.
 3. Complete the separate playback approval in your browser. Your computer

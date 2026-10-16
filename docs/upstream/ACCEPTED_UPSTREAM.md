@@ -224,3 +224,13 @@ authorization state. Production callback identities, ports, PKCE/state checks,
 protected storage and independent playback consent stay unchanged. No new
 permission or network destination is added. See
 [validation and limitations](../features/login-port-validation.md).
+
+## Isolate released-port callback regressions
+
+Original `f91ee83166b7b4a0474d48a7dd25f39231ed8759`, Dennis, Spotifast #847,
+focused port `a48d5ab`. The released-listener test retries setup on a fresh port
+when parallel tests claim its ephemeral port. Our added Unix completed-callback
+test uses the same principle for an entire three-rebind sequence, retaining
+failure for every other error and for ten unsuccessful attempts. Production
+listener settings remain unchanged. The original Nix failure and pending fresh
+Unix validation are recorded in the login feature validation document.

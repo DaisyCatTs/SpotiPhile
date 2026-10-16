@@ -74,3 +74,21 @@ ignored tests each), all target suites, formatting, both warnings-denied Clippy
 configurations, doctests, warnings-denied Rustdoc, optimized build and
 `spotifast 0.12.0` version smoke. Jekyll and final diff checks also passed.
 Unix runtime validation remains assigned to required CI before promotion.
+
+### Released-port allocation race found by Nix
+
+Nix CI on `0c528e3` compiled the package but failed the Unix callback regression
+when its just-released ephemeral port could not be rebound. Ubuntu CI on the
+same revision passed. Upstream separately fixed the released-port test's
+parallel allocation race in `f91ee83166b7b4a0474d48a7dd25f39231ed8759` (Dennis,
+Spotifast #847); that focused test port is retained as `a48d5ab`.
+
+Our completed-callback regression now retries its entire three-callback sequence
+on a fresh port only for AddrInUse. Every successful sequence must still complete
+three immediate rebinds and reject a second live listener. Other errors fail
+immediately, and ten unsuccessful sequences fail the test. No production
+listener behavior, sleep, skipped test or weakened socket setting is introduced.
+The corrected Unix execution and Nix package validation require fresh CI.
+The test-only correction passed the Windows callback test, all-target/all-feature
+suite (1,057 library tests, two existing ignored), warnings-denied all-feature
+Clippy, formatting and diff checks. Independent source review found no blocker.

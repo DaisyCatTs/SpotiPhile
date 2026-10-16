@@ -579,34 +579,53 @@ mod tests {
     #[tokio::test]
     async fn redirect_listener_rebinds_immediately_after_completed_callbacks() {
         use tokio::io::AsyncReadExt;
-        let mut listener = listen_for_redirect(0).unwrap();
-        let port = listener.local_addr().unwrap().port();
-        for _ in 0..3 {
-            assert!(
-                listen_for_redirect(port).is_err(),
-                "active listener stays exclusive"
-            );
-            let (_cancel, receiver) = watch::channel(false);
-            let waiting = tokio::spawn(async move {
-                wait_for_code_on_listener(listener, "state", receiver).await
-            });
-            let mut browser = tokio::net::TcpStream::connect(("127.0.0.1", port))
-                .await
-                .unwrap();
-            browser
-                .write_all(b"GET /login?code=test-code&state=state HTTP/1.1\r\n\r\n")
-                .await
-                .unwrap();
-            let mut response = Vec::new();
-            tokio::time::timeout(Duration::from_secs(2), browser.read_to_end(&mut response))
-                .await
-                .unwrap()
-                .unwrap();
-            assert_eq!(waiting.await.unwrap().unwrap(), "test-code");
-            assert!(response.starts_with(b"HTTP/1.1 200 OK"));
-            drop(browser);
-            listener = listen_for_redirect(port).unwrap();
+        let mut collisions = Vec::new();
+        // Parallel socket tests can acquire an ephemeral port during the
+        // deliberate listener-free gap. Retry the entire experiment on a
+        // fresh port, never skip a failed rebind within a successful sequence.
+        'attempt: for _ in 0..10 {
+            let mut listener = listen_for_redirect(0).unwrap();
+            let port = listener.local_addr().unwrap().port();
+            for _ in 0..3 {
+                assert!(
+                    listen_for_redirect(port).is_err(),
+                    "active listener stays exclusive"
+                );
+                let (_cancel, receiver) = watch::channel(false);
+                let waiting = tokio::spawn(async move {
+                    wait_for_code_on_listener(listener, "state", receiver).await
+                });
+                let mut browser = tokio::net::TcpStream::connect(("127.0.0.1", port))
+                    .await
+                    .unwrap();
+                browser
+                    .write_all(b"GET /login?code=test-code&state=state HTTP/1.1\r\n\r\n")
+                    .await
+                    .unwrap();
+                let mut response = Vec::new();
+                tokio::time::timeout(Duration::from_secs(2), browser.read_to_end(&mut response))
+                    .await
+                    .unwrap()
+                    .unwrap();
+                assert_eq!(waiting.await.unwrap().unwrap(), "test-code");
+                assert!(response.starts_with(b"HTTP/1.1 200 OK"));
+                drop(browser);
+                listener = match listen_for_redirect(port) {
+                    Ok(listener) => listener,
+                    Err(error)
+                        if error
+                            .downcast_ref::<std::io::Error>()
+                            .is_some_and(|error| error.kind() == std::io::ErrorKind::AddrInUse) =>
+                    {
+                        collisions.push(format!("port {port}: {error:#}"));
+                        continue 'attempt;
+                    }
+                    Err(error) => panic!("callback rebind failed: {error:#}"),
+                };
+            }
+            return;
         }
+        panic!("no complete immediate-rebind sequence succeeded: {collisions:?}");
     }
 
     #[test]

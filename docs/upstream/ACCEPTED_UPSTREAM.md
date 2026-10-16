@@ -250,3 +250,17 @@ regressions and our existing listener/configuration fixes. All local Windows
 gates and independent source review passed. Native macOS/Linux execution and
 protected promotion remain outstanding. See
 [validation and precise limits](../features/input-hardening-validation.md).
+
+## Rustls TLS encryption-level boundary patch
+
+Original `68c453e1c9fc524bca8d13f12a4ae6cbd9ad6465`, Carmine Paolino,
+coauthor Chris (`25006584+seichris@users.noreply.github.com`). Adaptation
+`b2e8796` updates only Rustls 0.23.43 to 0.23.45 and its registry checksum,
+retaining the existing tempfile/getrandom resolution. Official advisory
+RUSTSEC-2026-0285 identifies the fixed version. No transport API, account
+permission or credential format changes.
+
+Windows tests, lint, docs and optimized build passed; independent review found
+no material findings. This candidate is not yet promoted. Its fork-specific
+Nix vendor hash and full platform gates remain pending. See
+[validation](../features/rustls-patch-validation.md).

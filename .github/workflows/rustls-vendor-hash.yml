@@ -1,0 +1,61 @@
+name: Derive Rustls vendor hash
+
+on:
+  push:
+    branches: [audit/rustls-vendor-hash]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  derive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: wimpysworld/nothing-but-nix@v9
+      - uses: cachix/install-nix-action@v31
+      - uses: nix-community/cache-nix-action@v7
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('**/flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-
+      - name: Derive this fork's fixed-output dependency hash
+        shell: bash
+        run: |
+          if nix build .#default.cargoDeps --no-link --print-build-logs > vendor-hash.log 2>&1; then
+            cat vendor-hash.log
+            echo 'Expected a vendor hash mismatch for the changed lockfile.' >&2
+            exit 1
+          fi
+          cat vendor-hash.log
+          python3 - <<'PY'
+          import hashlib
+          import os
+          import pathlib
+          import re
+
+          log = pathlib.Path('vendor-hash.log').read_text()
+          matches = re.findall(
+              r"hash mismatch in fixed-output derivation '([^']+)':\s+"
+              r"specified:\s+(sha256-[A-Za-z0-9+/=]+)\s+"
+              r"got:\s+(sha256-[A-Za-z0-9+/=]+)", log)
+          matches = [m for m in matches if 'spotifast' in m[0] and 'vendor' in m[0]]
+          if len(matches) != 1:
+              raise SystemExit('Expected exactly one Spotifast vendor mismatch; inspect the log.')
+          derivation, specified, actual = matches[0]
+          flake = pathlib.Path('flake.nix').read_text()
+          if specified not in flake or actual == specified:
+              raise SystemExit('Mismatch does not match the existing vendor hash.')
+          lock_sha = hashlib.sha256(pathlib.Path('Cargo.lock').read_bytes()).hexdigest()
+          summary = (
+              '# Vendor hash discovery only\n\n'
+              'This is not a successful package build or release validation.\n\n'
+              f'- Cargo.lock SHA-256: `{lock_sha}`\n'
+              f'- Derivation: `{derivation}`\n'
+              f'- Vendor hash: `{actual}`\n')
+          pathlib.Path(os.environ['GITHUB_STEP_SUMMARY']).write_text(summary)
+          print(summary)
+          PY
